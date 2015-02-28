@@ -1,0 +1,10 @@
+{
+  "name": "QueueRead",
+  "version": "0.0.0", 
+  "dependencies": {   
+    "express": "*",   
+	"redis": "*",
+	"ejs" : "*",
+	"socket.io": "*"
+  }
+}

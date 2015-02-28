@@ -1,0 +1,53 @@
+body {
+	font-family: sans-serif;
+}
+core-header-panel {
+	background: white;
+}
+core-toolbar {
+	background-color: #03A9F4;
+}
+
+p {
+  margin: 20px;
+  padding: 20px 20px;
+  border-radius: 2px;
+  background-color: #eee;
+  line-height: 200%;
+  font-family:Microsoft JhengHei;
+  font-size : 1.5em;
+}
+
+ #cards {
+	margin: 0 auto;
+	background: #eee;
+	overflow: auto;
+	-webkit-user-select: none;
+	-moz-user-select: none;
+}
+
+swipeable-card  {   
+	margin: 10px;
+	padding: 20px 20px;
+	border-radius: 2px;
+ }
+ 
+.centerp {
+	width : 100%;	
+	margin-top : 5px;
+} 
+.centerchild {	
+	margin: 0 auto;
+	width: 0px;
+}
+
+
+ paper-button[raised].colored {
+      background: #4285f4;
+      color: #fff;
+    }
+	
+ .clickable-div 
+    {
+         cursor: pointer;
+    }

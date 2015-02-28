@@ -1,0 +1,61 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+    <!-- 1. Load webcomponents.min.js for polyfill support. -->
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+    <!-- 2. Use an HTML Import to bring in the element. -->
+    <link rel="import"
+          href="bower_components/core-ajax/core-ajax.html">	
+	<!--<link rel="import" 
+	  href="bower_components/core-toolbar/core-toolbar.html">
+	<link rel="import" 
+	  href="bower_components/core-header-panel/core-header-panel.html">
+	<link rel="import" 
+	  href="bower_components/core-icons/core-icons.html">
+	<link rel="import" 
+	  href="bower_components/paper-icon-button/paper-icon-button.html">
+	<link rel="import" href="bower_components/swipeable-card/swipeable-card.html">-->
+	<link rel="import" href="bower_components/core-pages/core-pages.html">
+	<!--<link rel="import" href="bower_components/core-icon-button/core-icon-button.html">-->
+	<link href="bundle.css" rel="stylesheet">
+	<title>Queue Read</title>
+	<script id="content" type="text/template">
+		<%-template%>
+	</script>
+  </head>
+  <body  fullbleed vertical layout unresolved >  
+ <!-- <core-header-panel flex >
+    <core-toolbar id="mainheader">
+      <paper-icon-button id="navicon" 
+        icon="menu"></paper-icon-button>
+      <span flex>Queue Read</span>
+      <paper-icon-button id="bookmark" 
+        icon="bookmark-outline"></paper-icon-button>
+    </core-toolbar>	
+	 </core-header-panel> -->
+	
+	<core-pages selected=<%=page - firstpage%> id="card">
+		<% for(var i=0; i< data.length ; i++) {%>			
+			<%- include item.ejs %>
+		<% } %>	
+	</core-pages>
+	
+<!--<div id="cards">	
+		<% for(var i=0; i< data.length ; i++) {%>
+		<swipeable-card><%= data[i] %></swipeable-card>
+	<% } %>
+	</div>--> 
+	<div>
+	
+	</div>
+  
+	<input type='hidden' id="pos" value=<%=pos%>>
+	<input type='hidden' id="page" value=<%=page%>>
+	<input type='hidden' id="firstpage" value=<%=firstpage%>>	
+	<div id="debug" class="centerp"></div>
+  <script src="/socket.io/socket.io.js"></script>
+  <script src="/views/main.js"></script>
+  <script src="/ejs.js"></script>
+</body>
+</html>
