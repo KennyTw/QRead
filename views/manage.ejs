@@ -1,0 +1,31 @@
+﻿<!DOCTYPE html>
+<html>
+  <head>
+	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
+    <!-- 1. Load webcomponents.min.js for polyfill support. -->	
+    <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
+	<link rel="import" 
+	  href="bower_components/paper-input/paper-input.html">
+	<link rel="import" 
+	  href="bower_components/paper-input/paper-input-decorator.html">
+	<link rel="import" 
+	  href="bower_components/paper-input/paper-autogrow-textarea.html">
+	<link rel="import" 
+	  href="bower_components/paper-button/paper-button.html">
+	<link href="bundle.css" rel="stylesheet">
+	<title>Queue Read</title>	 
+  </head>
+  <body  fullbleed vertical layout unresolved >   
+	 <paper-input-decorator label="with autogrowing text area">
+      <paper-autogrow-textarea rows=10>
+        <textarea id="content"><%=data%></textarea>
+      </paper-autogrow-textarea>
+    </paper-input-decorator>
+	<paper-input label="page" value="<%=page%>" id="page"></paper-input>
+	<paper-button raised id="paper-button">Update</paper-button>
+	<paper-input label="status"  id="status"></paper-input>
+	<div id="debug" class="centerp"></div>
+	<script src="/socket.io/socket.io.js"></script>
+	<script src="/views/manage.js"></script>
+</body>
+</html>

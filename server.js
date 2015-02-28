@@ -9,7 +9,7 @@ var http = require('http'),
 	var app = express()	 
 	  , server = http.createServer(app);
 	var io = socket.listen(server);
-	var currentpage = 0;
+	var currentpage = -1;
 	  
 
 	app.set('view engine', 'ejs');
@@ -38,13 +38,26 @@ var http = require('http'),
 		});
 	});
 	
+	app.get('/manage', function(req, res) {	
+		var page = req.param('i');	
+		if (!page)
+			page = 0;
+		db.lrange("data",page,page ,function(err,data){
+			currentpage = -1;
+			res.render('manage', { data:data[0] ,page : page});													
+		});	 
+	});
+	
 	io.on('connection', function(socket) {
 		var conn = socket.request.connection.remoteAddress ;
 		console.log(conn + ' -- connects to socket.io');
-		var rtn = {command:'forcereload',page:currentpage};
-		console.log(rtn);
-		//io.sockets.emit('events', rtn);
-		socket.broadcast.emit('events', rtn);
+		
+		if (currentpage > -1) {
+			var rtn = {command:'forcereload',page:currentpage};
+			console.log(rtn);
+			//io.sockets.emit('events', rtn);
+			socket.broadcast.emit('events', rtn);
+		}
 							 
 		socket.on('commands', function(data) {
 			console.log('On commands:' + JSON.stringify( data));
@@ -72,15 +85,37 @@ var http = require('http'),
 				});					
 			}  else if (data.command == 'loaddata') {
 				var page = parseInt(data.page) + 1;
-				db.lrange("data", page, page,function(err,dbdata){
-							 
+				db.lrange("data", page, page,function(err,dbdata){							 
 							 //res.render('index', { data: data ,pos : pos ,page:page })
 							 var rtn = {command:'data',dbdata:dbdata,page: page};
 							 console.log(dbdata);
 							 io.sockets.emit('events', rtn);	
 						}); 		
 				
-			}		
+			}	else if (data.command == 'update') {
+				
+				var page =  parseInt(data.page);
+
+				db.llen("data",function(err,dbdata) {
+					if (page > dbdata - 1) {
+						//insert
+						db.rpush("data",data.content,function(err,dbdata){
+							var rtn = {command:'updateok',page:dbdata};
+							socket.emit('events', rtn);							
+						});
+						
+					} else {
+						db.lset("data",parseInt(data.page) ,data.content,function(err){					
+							var rtn = {command:'updateok'};
+							socket.emit('events', rtn);
+							
+							var rtn = {command:'forcereload',page:currentpage};
+							console.log(rtn);					
+							socket.broadcast.emit('events', rtn);
+						});						
+					}					
+				});			
+			}
 		});	
 		
 		socket.on('disconnect', function() {

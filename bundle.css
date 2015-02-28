@@ -25,12 +25,6 @@ p {
 	-webkit-user-select: none;
 	-moz-user-select: none;
 }
-
-swipeable-card  {   
-	margin: 10px;
-	padding: 20px 20px;
-	border-radius: 2px;
- }
  
 .centerp {
 	width : 100%;	
@@ -40,14 +34,16 @@ swipeable-card  {
 	margin: 0 auto;
 	width: 0px;
 }
-
-
- paper-button[raised].colored {
-      background: #4285f4;
-      color: #fff;
-    }
 	
- .clickable-div 
-    {
+.clickable-div 
+{
          cursor: pointer;
-    }
+}
+	
+#paper-button {
+  color: #4285f4;
+}
+#paper-button[raised] {
+  background: #4285f4;
+  color: #fff;
+}
