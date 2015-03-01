@@ -10,7 +10,7 @@
   });*/
 	var currDomain = window.location.host;
 	var socket = io.connect(currDomain,{'forceNew':true });
-	
+	var book = document.querySelector('#book').value;	
 	
 	socket.on('events', function(evt) {	
 		console.log('events : ' + JSON.stringify(evt));
@@ -18,11 +18,19 @@
 		var pages = document.querySelector('core-pages');
 		var firstpage = parseInt(document.querySelector('#firstpage').value);
 		
-		if (evt.command == 'click') {
+		if (book != evt.book) return;
+		
+		if (evt.command == 'click') {			 
 			var newpage =  parseInt(evt.page) - firstpage;
 			//if (newpage <  pages.children.length) {		
 				pages.selected = newpage;
-				document.querySelector('#page').value = evt.page;
+				
+				if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > 1  ) {				
+					var data = {command:'reload',book:book};			
+					socket.emit('commands',data );
+				} else {
+					document.querySelector('#page').value = evt.page;
+				}
 				//debug.innerText = "selected:" + newpage;				
 			//}
 			window.scrollTo(0, 0);
@@ -56,7 +64,7 @@
 					document.querySelector('#firstpage').value = evt.page;
 					
 					window.scrollTo(0, 0);			
-					var data = {command:'click',page : parseInt(evt.page)};			 
+					var data = {command:'click',page : parseInt(evt.page),book:book};			 
 					socket.emit('commands',  data);	
 				}
 				else {
@@ -95,7 +103,7 @@
 		
 		if  (target.className == "contain"){
 			if (parseInt(pages.selected) + 1 >=  pages.children.length) {
-				var data = {command:'loaddata',page: parseInt(page)};			
+				var data = {command:'loaddata',page: parseInt(page),book:book};			
 				socket.emit('commands',data );
 				
 			} else {
@@ -116,7 +124,7 @@
 				bchange = true;
 			} else {
 				if (parseInt(page) -2 >= -1) {
-					var data = {command:'loaddata',page: parseInt(page) -2};			
+					var data = {command:'loaddata',page: parseInt(page) -2 , book:book};			
 					socket.emit('commands',data );
 				} else {
 					debug.innerText = "Begin Of Content";
@@ -129,7 +137,7 @@
 			document.querySelector('#page').value = page;
 			window.scrollTo(0, 0);
 			//var pages = document.querySelector('core-pages');
-			var data = {command:'click',page : parseInt(page)};
+			var data = {command:'click',page : parseInt(page),book:book};
 			//socket.disconnect();
 			//socket.connect();
 			socket.emit('commands',  data);	
@@ -164,7 +172,7 @@
 		
 		if (ismove){	
 			// window.pageYOffset  document.body.scrollHeight
-			var data = {command:'scrollend',page :  page , pos : window.pageYOffset };
+			var data = {command:'scrollend',page :  page , pos : window.pageYOffset ,book:book};
 			//socket.disconnect();
 			//socket.connect();
 			socket.emit('commands', data );
@@ -209,7 +217,7 @@
 			socket.disconnect();
 			socket.connect();
 			
-			var data = {command:'reload'};			
+			var data = {command:'reload',book:book};			
 			socket.emit('commands',data );
 		}
 		

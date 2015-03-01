@@ -23,6 +23,17 @@
 	<script id="content" type="text/template">
 		<%-template%>
 	</script>
+	<% if (font) { %>
+	<style>
+		p {		
+				<% if (font == 'e') { %>
+					 line-height: 200% !important;
+					 font-family:Arial, Helvetica, sans-serif !important;
+					 font-size : 1.2em !important;
+				<% } %>
+		}
+	</style>
+	<% } %>
   </head>
   <body  fullbleed vertical layout unresolved >  
  <!-- <core-header-panel flex >
@@ -34,8 +45,9 @@
         icon="bookmark-outline"></paper-icon-button>
     </core-toolbar>	
 	 </core-header-panel> -->
-	
+	<div id="debug" class="centerp"></div>
 	<core-pages selected=<%=page - firstpage%> id="card">
+	
 		<% for(var i=0; i< data.length ; i++) {%>			
 			<%- include item.ejs %>
 		<% } %>	
@@ -52,8 +64,9 @@
   
 	<input type='hidden' id="pos" value=<%=pos%>>
 	<input type='hidden' id="page" value=<%=page%>>
+	<input type='hidden' id="book" value=<%=book%>>
 	<input type='hidden' id="firstpage" value=<%=firstpage%>>	
-	<div id="debug" class="centerp"></div>
+	
   <script src="/socket.io/socket.io.js"></script>
   <script src="/views/main.js"></script>
   <script src="/ejs.js"></script>

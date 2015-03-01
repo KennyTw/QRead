@@ -17,16 +17,20 @@
 	button.addEventListener('click', function(e) {
 			var content = document.querySelector('#content').value;
 			var page = document.querySelector('#page').value;
+			var book = document.querySelector('#book').value;
+			
 			document.querySelector('#status').value = "";
-			var data = {command:'update',content : content ,page : page};		
+			var data = {command:'update',content : content ,page : page , book: book};		
 			socket.emit('commands',  data);		
 	});
 	
 	var buttonnext = document.querySelector('#paper-button-next');
 	buttonnext.addEventListener('click', function(e) {
 		var page = parseInt(document.querySelector('#page').value);
+		var book = document.querySelector('#book').value;
+		
 		page = page + 1;
-		var url = location.protocol + '//' + location.host + location.pathname + "?i=" + page;
+		var url = location.protocol + '//' + location.host + location.pathname + "?i=" + page + "&b=" + book;
 		location.href = url;
 			
 	});
@@ -34,8 +38,10 @@
 	var buttonprev  = document.querySelector('#paper-button-prev');
 	buttonprev.addEventListener('click', function(e) {
 		var page = parseInt(document.querySelector('#page').value);
+		var book = document.querySelector('#book').value;
+		
 		page = page - 1;
-		var url = location.protocol + '//' + location.host + location.pathname + "?i=" + page;
+		var url = location.protocol + '//' + location.host + location.pathname + "?i=" + page + "&b=" + book;
 		location.href = url;
 			
 	});
