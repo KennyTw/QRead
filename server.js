@@ -60,7 +60,7 @@ var http = require('http'),
 		}
 							 
 		socket.on('commands', function(data) {
-			console.log('On commands:' + JSON.stringify( data));
+			console.log('On commands:' + JSON.stringify( data) + "," + conn);
 			if (data.command == 'scrollend') {
 				db.hset("save","page",data.page);
 				db.hset("save","pos",data.pos);

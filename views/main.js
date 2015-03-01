@@ -22,6 +22,7 @@
 			var newpage =  parseInt(evt.page) - firstpage;
 			//if (newpage <  pages.children.length) {		
 				pages.selected = newpage;
+				document.querySelector('#page').value = evt.page;
 				//debug.innerText = "selected:" + newpage;				
 			//}
 			window.scrollTo(0, 0);
