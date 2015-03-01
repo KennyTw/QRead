@@ -21,3 +21,21 @@
 			var data = {command:'update',content : content ,page : page};		
 			socket.emit('commands',  data);		
 	});
+	
+	var buttonnext = document.querySelector('#paper-button-next');
+	buttonnext.addEventListener('click', function(e) {
+		var page = parseInt(document.querySelector('#page').value);
+		page = page + 1;
+		var url = location.protocol + '//' + location.host + location.pathname + "?i=" + page;
+		location.href = url;
+			
+	});
+	
+	var buttonprev  = document.querySelector('#paper-button-prev');
+	buttonprev.addEventListener('click', function(e) {
+		var page = parseInt(document.querySelector('#page').value);
+		page = page - 1;
+		var url = location.protocol + '//' + location.host + location.pathname + "?i=" + page;
+		location.href = url;
+			
+	});
