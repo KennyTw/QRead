@@ -24,6 +24,7 @@ var http = require('http'),
 		var qobj = req.query;
 		var book = qobj.b;
 		var font = qobj.f;
+		var mode = qobj.m;
 		var page = 0 ;
 		var pos = 0 ;
 		
@@ -44,7 +45,7 @@ var http = require('http'),
 							 //console.log(data);
 							 currentpage = page;
 							 currentbook = book;
-							 res.render('index', { data: data ,pos : pos ,page:page ,firstpage: page ,template:template , book : book , font : font});									
+							 res.render('index', { data: data ,pos : pos ,page:page ,firstpage: page ,template:template , book : book , font : font , mode : mode});									
 						}); 				
 			});
 		});
@@ -84,15 +85,31 @@ var http = require('http'),
 				if (!book)
 					book = ""; 
 				
-			if (data.command == 'scrollend') {				
-				db.hset("save" + book ,"page",data.page);
-				db.hset("save" + book,"pos",data.pos);
-				//io.sockets.emit('events', data);
-				socket.broadcast.emit('events', data);
+			if (data.page) {				
+				if (data.page < 0)
+					return;
+			}
+				
+			if (data.command == 'scrollend') {
+				db.llen("data" + book , function (err , dbdata) {
+					if (data.page > dbdata - 1) 
+						return;
+					
+					db.hset("save" + book ,"page",data.page);
+					db.hset("save" + book,"pos",data.pos);
+					//io.sockets.emit('events', data);
+					socket.broadcast.emit('events', data);
+				});		
+				
 			} else if (data.command == 'click') {
-				db.hset("save" + book ,"page",data.page);
-				//io.sockets.emit('events', data);				
-				socket.broadcast.emit('events', data);
+				db.llen("data" + book , function (err , dbdata) {
+					if (data.page > dbdata - 1) 
+						return;
+				
+					db.hset("save" + book ,"page",data.page);
+					//io.sockets.emit('events', data);				
+					socket.broadcast.emit('events', data);
+				});
 			} else if (data.command == 'reload') {
 				var page = 0 ;
 				var pos = 0 ;
