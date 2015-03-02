@@ -124,7 +124,8 @@ var http = require('http'),
 					});
 				});					
 			}  else if (data.command == 'loaddata') {
-				var page = parseInt(data.page) + 1;
+				//var page = parseInt(data.page) + 1;
+				var page = parseInt(data.page) ;
 				db.lrange("data" + book , page, page,function(err,dbdata){							 
 							 //res.render('index', { data: data ,pos : pos ,page:page })
 							 var rtn = {command:'data',dbdata:dbdata,page: page,book:book};

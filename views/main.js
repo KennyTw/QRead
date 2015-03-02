@@ -124,7 +124,7 @@
 				bchange = true;
 			} else {
 				if (parseInt(page) -2 >= -1) {
-					var data = {command:'loaddata',page: parseInt(page) -2 , book:book};			
+					var data = {command:'loaddata',page: parseInt(page) -1 , book:book};			
 					socket.emit('commands',data );
 				} else {
 					debug.innerText = "Begin Of Content";
