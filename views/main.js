@@ -46,6 +46,11 @@
 		else if (evt.command == 'data') {
 			var content = document.getElementById('content').innerHTML;
 			
+			if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > 1  ) {				
+					var data = {command:'reload',book: book};			
+					socket.emit('commands',data );
+			} 
+			
 			if (evt.dbdata.length > 0) {			
 				var html = ejs.render(content, { data: evt.dbdata , page: parseInt(evt.page) , i : 0 });
 				var doc = document.implementation.createHTMLDocument('');
@@ -103,7 +108,7 @@
 		
 		if  (target.className == "contain"){
 			if (parseInt(pages.selected) + 1 >=  pages.children.length) {
-				var data = {command:'loaddata',page: parseInt(page),book:book};			
+				var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
 				socket.emit('commands',data );
 				
 			} else {
