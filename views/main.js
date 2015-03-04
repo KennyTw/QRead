@@ -37,7 +37,7 @@
 		} else if (evt.command == 'scrollend') {
 			//window.scrollTo(0, evt.pos );
 		} else if (evt.command == 'reload') {
-			if (parseInt(evt.page) != parseInt(pages.selected) - firstpage)
+			//if (parseInt(evt.page) != parseInt(pages.selected) - firstpage)
 				location.reload(true);
 		} else if (evt.command == 'forcereload') {
 				if (parseInt(evt.page) != parseInt(document.querySelector('#page').value) || pages.children.length > 1)

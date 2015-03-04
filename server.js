@@ -119,8 +119,8 @@ var http = require('http'),
 					db.hget("save" + book ,"pos",function(err,dbdata) {
 						pos = dbdata;
 						var rtn = {command:'reload',page:page,pos:pos,book:book};
-						//io.sockets.emit('events', rtn);								
-						socket.broadcast.emit('events', rtn);
+						io.sockets.emit('events', rtn);								
+						//socket.broadcast.emit('events', rtn);
 					});
 				});					
 			}  else if (data.command == 'loaddata') {
