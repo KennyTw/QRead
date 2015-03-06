@@ -5,6 +5,7 @@
     "express": "*",   
 	"redis": "*",
 	"ejs" : "*",
-	"socket.io": "*"
+	"socket.io": "*",
+	"twitter" : "*"
   }
 }

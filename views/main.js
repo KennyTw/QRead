@@ -45,6 +45,8 @@
 		} 
 		else if (evt.command == 'data') {
 			var content = document.getElementById('content').innerHTML;
+			var debug = document.querySelector('#debug');
+			debug.innerText = "";
 			
 			if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > 1  ) {				
 					var data = {command:'reload',book: book};			
@@ -100,22 +102,25 @@
     });*/
 		
 	function click(e) {
-		var target = e.target; 
+		var target = e.target;
+		if (target.nodeName == "A") return;
 		var pages = document.querySelector('core-pages');
 		var bchange = false;
-		var page = parseInt(document.querySelector('#page').value);
-		
+		var page = parseInt(document.querySelector('#page').value);		
+		var debug = document.querySelector('#debug');	
 		
 		if  (target.className == "contain"){
 			if (parseInt(pages.selected) + 1 >=  pages.children.length) {
 				var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
 				socket.emit('commands',data );
+				debug.innerText = "sending...";
 				
 			} else {
 				//pages.selected = (parseInt(pages.selected) + 1) % pages.children.length;
 				pages.selected = (parseInt(pages.selected) + 1);
 				page ++;
 				bchange = true;
+				
 			}
 
 			
@@ -131,6 +136,7 @@
 				if (parseInt(page) -2 >= -1) {
 					var data = {command:'loaddata',page: parseInt(page) -1 , book:book};			
 					socket.emit('commands',data );
+					debug.innerText = "sending...";
 				} else {
 					debug.innerText = "Begin Of Content";
 				}
@@ -145,13 +151,24 @@
 			var data = {command:'click',page : parseInt(page),book:book};
 			//socket.disconnect();
 			//socket.connect();
-			socket.emit('commands',  data);	
+			socket.emit('commands',  data);
+			debug.innerText = "";			
 		}
 	  }
 	  
 	document.addEventListener('click', function(e) {
+		if (window.getSelection().toString() != ""){
+			e.stopPropagation();
+			e.preventDefault();
+			return;
+		}
+		
+		
 		click(e);
 	});
+	
+	
+	
 	
 	window.addEventListener('load',function(e) {	
 		var pos = document.querySelector('#pos');

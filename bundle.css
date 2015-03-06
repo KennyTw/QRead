@@ -18,6 +18,11 @@ p {
   font-size : 1.5em;
 }
 
+p a {
+  text-decoration: none;  
+  color: gray;
+}
+
  #cards {
 	margin: 0 auto;
 	background: #eee;
