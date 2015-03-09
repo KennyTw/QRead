@@ -46,10 +46,8 @@ fs.readFile('fbtoken', 'utf8', function (err,token) {
 		//getdata();process.exit(0); 
 		//setTimeout(function(){getdata("owner"); },1000 * 60 * 1);
 		getdata2("","me/home",function(){
-			getdata2("owner","me/home",function(){
-				getdata2("","me/home",function(){
-					process.exit(0); 
-				});				
+			getdata2("owner","me/home",function(){				
+					process.exit(0); 				
 			});
 		});
 	}
