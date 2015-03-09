@@ -6,6 +6,7 @@
 	"redis": "*",
 	"ejs" : "*",
 	"socket.io": "*",
-	"twitter" : "*"
+	"twitter" : "*",
+	"fb" : "*"
   }
 }

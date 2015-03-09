@@ -47,7 +47,7 @@ function getdata() {
 					
 					var tweet = tweets[i].text;
 					tweet = tweet.replace(/\&amp;/g,"&");
-					tweet = tweet.replace(/(https?:\/\/[\w-\.]+(:\d+)?(\/[\w\/\.]*)?(\?\S*)?(#\S*)?)/g,  '<a href="$1" target="_blank" >$1</a>');
+					tweet = tweet.replace(/(https?:\/\/[\w-\.]+(:\d+)?(\/[\w\/\.]*)?(\?\S*)?(#\S*)?)/g,  '<a href="$1" target="new" >$1</a>');
 					tweet = tweet.replace(/\#(\w+)/g,"");
 					tweet = tweet.replace(/\@(\w+)/g,"");
 					tweet = tweets[i].user.name	+ " : " + tweet;

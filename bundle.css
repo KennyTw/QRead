@@ -16,11 +16,19 @@ p {
   line-height: 180%;
   font-family:Microsoft JhengHei;
   font-size : 1.5em;
+  word-break: break-all;
 }
 
 p a {
   text-decoration: none;  
   color: gray;
+}
+
+p  img{
+  display: block;
+  margin-left: auto;
+  margin-right: auto;
+  max-width: 100%;
 }
 
  #cards {
@@ -37,8 +45,8 @@ p a {
 	text-align : center;
 } 
 .centerchild {	
-	margin: 0 auto;
-	width: 0px;
+	margin-left: auto;
+	margin-right: auto;
 }
 	
 .clickable-div 
@@ -52,4 +60,17 @@ p a {
 #paper-button[raised] {
   background: #4285f4;
   color: #fff;
+}
+
+@media only screen and (min-width: 1024px) {
+	p {
+		  margin: 20px 20% 0px 20%;
+	}
+}
+
+@media only screen 
+and (min-device-width : 768px) 
+and (max-device-width : 1024px)  { /* STYLES GO HERE */}
+
+@media only screen and (max-width: 767px) {
 }

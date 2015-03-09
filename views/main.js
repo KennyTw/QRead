@@ -54,7 +54,7 @@
 			} 
 			
 			if (evt.dbdata.length > 0) {			
-				var html = ejs.render(content, { data: evt.dbdata , page: parseInt(evt.page) , i : 0 });
+				var html = ejs.render(content, { data: evt.dbdata , total:evt.total , page: parseInt(evt.page) , i : 0 });
 				var doc = document.implementation.createHTMLDocument('');
 				range = doc.createRange();
 				body = doc.body;
@@ -109,7 +109,7 @@
 		var page = parseInt(document.querySelector('#page').value);		
 		var debug = document.querySelector('#debug');	
 		
-		if  (target.className == "contain"){
+		if  (target.className == "contain" || target.nodeName == "IMG"){
 			if (parseInt(pages.selected) + 1 >=  pages.children.length) {
 				var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
 				socket.emit('commands',data );

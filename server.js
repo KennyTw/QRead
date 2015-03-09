@@ -40,13 +40,15 @@ var http = require('http'),
 			page = data;
 			db.hget("save" + book,"pos",function(err,data) {
 				pos = data;	
-
-				db.lrange("data" + book ,page,page,function(err,data){
+				
+				db.llen("data" + book, function(err,total) {
+					db.lrange("data" + book ,page,page,function(err,data){
 							 //console.log(data);
 							 currentpage = page;
 							 currentbook = book;
-							 res.render('index', { data: data ,pos : pos ,page:page ,firstpage: page ,template:template , book : book , font : font , mode : mode});									
-						}); 				
+							 res.render('index', { data: data ,pos : pos ,page:page ,total : total ,firstpage: page ,template:template , book : book , font : font , mode : mode});									
+					}); 							
+				});						
 			});
 		});
 	});
@@ -94,6 +96,7 @@ var http = require('http'),
 				db.llen("data" + book , function (err , dbdata) {
 					if (data.page > dbdata - 1) 
 						return;
+					data.total = dbdata;
 					
 					db.hset("save" + book ,"page",data.page);
 					db.hset("save" + book,"pos",data.pos);
@@ -105,7 +108,7 @@ var http = require('http'),
 				db.llen("data" + book , function (err , dbdata) {
 					if (data.page > dbdata - 1) 
 						return;
-				
+					data.total = dbdata;
 					db.hset("save" + book ,"page",data.page);
 					//io.sockets.emit('events', data);				
 					socket.broadcast.emit('events', data);
@@ -126,12 +129,15 @@ var http = require('http'),
 			}  else if (data.command == 'loaddata') {
 				//var page = parseInt(data.page) + 1;
 				var page = parseInt(data.page) ;
-				db.lrange("data" + book , page, page,function(err,dbdata){							 
-							 //res.render('index', { data: data ,pos : pos ,page:page })
-							 var rtn = {command:'data',dbdata:dbdata,page: page,book:book};
-							 console.log(dbdata);
-							 io.sockets.emit('events', rtn);	
-						}); 		
+				
+				db.llen("data" + book, function(err,total) {
+					db.lrange("data" + book , page, page,function(err,dbdata){							 
+								 //res.render('index', { data: data ,pos : pos ,page:page })
+								 var rtn = {command:'data',dbdata:dbdata,page: page,total : total,book:book};
+								 console.log(dbdata);
+								 io.sockets.emit('events', rtn);	
+							}); 
+				});
 				
 			}	else if (data.command == 'update') {
 				
