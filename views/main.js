@@ -11,6 +11,7 @@
 	var currDomain = window.location.host;
 	var socket = io.connect(currDomain,{'forceNew':true });
 	var book = document.querySelector('#book').value;	
+	var intervalobj;
 	
 	socket.on('events', function(evt) {	
 		console.log('events : ' + JSON.stringify(evt));
@@ -82,6 +83,7 @@
 				
 				
 			} else {
+				clearInterval(intervalobj);
 				debug.innerText = "End Of Content";
 			}		
 		}
@@ -100,20 +102,32 @@
 		var n = d.toLocaleTimeString();
 		debug.innerText = n + ":connect";
     });*/
+	
+	 
 		
 	function click(e) {
 		var target = e.target;
 		if (target.nodeName == "A") return;
+		if (target.id == "auto") {
+			if (intervalobj != undefined) {
+				clearInterval(intervalobj);
+			} else {
+				intervalobj = setInterval(function() {
+					var active = document.querySelector('.core-selected .contain');
+					active.click();
+				}, 10000);
+			}
+		}
 		var pages = document.querySelector('core-pages');
 		var bchange = false;
 		var page = parseInt(document.querySelector('#page').value);		
-		var debug = document.querySelector('#debug');	
+		var debug = document.querySelector('#debug');
 		
 		if  (target.className == "contain" || target.nodeName == "IMG"){
 			if (parseInt(pages.selected) + 1 >=  pages.children.length) {
 				var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
 				socket.emit('commands',data );
-				debug.innerText = "sending...";
+				debug.innerText = "loading...";
 				
 			} else {
 				//pages.selected = (parseInt(pages.selected) + 1) % pages.children.length;
@@ -162,7 +176,13 @@
 			e.preventDefault();
 			return;
 		}
-		
+		if (intervalobj != undefined) {
+			clearInterval(intervalobj);			 
+				intervalobj = setInterval(function() {
+					var active = document.querySelector('.core-selected .contain');
+					active.click();
+				}, 10000);
+		}
 		
 		click(e);
 	});
@@ -173,7 +193,7 @@
 	window.addEventListener('load',function(e) {	
 		var pos = document.querySelector('#pos');
 		if (pos)
-			window.scrollTo(0, pos.value  );		
+			window.scrollTo(0, pos.value  );
 	});
 	
 	var ismove = false;

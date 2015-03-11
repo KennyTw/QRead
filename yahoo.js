@@ -50,7 +50,8 @@ function yahoodbprocess(streamdata , callback)  {
 					var desc = record.description;
 					desc = desc.replace("<p>","");
 					desc = desc.replace("</p>","");
-					desc = desc.replace('align="left"',''); 
+					desc = desc.replace('align="left"','');
+					desc = desc.replace(record.link,'javascript:none'); 
 					
 					yahootext = yahootext + " : " + desc;
 					yahootext = yahootext + " <a href='" +  record.link  + "' target='new'>Link</a>";
