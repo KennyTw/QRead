@@ -46,7 +46,7 @@ var http = require('http'),
 							 //console.log(data);
 							 currentpage = page;
 							 currentbook = book;
-							 res.render('index', { data: data ,pos : pos ,page:page ,total : total ,firstpage: page ,template:template , book : book , font : font , mode : mode});									
+							 res.render('index', { data: data ,pos : pos ,page:page ,total : total ,firstpage: page ,template:template , book : book , font : font , mode : mode , autostatus : 'auto off'});									
 					}); 							
 				});						
 			});

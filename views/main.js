@@ -11,7 +11,8 @@
 	var currDomain = window.location.host;
 	var socket = io.connect(currDomain,{'forceNew':true });
 	var book = document.querySelector('#book').value;	
-	var intervalobj;
+	var finalcountdown = 5;
+	var intervalobj;	
 	
 	socket.on('events', function(evt) {	
 		console.log('events : ' + JSON.stringify(evt));
@@ -84,6 +85,7 @@
 				
 			} else {
 				clearInterval(intervalobj);
+				intervalobj = undefined;
 				debug.innerText = "End Of Content";
 			}		
 		}
@@ -103,21 +105,37 @@
 		debug.innerText = n + ":connect";
     });*/
 	
-	 
+	function clickprocess(e) {
+		var target =  e.target;
+		finalcountdown = 5;
+		if (target.id == "auto") {
+			if (intervalobj != undefined) {
+				clearInterval(intervalobj);
+				intervalobj = undefined;
+				finalcountdown = 5;
+				target.innerText = "auto off";				
+			} else {				
+				intervalobj = setInterval(function() {
+					var auto = document.querySelector('#auto');
+					if (finalcountdown == 0) {
+						finalcountdown = 5;						
+						var active = document.querySelector('.core-selected .contain');
+						active.click();
+					} else {
+						finalcountdown --;
+						auto.innerText = "auto on " + finalcountdown;										
+					}
+				}, 1000);
+				target.innerText = "auto on  " + finalcountdown;								
+			}
+		}		
+	} 
 		
 	function click(e) {
 		var target = e.target;
 		if (target.nodeName == "A") return;
-		if (target.id == "auto") {
-			if (intervalobj != undefined) {
-				clearInterval(intervalobj);
-			} else {
-				intervalobj = setInterval(function() {
-					var active = document.querySelector('.core-selected .contain');
-					active.click();
-				}, 10000);
-			}
-		}
+		if (target.id == "auto") return;
+		
 		var pages = document.querySelector('core-pages');
 		var bchange = false;
 		var page = parseInt(document.querySelector('#page').value);		
@@ -176,14 +194,7 @@
 			e.preventDefault();
 			return;
 		}
-		if (intervalobj != undefined) {
-			clearInterval(intervalobj);			 
-				intervalobj = setInterval(function() {
-					var active = document.querySelector('.core-selected .contain');
-					active.click();
-				}, 10000);
-		}
-		
+		clickprocess(e);
 		click(e);
 	});
 	
@@ -220,6 +231,7 @@
 			socket.emit('commands', data );
 		}
 		else {
+			clickprocess(e);
 			click(e);
 			/*window.scrollTo(0, 0);
 			var pages = document.querySelector('core-pages');
