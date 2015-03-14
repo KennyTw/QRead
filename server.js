@@ -202,9 +202,9 @@ var http = require('http'),
 	evt.on('message', function(channel, message) {
 		console.log("message : " + message);
 		message = JSON.parse(message);
-		if (message.command == "newdata") {
-			var rtn = {command:'reload',book:message.book,status:'newdata'};
-			io.sockets.emit('events', rtn);			
+		if (message.command == "newdata") {			
+			var data = {command:'sync',book:message.book};	
+			io.sockets.emit('events', data);			
 		}		
 	});
 
