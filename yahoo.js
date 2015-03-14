@@ -3,6 +3,7 @@ var FeedParser = require('feedparser')
   
 var	redis = require('redis');
 var db = redis.createClient();
+var newcount = 0;
 
 function fetch(feed,callback) {
   // Define our streams
@@ -57,7 +58,8 @@ function yahoodbprocess(streamdata , callback)  {
 					yahootext = yahootext + " <a href='" +  record.link  + "' target='new'>Link</a>";
 					
 					console.log(record.title);
-					db.rpush("datayahoo"  ,yahootext ,function(err,dbdata){});						
+					db.rpush("datayahoo"  ,yahootext ,function(err,dbdata){});
+					newcount++;
 					
 				} else {
 					console.log('exist:' + record.guid + ' ' + record.title);
@@ -87,7 +89,12 @@ db.exists("saveyahoo" ,function(err,dbdata) {
 			fetch('https://tw.news.yahoo.com/rss/',function() {
 				fetch('https://tw.news.yahoo.com/rss/technology',function () {
 					fetch('https://tw.news.yahoo.com/rss/world',function() {
-						console.log('done');
+						console.log('done : ' + newcount);
+						
+						if (newcount > 0) {
+							var rtn = {command:'newdata',book:'yahoo'};
+							db.publish("events",JSON.stringify(rtn));					
+						}
 						process.exit();
 					});
 				});

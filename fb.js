@@ -2,6 +2,7 @@ var FB = require('fb');
 var	redis = require('redis');
 var db = redis.createClient();
 var fs = require('fs');
+var newcount = 0;
 
 /*
 FB.api('oauth/access_token', {
@@ -46,7 +47,12 @@ fs.readFile('fbtoken', 'utf8', function (err,token) {
 		//getdata();process.exit(0); 
 		//setTimeout(function(){getdata("owner"); },1000 * 60 * 1);
 		getdata2("","me/home",function(){
-			getdata2("owner","me/home",function(){				
+			getdata2("owner","me/home",function(){
+					console.log('done : ' + newcount);
+					if (newcount > 0) {
+							var rtn = {command:'newdata',book:'fb'};
+							db.publish("events",JSON.stringify(rtn));					
+					}
 					process.exit(0); 				
 			});
 		});
@@ -187,7 +193,8 @@ function fbdbprocess(datalist , callback) {
 					 
 					
 					console.log(record.id + ":" + record.story);
-					db.rpush("datafb"  ,fbtext ,function(err,dbdata){});						
+					db.rpush("datafb"  ,fbtext ,function(err,dbdata){});
+					newcount ++;
 					
 				} else {
 					console.log('exist:' + record.id);

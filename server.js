@@ -2,6 +2,7 @@ var http = require('http'),
 	express = require('express'),
 	redis = require('redis'),
 	db = redis.createClient(),
+	evt = redis.createClient(),
 	socket = require('socket.io');
 	
 	var template = require('fs').readFileSync('./views/item.ejs', 'utf-8');
@@ -106,12 +107,20 @@ var http = require('http'),
 				
 			} else if (data.command == 'click') {
 				db.llen("data" + book , function (err , dbdata) {
-					if (data.page > dbdata - 1) 
-						return;
-					data.total = dbdata;
-					db.hset("save" + book ,"page",data.page);
-					//io.sockets.emit('events', data);				
-					socket.broadcast.emit('events', data);
+					var total = dbdata;
+					db.hget("save" + book ,"page",function(err,dbdata) {
+						var currentpage = dbdata;						
+						if (data.page > total - 1 || Math.abs(data.page - currentpage) > 1  ) {
+							console.log("data.page : " + data.page  + ", dbdata : " + dbdata);
+							var rtn = {command:'reload',book:book};
+							io.sockets.emit('events', rtn);	
+							return;
+						}
+						data.total = total;
+						db.hset("save" + book ,"page",data.page);
+						//io.sockets.emit('events', data);				
+						socket.broadcast.emit('events', data);					
+					});				
 				});
 			} else if (data.command == 'reload') {
 				var page = 0 ;
@@ -165,6 +174,22 @@ var http = require('http'),
 						});						
 					}					
 				});			
+			} else if (data.command == 'sync') {
+					db.hget("save" + book,"page",function(err,data) {
+					if(!data) {
+						res.send('No Data');
+						return;
+					}
+					
+					page = data;					
+					db.llen("data" + book ,function(err,dbdata) {
+						var total = dbdata;						
+						db.lrange("data" + book , page, page,function(err,dbdata){
+							var rtn = {command:'sync',dbdata:dbdata,page:page,pos:0,total:total,book:book};
+							socket.emit('events', rtn)							
+						});							
+					}); 
+					});
 			}
 		});	
 		
@@ -173,6 +198,18 @@ var http = require('http'),
 		});
 	});
 
+	// listen to events from redis and call each callback from subscribers
+	evt.on('message', function(channel, message) {
+		console.log("message : " + message);
+		message = JSON.parse(message);
+		if (message.command == "newdata") {
+			var rtn = {command:'reload',book:message.book,status:'newdata'};
+			io.sockets.emit('events', rtn);			
+		}		
+	});
+
+	// subscribe to __events channel__
+	evt.subscribe('events');
 	
 		
 server.listen(80); //the port you want to use

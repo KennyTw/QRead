@@ -39,7 +39,7 @@
 		} else if (evt.command == 'scrollend') {
 			window.scrollTo(0, evt.pos );
 		} else if (evt.command == 'reload') {
-			//if (parseInt(evt.page) != parseInt(pages.selected) - firstpage)
+			//if (parseInt(evt.page) != parseInt(pages.selected) - firstpage)				
 				location.reload(true);
 		} else if (evt.command == 'forcereload') {
 				if (parseInt(evt.page) != parseInt(document.querySelector('#page').value) || pages.children.length > 1)
@@ -88,6 +88,46 @@
 				intervalobj = undefined;
 				debug.innerText = "End Of Content";
 			}		
+		} else if (evt.command == 'sync') {
+			var content = document.getElementById('content').innerHTML;
+			var debug = document.querySelector('#debug');
+			debug.innerText = "";
+			
+			if (evt.dbdata.length > 0) {				
+				
+				
+				for (var i = pages.childNodes.length - 1 ; i >= 0 ; i --) {
+					if (pages.childNodes[i].nodeName == "DIV")
+						pages.removeChild(pages.childNodes[i]);
+				}
+				
+			
+				var html = ejs.render(content, { data: evt.dbdata , total:evt.total , page: parseInt(evt.page) , i : 0 });
+				
+				var doc = document.implementation.createHTMLDocument('');
+				range = doc.createRange();
+				body = doc.body;
+				body.innerHTML = html;
+				range.selectNodeContents(body);
+				var frag = range.extractContents();
+				
+				pages.lastChild.parentNode.insertBefore(frag, pages.lastChild);
+				
+				//pages.firstChild.parentNode.innerHTML = html;
+				
+				//var contentitem = document.querySelector('.contentitem');
+				//contentitem.click();
+				//contentitem.classList.add('core-selected');
+				//contentitem.setAttribute('active', '');			
+				
+				document.querySelector('#page').value = evt.page;
+				document.querySelector('#firstpage').value = evt.page;
+				document.querySelector('#pos').value = evt.pos;	
+
+				pages.selected = 0;
+				
+			}
+			
 		}
 	});
 	
@@ -168,7 +208,7 @@
 				if (parseInt(page) -2 >= -1) {
 					var data = {command:'loaddata',page: parseInt(page) -1 , book:book};			
 					socket.emit('commands',data );
-					debug.innerText = "sending...";
+					debug.innerText = "loading...";
 				} else {
 					debug.innerText = "Begin Of Content";
 				}
@@ -271,10 +311,9 @@
 			socket.disconnect();
 			socket.connect();
 			
-			var data = {command:'reload',book:book};			
+			var data = {command:'sync',book:book};			
 			socket.emit('commands',data );
-		}
-		
+		}		
 	}, false);
 	
 

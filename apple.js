@@ -3,6 +3,7 @@ var FeedParser = require('feedparser')
   
 var	redis = require('redis');
 var db = redis.createClient();
+var newcount = 0;
 
 function fetch(feed,callback) {
   // Define our streams
@@ -49,10 +50,11 @@ function dbprocess(streamdata , callback)  {
 					var text = record.title;
 					var desc = record.description;
 					desc = desc.replace("<a","<a target='new' ");					
-					text = text + " : " + desc;				
+					text = desc;				
 					
 					console.log(record.title);
-					db.rpush("dataapple"  ,text ,function(err,dbdata){});						
+					db.rpush("dataapple"  ,text ,function(err,dbdata){});	
+					newcount ++;
 					
 				} else {
 					console.log('exist:' + record.guid + ' ' + record.title);
@@ -80,7 +82,12 @@ db.exists("saveapple" ,function(err,dbdata) {
 						db.hset("saveapple"  ,"pos",0);
 					}	
 			fetch('http://www.appledaily.com.tw/rss/newcreate/kind/rnews/type/new',function() {				
-						console.log('done');
+						console.log('done : ' + newcount);
+						if (newcount > 0) {
+							var rtn = {command:'newdata',book:'apple'};
+							db.publish("events",JSON.stringify(rtn));					
+						}
+						
 						process.exit();
 					});
 			

@@ -1,6 +1,7 @@
 var Twitter = require('twitter');
 var	redis = require('redis');
 var db = redis.createClient();
+var newcount = 0;
 
 
 var client = new Twitter({
@@ -64,9 +65,15 @@ function getdata() {
 					if ((tweets[i].id) > parseInt(dbdata)) {
 						db.hset("savetwitter"  ,"lastid",tweets[i].id);					
 						db.rpush("datatwitter"  ,tweet,function(err,dbdata){});	
+						newcount++;
 					}
 				}
 				//console.log(dbdata);
+				console.log('done : ' + newcount);
+				if (newcount > 0) {
+							var rtn = {command:'newdata',book:'twitter'};
+							db.publish("events",JSON.stringify(rtn));					
+				}
 				
 				process.exit(0);
 				
