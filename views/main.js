@@ -9,33 +9,55 @@
     pages.selected = (pages.selected + 1) % pages.children.length;
   });*/
 	var currDomain = window.location.host;
+	//var socket = io.connect(currDomain,{'forceNew':true });
 	var socket = io.connect(currDomain,{'forceNew':true });
 	var book = document.querySelector('#book').value;	
 	var finalcountdown = 5;
-	var intervalobj;	
+	var intervalobj;
+	//var lastcommand = "";
+	//var timerobj ;
+	var sendqueue = [];
 	
 	socket.on('events', function(evt) {	
 		console.log('events : ' + JSON.stringify(evt));
 		//debug.innerText = JSON.stringify(evt);
+		var debug = document.querySelector('#debug');
 		var pages = document.querySelector('core-pages');
 		var firstpage = parseInt(document.querySelector('#firstpage').value);
-		
+		var lastpage = parseInt(document.querySelector('#lastpage').value);
+		//lastcommand = "";
+		//clearTimeout(timerobj);
 		if (book != evt.book) return;
+		
+		var sendobj = sendqueue[evt.id];
+		if (sendobj != null) {
+			clearTimeout(sendobj.timeobj);
+			sendqueue[evt.id] = null;
+		}
 		
 		if (evt.command == 'click') {			 
 			var newpage =  parseInt(evt.page) - firstpage;
 			//if (newpage <  pages.children.length) {		
-				pages.selected = newpage;
+				
 				
 				if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > 1  ) {				
 					var data = {command:'reload',book:book};			
-					socket.emit('commands',data );
-				} else {
+					//socket.emit('commands',data );
+					send(data);
+				} else if (evt.page > lastpage || evt.page <  firstpage)  {
+					document.querySelector('#lock').value = 1;
+					var data = {command:'loaddata',page: parseInt(evt.page) ,book:book , memo:'noclick'};			
+					//socket.emit('commands',data );
+					send(data);
+					debug.innerText = "loading...";
+				} else {	
 					document.querySelector('#page').value = evt.page;
+					pages.selected = newpage;
+					window.scrollTo(0, 0);
 				}
 				//debug.innerText = "selected:" + newpage;				
 			//}
-			window.scrollTo(0, 0);
+			
 		} else if (evt.command == 'scrollend') {
 			window.scrollTo(0, evt.pos );
 		} else if (evt.command == 'reload') {
@@ -46,13 +68,14 @@
 					location.reload(true);
 		} 
 		else if (evt.command == 'data') {
-			var content = document.getElementById('content').innerHTML;
-			var debug = document.querySelector('#debug');
+			var content = document.getElementById('content').innerHTML;			
 			debug.innerText = "";
+			document.querySelector('#lock').value = 0;
 			
 			if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > 1  ) {				
 					var data = {command:'reload',book: book};			
-					socket.emit('commands',data );
+					//socket.emit('commands',data );
+					send(data);
 			} 
 			
 			if (evt.dbdata.length > 0) {			
@@ -72,13 +95,21 @@
 					document.querySelector('#page').value = evt.page;
 					document.querySelector('#firstpage').value = evt.page;
 					
-					window.scrollTo(0, 0);			
-					var data = {command:'click',page : parseInt(evt.page),book:book};			 
-					socket.emit('commands',  data);	
+					window.scrollTo(0, 0);	
+					if (evt.memo != 'noclick') {
+						var data = {command:'click',page : parseInt(evt.page),book:book};			 
+						//socket.emit('commands',  data);	
+						send(data);
+					}
 				}
 				else {
 					pages.lastChild.parentNode.insertBefore(frag, pages.lastChild);
+					document.querySelector('#lastpage').value = evt.page;					
 					var active = document.querySelector('.core-selected .contain');
+					
+					if (evt.memo == 'noclick') {
+						active.setAttribute('noclick','');
+					}					
 					active.click();
 				}
 				
@@ -90,18 +121,18 @@
 			}		
 		} else if (evt.command == 'sync') {
 			var content = document.getElementById('content').innerHTML;
-			var debug = document.querySelector('#debug');
+			//var debug = document.querySelector('#debug');
 			debug.innerText = "";
 			
-			if (evt.dbdata.length > 0) {				
-				
+			if (evt.dbdata.length > 0) {
+
+				var oldlastpage = parseInt(document.querySelector('#lastpage').value);
 				
 				for (var i = pages.childNodes.length - 1 ; i >= 0 ; i --) {
 					if (pages.childNodes[i].nodeName == "DIV")
 						pages.removeChild(pages.childNodes[i]);
-				}
-				
-			
+				}		
+
 				var html = ejs.render(content, { data: evt.dbdata , total:evt.total , page: parseInt(evt.page) , i : 0 });
 				
 				var doc = document.implementation.createHTMLDocument('');
@@ -122,12 +153,28 @@
 				
 				document.querySelector('#page').value = evt.page;
 				document.querySelector('#firstpage').value = evt.page;
+				document.querySelector('#lastpage').value = evt.page;
 				document.querySelector('#pos').value = evt.pos;	
 
 				pages.selected = 0;
 				
+				if (evt.total > oldlastpage) {
+					debug.innerText = "new data : " + (evt.total - oldlastpage - 1);
+					var oldtitle = window.parent.document.title;
+					if (window.parent.location.pathname == "/all.html") 
+						oldtitle = "QRead All";					
+					var pos1 = oldtitle.indexOf(') ');
+					if (pos1 > 0) {
+						oldtitle = oldtitle.substring(pos1 + 2,oldtitle.length);
+					} 					
+					window.parent.document.title = "(" + (evt.total - oldlastpage - 1) + ") " + oldtitle;					
+				}
+				
+				
 			}
 			
+		} else if (evt.command == 'ping') {
+			 
 		}
 	});
 	
@@ -180,11 +227,17 @@
 		var bchange = false;
 		var page = parseInt(document.querySelector('#page').value);		
 		var debug = document.querySelector('#debug');
+		var lastpage = parseInt(document.querySelector('#lastpage').value);
+		var lock = parseInt(document.querySelector('#lock').value);
+		
+		if (lock == 1) return;
 		
 		if  (target.className == "contain" || target.nodeName == "IMG"){
-			if (parseInt(pages.selected) + 1 >=  pages.children.length) {
+			if (parseInt(page) + 1 >  lastpage) {
+				document.querySelector('#lock').value = 1;
 				var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
-				socket.emit('commands',data );
+				//socket.emit('commands',data );
+				send(data);
 				debug.innerText = "loading...";
 				
 			} else {
@@ -206,8 +259,10 @@
 				bchange = true;
 			} else {
 				if (parseInt(page) -2 >= -1) {
+					document.querySelector('#lock').value = 1;
 					var data = {command:'loaddata',page: parseInt(page) -1 , book:book};			
-					socket.emit('commands',data );
+					//socket.emit('commands',data );
+					send(data);
 					debug.innerText = "loading...";
 				} else {
 					debug.innerText = "Begin Of Content";
@@ -219,11 +274,13 @@
 		if (bchange) {
 			document.querySelector('#page').value = page;
 			window.scrollTo(0, 0);
-			//var pages = document.querySelector('core-pages');
-			var data = {command:'click',page : parseInt(page),book:book};
-			//socket.disconnect();
-			//socket.connect();
-			socket.emit('commands',  data);
+			
+			if (!target.hasAttribute('noclick')) {
+				var data = {command:'click',page : parseInt(page),book:book};			 
+				send(data);
+			} else {
+				target.removeAttribute('noclick');
+			}
 			debug.innerText = "";			
 		}
 	  }
@@ -268,7 +325,8 @@
 			var data = {command:'scrollend',page :  page , pos : window.pageYOffset ,book:book};
 			//socket.disconnect();
 			//socket.connect();
-			socket.emit('commands', data );
+			//socket.emit('commands', data );
+			send(data);
 		}
 		else {
 			clickprocess(e);
@@ -304,20 +362,52 @@
 		var debug = document.querySelector('#debug');		
 		var d = new Date();
 		var n = d.toLocaleTimeString();
-		debug.innerText = n + ":visibilityChange:" + document.visibilityState;
+		//debug.innerText = n + ":visibilityChange:" + document.visibilityState;
+	
 		
+		if ( document.visibilityState == 'visible') {	
+			if (window.parent.location.pathname == "/all.html") {
+				window.parent.document.title = "QRead All";
+			} else
+				window.parent.document.title = document.querySelector('#title').value;
 		
-		if ( document.visibilityState == 'visible') {		
-			socket.disconnect();
+			/*socket.disconnect();
 			socket.connect();
 			
 			var data = {command:'sync',book:book};			
-			socket.emit('commands',data );
+			socket.emit('commands',data );*/
+			/*var isTouchDevice = function() {  return 'ontouchstart' in window || 'onmsgesturechange' in window; };			
+			if (isTouchDevice())
+				location.reload(true);*/
+			
+			 
+			var data = {command:'ping',book:book};						
+			send(data);
+			 
 		}		
 	}, false);
 	
 
-  
+ function send(data) {
+	
+	var timestamp = Number(new Date());	
+	data["id"] = timestamp;
+	//console.log(data);
+	socket.emit('commands',data);	
+	
+	timerobj = setTimeout(function(timestamp){
+				if (sendqueue[timestamp] != null) {
+					var debug = document.querySelector('#debug');
+					debug.innerText = "resend..";
+					socket.disconnect();
+					socket.connect();
+					
+					socket.emit('commands',sendqueue[timestamp].data);					
+				}					
+	},2000);
+	
+	sendqueue[timestamp] = {id:timestamp,timeobj:timerobj,data:data};
+ }
 	
   
 

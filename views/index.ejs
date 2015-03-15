@@ -4,6 +4,7 @@
 	<meta name="viewport" content="width=device-width; initial-scale=1.0; maximum-scale=1.0; user-scalable=0;">
 	<meta http-equiv="cache-control" content="no-cache">
 	<meta http-equiv="pragma" content="no-cache">
+	<meta http-equiv="expires" content="-1">
     <!-- 1. Load webcomponents.min.js for polyfill support. -->
     <script src="bower_components/webcomponentsjs/webcomponents.min.js"></script>
     <!-- 2. Use an HTML Import to bring in the element. -->
@@ -89,7 +90,10 @@
 	<input type='hidden' id="pos" value=<%=pos%>>
 	<input type='hidden' id="page" value=<%=page%>>
 	<input type='hidden' id="book" value=<%=book%>>
-	<input type='hidden' id="firstpage" value=<%=firstpage%>>	
+	<input type='hidden' id="firstpage" value=<%=firstpage%>>
+	<input type='hidden' id="lastpage" value=<%=firstpage%>>
+	<input type='hidden' id="lock" value=0>
+	<input type='hidden' id="title" value="<%="QRead " + book%>">
 	
   <script src="/socket.io/socket.io.js"></script>
   <script src="/views/main.js"></script>

@@ -74,12 +74,14 @@ var http = require('http'),
 		var conn = socket.request.connection.remoteAddress ;
 		console.log(conn + ' -- connects to socket.io');
 		
-		if (currentpage > -1) {
+		/*if (currentpage > -1) {
 			var rtn = {command:'forcereload',page:currentpage , book : currentbook};
 			console.log(rtn);
 			//io.sockets.emit('events', rtn);
 			socket.broadcast.emit('events', rtn);
-		}
+		}*/
+		
+		
 							 
 		socket.on('commands', function(data) {
 			console.log('On commands:' + JSON.stringify( data) + "," + conn);
@@ -93,13 +95,15 @@ var http = require('http'),
 					return;
 			}
 				
-			if (data.command == 'scrollend') {
+			if (data.command == 'ping') {
+				 socket.emit('events', data);				
+			} else	if (data.command == 'scrollend') {
 				db.llen("data" + book , function (err , dbdata) {
 					if (data.page > dbdata - 1) 
 						return;
 					data.total = dbdata;
 					
-					db.hset("save" + book ,"page",data.page);
+					//db.hset("save" + book ,"page",data.page);
 					db.hset("save" + book,"pos",data.pos);
 					//io.sockets.emit('events', data);
 					socket.broadcast.emit('events', data);
@@ -109,10 +113,10 @@ var http = require('http'),
 				db.llen("data" + book , function (err , dbdata) {
 					var total = dbdata;
 					db.hget("save" + book ,"page",function(err,dbdata) {
-						var currentpage = dbdata;						
-						if (data.page > total - 1 || Math.abs(data.page - currentpage) > 1  ) {
+						//var currentpage = dbdata;						
+						if (data.page > total - 1 || Math.abs(data.page - dbdata) > 1  ) {
 							console.log("data.page : " + data.page  + ", dbdata : " + dbdata);
-							var rtn = {command:'reload',book:book};
+							var rtn = {command:'reload',book:book,id:data.id};
 							io.sockets.emit('events', rtn);	
 							return;
 						}
@@ -130,7 +134,7 @@ var http = require('http'),
 					page = dbdata;	
 					db.hget("save" + book ,"pos",function(err,dbdata) {
 						pos = dbdata;
-						var rtn = {command:'reload',page:page,pos:pos,book:book};
+						var rtn = {command:'reload',page:page,pos:pos,book:book,id:data.id};
 						io.sockets.emit('events', rtn);								
 						//socket.broadcast.emit('events', rtn);
 					});
@@ -142,9 +146,10 @@ var http = require('http'),
 				db.llen("data" + book, function(err,total) {
 					db.lrange("data" + book , page, page,function(err,dbdata){							 
 								 //res.render('index', { data: data ,pos : pos ,page:page })
-								 var rtn = {command:'data',dbdata:dbdata,page: page,total : total,book:book};
+								 var rtn = {command:'data',dbdata:dbdata,page: page,total : total,book:book,id:data.id,memo:data.memo};
 								 console.log(dbdata);
-								 io.sockets.emit('events', rtn);	
+								 //io.sockets.emit('events', rtn);	
+								 socket.emit('events', rtn);
 							}); 
 				});
 				
@@ -160,15 +165,15 @@ var http = require('http'),
 					if (page > dbdata - 1) {
 						//insert
 						db.rpush("data" + book ,data.content,function(err,dbdata){
-							var rtn = {command:'updateok',page:dbdata,book:book};
+							var rtn = {command:'updateok',page:dbdata,book:book,id:data.id};
 							socket.emit('events', rtn);							
 						});					
 					} else {
 						db.lset("data" + book ,parseInt(data.page) ,data.content,function(err){					
-							var rtn = {command:'updateok',book:book};
+							var rtn = {command:'updateok',book:book,id:data.id};
 							socket.emit('events', rtn);
 							
-							var rtn = {command:'forcereload',page:currentpage,book:book};
+							var rtn = {command:'forcereload',page:currentpage,book:book,id:data.id};
 							console.log(rtn);					
 							socket.broadcast.emit('events', rtn);
 						});						
@@ -185,7 +190,7 @@ var http = require('http'),
 					db.llen("data" + book ,function(err,dbdata) {
 						var total = dbdata;						
 						db.lrange("data" + book , page, page,function(err,dbdata){
-							var rtn = {command:'sync',dbdata:dbdata,page:page,pos:0,total:total,book:book};
+							var rtn = {command:'sync',dbdata:dbdata,page:page,pos:0,total:total,book:book,id:data.id};
 							socket.emit('events', rtn)							
 						});							
 					}); 
@@ -203,8 +208,21 @@ var http = require('http'),
 		console.log("message : " + message);
 		message = JSON.parse(message);
 		if (message.command == "newdata") {			
-			var data = {command:'sync',book:message.book};	
-			io.sockets.emit('events', data);			
+			db.hget("save" + message.book,"page",function(err,data) {
+					if(!data) {
+						res.send('No Data');
+						return;
+					}
+					
+					var page = data;					
+					db.llen("data" + message.book ,function(err,dbdata) {
+						var total = dbdata;						
+						db.lrange("data" + message.book , page, page,function(err,dbdata){
+							var rtn = {command:'sync',dbdata:dbdata,page:page,pos:0,total:total,book:message.book,id:0};
+							io.sockets.emit('events', rtn)							
+						});							
+					}); 
+					});					
 		}		
 	});
 
