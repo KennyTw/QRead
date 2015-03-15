@@ -195,6 +195,20 @@ var http = require('http'),
 						});							
 					}); 
 					});
+			} else if (data.command == 'checksync') {
+				db.hget("save" + book,"page",function(err,data) {
+				if(!data) {
+						res.send('No Data');
+						return;
+				}
+				
+					page = data;
+					db.llen("data" + book ,function(err,dbdata) {
+							var total = dbdata;						
+							var rtn = {command:'checksync',page:page,total:total,book:book,id:data.id};
+							socket.emit('events', rtn);
+					}); 				
+				});
 			}
 		});	
 		

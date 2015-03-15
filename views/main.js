@@ -175,6 +175,10 @@
 			
 		} else if (evt.command == 'ping') {
 			 
+		} else if (evt.command == 'checksync') {
+			if (parseInt(document.querySelector('#page').value) != evt.page) {
+				location.reload(true);
+			}
 		}
 	});
 	
@@ -381,7 +385,9 @@
 				location.reload(true);*/
 			
 			 
-			var data = {command:'ping',book:book};						
+			//var data = {command:'ping',book:book};
+			var page = parseInt(document.querySelector('#page').value);
+			var data = {command:'checksync',book:book,page:page};
 			send(data);
 			 
 		}		
