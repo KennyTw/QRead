@@ -409,7 +409,7 @@
 	//console.log(data);
 	socket.emit('commands',data);	
 	
-	if (data.command == 'click') {
+	if (data.command == 'click' ||  data.command == 'scrollend') {
 		//click no return
 		data["id"] = null;
 	} else {
