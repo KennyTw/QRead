@@ -20,6 +20,11 @@ var http = require('http'),
         express.static(__dirname) //where your static content is located in your filesystem
     );
 	
+	app.get('/all', function(req, res) {
+		var qobj = req.query;
+		var mode = qobj.m;
+		res.render('all', {  mode : mode });									
+	});
 	
 	app.get('/', function(req, res) {		
 		var qobj = req.query;

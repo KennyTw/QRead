@@ -161,7 +161,7 @@
 				if (evt.total > oldlastpage) {
 					debug.innerText = "new data : " + (evt.total - oldlastpage - 1);
 					var oldtitle = window.parent.document.title;
-					if (window.parent.location.pathname == "/all.html") 
+					if (window.parent.location.pathname == "/all") 
 						oldtitle = "QRead All";					
 					var pos1 = oldtitle.indexOf(') ');
 					if (pos1 > 0) {
@@ -370,7 +370,7 @@
 	
 		
 		if ( document.visibilityState == 'visible') {	
-			if (window.parent.location.pathname == "/all.html") {
+			if (window.parent.location.pathname == "/all") {
 				window.parent.document.title = "QRead All";
 			} else
 				window.parent.document.title = document.querySelector('#title').value;
