@@ -403,16 +403,19 @@
 					socket.emit('commands',sendqueue[timestamp].data);					
 	}	 
  }
- function send(data) {
-	
+ function send(data) {	
 	var timestamp = Number(new Date());	
 	data["id"] = timestamp;
 	//console.log(data);
 	socket.emit('commands',data);	
 	
-	timerobj = setTimeout("resendcheck(" + timestamp + ")",2000,timestamp);
-	
-	sendqueue[timestamp] = {id:timestamp,timeobj:timerobj,data:data};
+	if (data.command == 'click') {
+		//click no return
+		data["id"] = null;
+	} else {
+		timerobj = setTimeout("resendcheck(" + timestamp + ")",5000,timestamp);	
+		sendqueue[timestamp] = {id:timestamp,timeobj:timerobj,data:data};
+	}
  }
 	
   
