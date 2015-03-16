@@ -393,7 +393,16 @@
 		}		
 	}, false);
 	
-
+ function  resendcheck(timestamp) {
+	if (sendqueue[timestamp] != null) {
+					var debug = document.querySelector('#debug');
+					debug.innerText = "resend..";
+					socket.disconnect();
+					socket.connect();
+					
+					socket.emit('commands',sendqueue[timestamp].data);					
+	}	 
+ }
  function send(data) {
 	
 	var timestamp = Number(new Date());	
@@ -401,16 +410,7 @@
 	//console.log(data);
 	socket.emit('commands',data);	
 	
-	timerobj = setTimeout(function(timestamp){
-				if (sendqueue[timestamp] != null) {
-					var debug = document.querySelector('#debug');
-					debug.innerText = "resend..";
-					socket.disconnect();
-					socket.connect();
-					
-					socket.emit('commands',sendqueue[timestamp].data);					
-				}					
-	},2000);
+	timerobj = setTimeout("resendcheck(" + timestamp + ")",2000,timestamp);
 	
 	sendqueue[timestamp] = {id:timestamp,timeobj:timerobj,data:data};
  }
