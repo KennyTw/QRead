@@ -45,3 +45,15 @@
 		location.href = url;
 			
 	});
+	
+	var buttonextract  = document.querySelector('#paper-button-extract');
+	buttonextract.addEventListener('click', function(e) {
+		var content = document.querySelector('#extract').value;
+		var linebreak = content.split("\n");
+		//console.log("linebreak:" + linebreak.length);
+		
+		for (var i = 0 ; i < linebreak.length ; i ++) {
+			console.log("linebreak:" + i + ":" + linebreak[i]);
+		}
+			
+	});

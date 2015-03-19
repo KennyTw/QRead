@@ -3,7 +3,9 @@ var http = require('http'),
 	redis = require('redis'),
 	db = redis.createClient(),
 	evt = redis.createClient(),
-	socket = require('socket.io');
+	socket = require('socket.io');	
+	var soap = require('soap');
+	
 	
 	var template = require('fs').readFileSync('./views/item.ejs', 'utf-8');
 
@@ -100,6 +102,40 @@ var http = require('http'),
 					return;
 			}
 				
+			if (data.command == 'tts') {
+				soap.createClient('http://tts.itri.org.tw/TTSService/Soap_1_3.php?wsdl', function(err, client) {
+				   client.ConvertSimple({Account: 'KennyLee' , Password : 'kenny1222',TTSText : data.text}, function(err, result) {
+						var resultData = result.Result.$value;
+						resultData = resultData.split('&');
+						
+						if (resultData[0] == 0) {
+							var audioId = resultData[2];
+							console.log('audioId:' +  audioId); 
+							var limit = 0;
+							var selfInterval = setInterval(function(){ 
+								if (limit > 60)
+									clearInterval(selfInterval);
+								
+								client.GetConvertStatus({Account: 'KennyLee' , Password : 'kenny1222',ConvertID : audioId}, function(err, result) {
+								//console.log(result);
+								var resultData = result.Result.$value;
+								console.log(result);
+								resultData = resultData.split('&');
+								if (resultData[0] == 0 && resultData[2] == 2 ) {
+										clearInterval(selfInterval);
+										console.log(resultData[4]);
+										delete data.text;
+										data.url = resultData[4];
+										socket.emit('events', data);										
+									};									
+								});	
+
+								limit ++;
+							}, 1000);
+						}  
+					});
+				});				
+			} else
 			if (data.command == 'ping') {
 				 socket.emit('events', data);				
 			} else	if (data.command == 'scrollend') {

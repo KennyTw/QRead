@@ -9,6 +9,9 @@
 	"twitter" : "*",
 	"fb" : "*",
 	"feedparser" : "*",
-	"request" : "*"
+	"request" : "*",
+	"html-to-text" : "*",
+	"readability-api" : "*",
+	"soap" : "*"
   }
 }

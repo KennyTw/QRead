@@ -22,10 +22,18 @@
       </paper-autogrow-textarea>
     </paper-input-decorator>
 	<paper-input label="page" value="<%=page%>" id="page"></paper-input>
-	<paper-button raised id="paper-button">Update</paper-button>
+	<paper-button class="paper-button" raised id="paper-button"   >Update</paper-button>
 	<paper-button raised id="paper-button-next">Next Page</paper-button>
 	<paper-button raised id="paper-button-prev">Prev Page</paper-button>
 	<paper-input label="status"  id="status"></paper-input>
+	
+	<paper-input-decorator label="with autogrowing text area">
+      <paper-autogrow-textarea rows=10>
+        <textarea id="extract"></textarea>
+      </paper-autogrow-textarea>
+    </paper-input-decorator>
+	<paper-button class="paper-button" raised id="paper-button-extract">Extract</paper-button>
+	
 	<div id="debug" class="centerp"></div>
 	<input type="hidden" id="book" value="<%=book%>">
 	<script src="/socket.io/socket.io.js"></script>

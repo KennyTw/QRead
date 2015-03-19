@@ -17,11 +17,16 @@
 	//var lastcommand = "";
 	//var timerobj ;
 	var sendqueue = [];
+	var debug = document.querySelector('#debug');
+	
+	/*var tts = new TTS(); 
+	tts.PlayerSet.hidden = false;
+    tts.PlayerSet.width = 100; 
+    tts.PlayerSet.height = 30;*/
 	
 	socket.on('events', function(evt) {	
 		console.log('events : ' + JSON.stringify(evt));
-		//debug.innerText = JSON.stringify(evt);
-		var debug = document.querySelector('#debug');
+		//debug.innerText = JSON.stringify(evt);		
 		var pages = document.querySelector('core-pages');
 		var firstpage = parseInt(document.querySelector('#firstpage').value);
 		var lastpage = parseInt(document.querySelector('#lastpage').value);
@@ -35,6 +40,8 @@
 			sendqueue[evt.id] = null;
 		}
 		
+		debug.innerText = "";
+		
 		if (evt.command == 'click') {			 
 			var newpage =  parseInt(evt.page) - firstpage;
 			//if (newpage <  pages.children.length) {		
@@ -43,12 +50,12 @@
 				if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > 1  ) {				
 					var data = {command:'reload',book:book};			
 					//socket.emit('commands',data );
-					send(data);
+					send(data,true);
 				} else if (evt.page > lastpage || evt.page <  firstpage)  {
 					document.querySelector('#lock').value = 1;
 					var data = {command:'loaddata',page: parseInt(evt.page) ,book:book , memo:'noclick'};			
 					//socket.emit('commands',data );
-					send(data);
+					send(data,true);
 					debug.innerText = "loading...";
 				} else {	
 					document.querySelector('#page').value = evt.page;
@@ -75,7 +82,7 @@
 			if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > 1  ) {				
 					var data = {command:'reload',book: book};			
 					//socket.emit('commands',data );
-					send(data);
+					send(data,true);
 			} 
 			
 			if (evt.dbdata.length > 0) {			
@@ -99,7 +106,7 @@
 					if (evt.memo != 'noclick') {
 						var data = {command:'click',page : parseInt(evt.page),book:book};			 
 						//socket.emit('commands',  data);	
-						send(data);
+						send(data,false);
 					}
 				}
 				else {
@@ -112,6 +119,10 @@
 					}					
 					active.click();
 				}
+				
+				/*var textcontain = document.querySelector('#' + "contain" + evt.page);
+				textcontain = textcontain.innerHTML.replace(/<(?:.|\n)*?>/gm, '');				
+				tts.ConvertInit(textcontain,"media" + evt.page ,"Bruce","100","0","0","0","5");*/
 				
 				
 			} else {
@@ -179,6 +190,17 @@
 			if (parseInt(document.querySelector('#page').value) != evt.page) {
 				location.reload(true);
 			}
+		} else if (evt.command == 'tts') {
+			var doc = document.implementation.createHTMLDocument('');
+			range = doc.createRange();
+			body = doc.body;
+			var html = "<audio id='ttscontrol" + evt.page  + "' controls='controls' autoplay='autoplay'>";
+			html += "<source src='"  + evt.url + "' type='audio/wav'>Your browser does not support the audio element.</audio>";
+			body.innerHTML = html;
+			range.selectNodeContents(body);
+			var frag = range.extractContents();			
+			var ttscontrol = document.querySelector('#ttscontroldiv' + evt.page);
+			ttscontrol.appendChild(frag);			
 		}
 	});
 	
@@ -219,13 +241,25 @@
 				}, 1000);
 				target.innerText = "auto on  " + finalcountdown;								
 			}
-		}		
+		} else if (	target.id == "ttsplay") {
+			
+			var page =  document.querySelector('#page').value;
+			var textcontain = document.querySelector('#' + "contain" + page);
+			textcontain = textcontain.innerHTML.replace(/<(?:.|\n)*?>/gm, '');				
+				
+			var data = {command:'tts', text : textcontain ,page: page , book:book};	
+			send(data,false);
+			debug.innerText = "send tts ...";
+			
+		}
 	} 
 		
 	function click(e) {
 		var target = e.target;
 		if (target.nodeName == "A") return;
 		if (target.id == "auto") return;
+		if (target.id == "ttsplay") return;
+		//if (target.id.indexOf("loading") >= 0 ) return;
 		
 		var pages = document.querySelector('core-pages');
 		var bchange = false;
@@ -241,7 +275,7 @@
 				document.querySelector('#lock').value = 1;
 				var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
 				//socket.emit('commands',data );
-				send(data);
+				send(data,true);
 				debug.innerText = "loading...";
 				
 			} else {
@@ -266,7 +300,7 @@
 					document.querySelector('#lock').value = 1;
 					var data = {command:'loaddata',page: parseInt(page) -1 , book:book};			
 					//socket.emit('commands',data );
-					send(data);
+					send(data,true);
 					debug.innerText = "loading...";
 				} else {
 					debug.innerText = "Begin Of Content";
@@ -281,7 +315,7 @@
 			
 			if (!target.hasAttribute('noclick')) {
 				var data = {command:'click',page : parseInt(page),book:book};			 
-				send(data);
+				send(data,false);
 			} else {
 				target.removeAttribute('noclick');
 			}
@@ -306,6 +340,11 @@
 		var pos = document.querySelector('#pos');
 		if (pos)
 			window.scrollTo(0, pos.value  );
+		
+		/*var page =  document.querySelector('#page').value;
+		var textcontain = document.querySelector('#' + "contain" + page);
+		textcontain = textcontain.innerHTML.replace(/<(?:.|\n)*?>/gm, '');				
+		tts.ConvertInit(textcontain,"media" + page ,"Bruce","100","0","0","0","5");*/
 	});
 	
 	var ismove = false;
@@ -330,7 +369,7 @@
 			//socket.disconnect();
 			//socket.connect();
 			//socket.emit('commands', data );
-			send(data);
+			send(data,false);
 		}
 		else {
 			clickprocess(e);
@@ -388,7 +427,7 @@
 			//var data = {command:'ping',book:book};
 			var page = parseInt(document.querySelector('#page').value);
 			var data = {command:'checksync',book:book,page:page};
-			send(data);
+			send(data,true);
 			 
 		}		
 	}, false);
@@ -403,13 +442,14 @@
 					socket.emit('commands',sendqueue[timestamp].data);					
 	}	 
  }
- function send(data) {	
+ function send(data,traceback) {	
 	var timestamp = Number(new Date());	
 	data["id"] = timestamp;
 	//console.log(data);
 	socket.emit('commands',data);	
 	
-	if (data.command == 'click' ||  data.command == 'scrollend') {
+	//if (data.command == 'click' ||  data.command == 'scrollend') {
+	if (!traceback){
 		//click no return
 		data["id"] = null;
 	} else {
