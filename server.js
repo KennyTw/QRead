@@ -25,7 +25,8 @@ var http = require('http'),
 	app.get('/all', function(req, res) {
 		var qobj = req.query;
 		var mode = qobj.m;
-		res.render('all', {  mode : mode });									
+		var a = qobj.a;
+		res.render('all', {  mode : mode , autolink : a });									
 	});
 	
 	app.get('/', function(req, res) {		
@@ -33,6 +34,8 @@ var http = require('http'),
 		var book = qobj.b;
 		var font = qobj.f;
 		var mode = qobj.m;
+		var a = qobj.a;
+		
 		var page = 0 ;
 		var pos = 0 ;
 		
@@ -54,7 +57,7 @@ var http = require('http'),
 							 //console.log(data);
 							 currentpage = page;
 							 currentbook = book;
-							 res.render('index', { data: data ,pos : pos ,page:page ,total : total ,firstpage: page ,template:template , book : book , font : font , mode : mode , autostatus : 'auto off'});									
+							 res.render('index', { data: data ,pos : pos ,page:page ,total : total ,firstpage: page ,template:template , book : book , font : font , mode : mode , autostatus : 'auto off' , autolink : a});									
 					}); 							
 				});						
 			});

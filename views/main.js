@@ -11,13 +11,15 @@
 	var currDomain = window.location.host;
 	//var socket = io.connect(currDomain,{'forceNew':true });
 	var socket = io.connect(currDomain,{'forceNew':true });
-	var book = document.querySelector('#book').value;	
-	var finalcountdown = 5;
+	var book = document.querySelector('#book').value;
+	var countdownini = 5;
+	var finalcountdown = countdownini ;
 	var intervalobj;
 	//var lastcommand = "";
 	//var timerobj ;
 	var sendqueue = [];
 	var debug = document.querySelector('#debug');
+	var autolinkwindow = null;
 	
 	/*var tts = new TTS(); 
 	tts.PlayerSet.hidden = false;
@@ -26,6 +28,7 @@
 	
 	socket.on('events', function(evt) {	
 		console.log('events : ' + JSON.stringify(evt));
+		document.querySelector('#lastcmd').value = evt.command;		
 		//debug.innerText = JSON.stringify(evt);		
 		var pages = document.querySelector('core-pages');
 		var firstpage = parseInt(document.querySelector('#firstpage').value);
@@ -88,8 +91,8 @@
 			if (evt.dbdata.length > 0) {			
 				var html = ejs.render(content, { data: evt.dbdata , total:evt.total , page: parseInt(evt.page) , i : 0 });
 				var doc = document.implementation.createHTMLDocument('');
-				range = doc.createRange();
-				body = doc.body;
+				var range = doc.createRange();
+				var body = doc.body;
 				body.innerHTML = html;
 				range.selectNodeContents(body);
 				var frag = range.extractContents();
@@ -117,7 +120,7 @@
 					if (evt.memo == 'noclick') {
 						active.setAttribute('noclick','');
 					}					
-					active.click();
+					active.click();					
 				}
 				
 				/*var textcontain = document.querySelector('#' + "contain" + evt.page);
@@ -129,6 +132,7 @@
 				clearInterval(intervalobj);
 				intervalobj = undefined;
 				debug.innerText = "End Of Content";
+				document.querySelector('#autotts').value = 0;
 			}		
 		} else if (evt.command == 'sync') {
 			var content = document.getElementById('content').innerHTML;
@@ -147,8 +151,8 @@
 				var html = ejs.render(content, { data: evt.dbdata , total:evt.total , page: parseInt(evt.page) , i : 0 });
 				
 				var doc = document.implementation.createHTMLDocument('');
-				range = doc.createRange();
-				body = doc.body;
+				var range = doc.createRange();
+				var body = doc.body;
 				body.innerHTML = html;
 				range.selectNodeContents(body);
 				var frag = range.extractContents();
@@ -181,6 +185,10 @@
 					window.parent.document.title = "(" + (evt.total - oldlastpage - 1) + ") " + oldtitle;					
 				}
 				
+				if (document.querySelector('#autotts').value == 1)
+					document.querySelector('#ttsplay').click();
+					
+				
 				
 			}
 			
@@ -191,16 +199,37 @@
 				location.reload(true);
 			}
 		} else if (evt.command == 'tts') {
-			var doc = document.implementation.createHTMLDocument('');
-			range = doc.createRange();
-			body = doc.body;
-			var html = "<audio id='ttscontrol" + evt.page  + "' controls='controls' autoplay='autoplay'>";
-			html += "<source src='"  + evt.url + "' type='audio/wav'>Your browser does not support the audio element.</audio>";
-			body.innerHTML = html;
-			range.selectNodeContents(body);
-			var frag = range.extractContents();			
-			var ttscontrol = document.querySelector('#ttscontroldiv' + evt.page);
-			ttscontrol.appendChild(frag);			
+			
+			if (document.querySelector('#ttscontrol' + evt.page) == undefined) {			
+				var doc = document.implementation.createHTMLDocument('');
+				var range = doc.createRange();
+				var body = doc.body;					
+				var html = "<audio id='ttscontrol" + evt.page  + "' controls='controls' preload='auto' autoplay>";
+				html += "<source src='"  + evt.url + "' type='audio/wav'>Your browser does not support the audio element.</audio>";			
+				body.innerHTML = html;
+				range.selectNodeContents(body);
+				var frag = range.extractContents();			
+				var ttscontrol = document.querySelector('#ttscontroldiv' + evt.page);							
+				ttscontrol.appendChild(frag.cloneNode(true));
+				
+				/*var playcontrol = document.querySelector('#ttscontrol' + evt.page);
+				
+				playcontrol.load();
+				playcontrol.addEventListener('canplaythrough', function() {				   
+				   //playcontrol.play();
+				   setTimeout(function(){
+						playcontrol.play();
+					}, 2000);
+				});*/
+
+				if (document.querySelector('#autotts').value == 1) {
+					var audiocontrol = document.querySelector('#ttscontrol' + evt.page );
+					audiocontrol.addEventListener('ended', function(){
+						var active = document.querySelector('.core-selected .contain');								
+						active.click();
+					});				
+				}
+			}
 		}
 	});
 	
@@ -220,18 +249,18 @@
 	
 	function clickprocess(e) {
 		var target =  e.target;
-		finalcountdown = 5;
+		finalcountdown = countdownini;
 		if (target.id == "auto") {
 			if (intervalobj != undefined) {
 				clearInterval(intervalobj);
 				intervalobj = undefined;
-				finalcountdown = 5;
+				finalcountdown = countdownini ;
 				target.innerText = "auto off";				
 			} else {				
 				intervalobj = setInterval(function() {
 					var auto = document.querySelector('#auto');
 					if (finalcountdown == 0) {
-						finalcountdown = 5;						
+						finalcountdown = countdownini;						
 						var active = document.querySelector('.core-selected .contain');
 						active.click();
 					} else {
@@ -241,11 +270,14 @@
 				}, 1000);
 				target.innerText = "auto on  " + finalcountdown;								
 			}
-		} else if (	target.id == "ttsplay") {
+		} else if (	target.id == "ttsplay" || target.id == "autottsplay") {
+			if ( target.id == "autottsplay")
+				document.querySelector('#autotts').value = 1;
 			
 			var page =  document.querySelector('#page').value;
 			var textcontain = document.querySelector('#' + "contain" + page);
-			textcontain = textcontain.innerHTML.replace(/<(?:.|\n)*?>/gm, '');				
+			textcontain = textcontain.innerHTML.replace(/<a [^>]+>([^<]+)<\/a>/g,"");
+			textcontain = textcontain.replace(/<(?:.|\n)*?>/gm, '');				
 				
 			var data = {command:'tts', text : textcontain ,page: page , book:book};	
 			send(data,false);
@@ -258,7 +290,8 @@
 		var target = e.target;
 		if (target.nodeName == "A") return;
 		if (target.id == "auto") return;
-		if (target.id == "ttsplay") return;
+		if (target.id == "ttsplay" || target.id == "autottsplay") return;
+		if (target.id.indexOf("ttscontrol") >= 0 ) return;
 		//if (target.id.indexOf("loading") >= 0 ) return;
 		
 		var pages = document.querySelector('core-pages');
@@ -282,8 +315,11 @@
 				//pages.selected = (parseInt(pages.selected) + 1) % pages.children.length;
 				pages.selected = (parseInt(pages.selected) + 1);
 				page ++;
-				bchange = true;
-				
+				bchange = true;	
+				if (document.querySelector('#autotts').value == 1) {
+					document.querySelector('#page').value = page;
+					document.querySelector('#ttsplay').click();
+				}	
 			}
 
 			
@@ -319,7 +355,9 @@
 			} else {
 				target.removeAttribute('noclick');
 			}
-			debug.innerText = "";			
+			debug.innerText = "";
+			
+					
 		}
 	  }
 	  
@@ -358,10 +396,11 @@
 	});
 	
 	document.addEventListener('touchend', function(e) {
-		e.stopPropagation();
-		e.preventDefault();
+		//e.stopPropagation();
+		//e.preventDefault();
 		var pages = document.querySelector('core-pages');
 		var page = parseInt(document.querySelector('#page').value);
+		
 		
 		if (ismove){	
 			// window.pageYOffset  document.body.scrollHeight
@@ -401,6 +440,20 @@
 		debug.innerText = n + ":blur";
 	});*/
 	
+	document.querySelector('core-pages').addEventListener('core-select', function (event) {
+	  //parse content link
+			if (document.querySelector('#autolink').value  && document.querySelector('#lastcmd').value != 'sync') {
+				var active = document.querySelector('.core-selected .contain a');
+				if (active) {								
+					if (autolinkwindow) {
+						autolinkwindow.location.href = active.href;
+					} else {
+						autolinkwindow = window.open(active.href, 'qread');						
+					}
+				}
+			}		
+	});
+
 	document.addEventListener("visibilitychange", function() {
 		var debug = document.querySelector('#debug');		
 		var d = new Date();

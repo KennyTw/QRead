@@ -68,15 +68,16 @@
 			<%- include item.ejs %>
 		<% } %>			
 	</core-pages>
-	
-	
 	<input type='hidden' id="pos" value=<%=pos%>>
 	<input type='hidden' id="page" value=<%=page%>>
 	<input type='hidden' id="book" value=<%=book%>>
 	<input type='hidden' id="firstpage" value=<%=firstpage%>>
 	<input type='hidden' id="lastpage" value=<%=firstpage%>>
 	<input type='hidden' id="lock" value=0>
+	<input type='hidden' id="autotts" value=0>
 	<input type='hidden' id="title" value="<%="QRead " + book%>">
+	<input type='hidden' id="autolink" value="<%=autolink%>">
+	<input type='hidden' id="lastcmd" >
 	
   <script src="/socket.io/socket.io.js"></script>
   <script src="/views/main.js"></script>
