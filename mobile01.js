@@ -29,11 +29,11 @@ function fetch(feed,callback) {
   }); 
   feedparser.on('readable', function() { 
     //console.log(  '-------------------------- readable');
-	yahoodbprocess(this,function() {});	
+	 dbprocess(this,function() {});	
   });
 }  
 
-function yahoodbprocess(streamdata , callback)  {
+function dbprocess(streamdata , callback)  {
 	(function addOne() {
 		var record = streamdata.read(); // get the first record of coll and reduce coll by one
 		try {
@@ -42,31 +42,30 @@ function yahoodbprocess(streamdata , callback)  {
 			  callback();
 			  return;
 		  }
-		  db.sadd('saveyahookey',record.guid, function(err,dbresult) {
-			if (err) { callback(err); return }
-			
-				if (dbresult > 0) {	
-					
-					var yahootext = record.title;
-					var desc = record.description;
-					desc = desc.replace("<p>","");
-					desc = desc.replace("</p>","");
-					desc = desc.replace('align="left"','');
-					//desc = desc.replace(record.link,'javascript:none'); 
-					
-					yahootext = yahootext + " : " + desc;
-					yahootext = yahootext + " <a href='" +  record.link  + "' target='new'>Link</a>";
-					
-					console.log(record.title);
-					db.rpush("datayahoo"  ,yahootext ,function(err,dbdata){});
-					newcount++;
-					
-				} else {
-					console.log('exist:' + record.guid + ' ' + record.title);
-				}
-				addOne();
-			
-		  });
+		  var pos1 = record.link.indexOf('&t=');
+		  if (pos1 >= 0) {
+			  var id = record.link.substring(pos1+3,record.link.length);
+			  db.sadd('savemobile01key',id, function(err,dbresult) {
+				if (err) { callback(err); return }
+				
+					if (dbresult > 0) {	
+						
+						var text = record.title;
+						var desc = record.description;
+						desc = desc + " <a target='new' href='" + record.link + "'>Link</a>";									
+						text = text + ":" + desc;				
+						
+						console.log(record.title);
+						db.rpush("datamobile01"  ,text ,function(err,dbdata){});	
+						newcount ++;
+						
+					} else {
+						console.log('exist:' +  id + ' ' + record.title);
+					}
+					addOne();
+				
+			  });
+		  }
 		} catch (exception) {
 		  callback(exception);
 		}
@@ -81,24 +80,21 @@ function done(err) {
   process.exit();
 }
 
-db.exists("saveyahoo" ,function(err,dbdata) {					
+db.exists("savemobile01" ,function(err,dbdata) {					
 					if (dbdata == 0) {
-						db.hset("saveyahoo"  ,"page",0);
-						db.hset("saveyahoo"  ,"pos",0);
+						db.hset("savemobile01"  ,"page",0);
+						db.hset("savemobile01"  ,"pos",0);
 					}	
-			fetch('https://tw.news.yahoo.com/rss/',function() {
-				fetch('https://tw.news.yahoo.com/rss/technology',function () {
-					fetch('https://tw.news.yahoo.com/rss/world',function() {
+					fetch('http://www.mobile01.com/rss/hottopics.xml',function() {				
 						console.log('done : ' + newcount);
-						
 						if (newcount > 0) {
-							var rtn = {command:'newdata',book:'yahoo'};
+							var rtn = {command:'newdata',book:'mobile01'};
 							db.publish("events",JSON.stringify(rtn));					
 						}
+						
 						process.exit();
 					});
-				});
-			});			
+			
 });
 
 
