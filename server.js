@@ -100,9 +100,13 @@ var http = require('http'),
 								 for (var i = 0 ; i < data.length ; i ++) {									 
 									 datamerge += data[i] + "<br><br>";
 								 }						 
-								 					 
-								 var dataarr = [];
+								 
+								var dataarr = [];
+								if (data.length > 0) {								 
 								 dataarr.push(datamerge);
+								} else {
+									dataarr = data;
+								}
 								 
 								 currentpage = page;
 								 currentbook = book;
@@ -246,9 +250,13 @@ var http = require('http'),
 								 for (var i = 0 ; i < dbdata.length ; i ++) {									 
 									 datamerge += dbdata[i] + "<br><br>";
 								 }						 
-								 					 
+								 				 
 								 var dataarr = [];
-								 dataarr.push(datamerge);
+								if (data.length > 0) {
+									dataarr.push(datamerge);
+								} else {
+									dataarr = 	dbdata;								
+								}
 								 
 								 var rtn = {command:'data',dbdata:dataarr,page: page,total : total,book:book,id:data.id,memo:data.memo,step:data.step};
 								 //console.log(dbdata);
