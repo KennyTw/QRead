@@ -20,6 +20,7 @@
 	var sendqueue = [];
 	var debug = document.querySelector('#debug');
 	var autolinkwindow = null;
+	var step =  parseInt(document.querySelector('#step').value);
 	
 	/*var tts = new TTS(); 
 	tts.PlayerSet.hidden = false;
@@ -50,7 +51,7 @@
 			//if (newpage <  pages.children.length) {		
 				
 				
-				if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > 1  ) {				
+				if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > step ) {				
 					var data = {command:'reload',book:book};			
 					//socket.emit('commands',data );
 					send(data,true);
@@ -82,14 +83,14 @@
 			debug.innerText = "";
 			document.querySelector('#lock').value = 0;
 			
-			if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > 1  ) {				
+			if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > step  ) {				
 					var data = {command:'reload',book: book};			
 					//socket.emit('commands',data );
 					send(data,true);
 			} 
 			
 			if (evt.dbdata.length > 0) {			
-				var html = ejs.render(content, { data: evt.dbdata , total:evt.total , page: parseInt(evt.page) , i : 0 });
+				var html = ejs.render(content, { data: evt.dbdata , total:evt.total , page: parseInt(evt.page) , i : 0 ,step : evt.step});
 				var doc = document.implementation.createHTMLDocument('');
 				var range = doc.createRange();
 				var body = doc.body;
@@ -135,6 +136,12 @@
 				document.querySelector('#autotts').value = 0;
 			}		
 		} else if (evt.command == 'sync') {
+			if (step > 1) {
+				location.reload(true);
+				return;
+			}
+				
+			
 			var content = document.getElementById('content').innerHTML;
 			//var debug = document.querySelector('#debug');
 			debug.innerText = "";
@@ -204,8 +211,10 @@
 				var doc = document.implementation.createHTMLDocument('');
 				var range = doc.createRange();
 				var body = doc.body;					
-				var html = "<audio id='ttscontrol" + evt.page  + "' controls='controls' preload='auto' autoplay>";
-				html += "<source src='"  + evt.url + "' type='audio/wav'>Your browser does not support the audio element.</audio>";			
+				//var html = "<audio id='ttscontrol" + evt.page  + "' controls='controls' preload='auto' autoplay>";
+				//html += "<source src='"  + evt.url + "' type='audio/wav'>Your browser does not support the audio element.</audio>";			
+				var html = "<audio id='ttscontrol" + evt.page  + "' src='"  + evt.url + "' controls='controls' preload='auto' autoplay>";
+				//html += "<source src='"  + evt.url + "' type='audio/wav'>Your browser does not support the audio element.</audio>";			
 				body.innerHTML = html;
 				range.selectNodeContents(body);
 				var frag = range.extractContents();			
@@ -249,7 +258,7 @@
 	
 	function clickprocess(e) {
 		var target =  e.target;
-		finalcountdown = countdownini;
+		finalcountdown = countdownini;		
 		if (target.id == "auto") {
 			if (intervalobj != undefined) {
 				clearInterval(intervalobj);
@@ -287,26 +296,28 @@
 	} 
 		
 	function click(e) {
-		var target = e.target;
+		var target = e.target;		
 		if (target.nodeName == "A") return;
 		if (target.id == "auto") return;
 		if (target.id == "ttsplay" || target.id == "autottsplay") return;
 		if (target.id.indexOf("ttscontrol") >= 0 ) return;
-		//if (target.id.indexOf("loading") >= 0 ) return;
+		//if (target.id.indexOf("loading") >= 0 ) return;		
+		e.stopPropagation();
+		e.preventDefault();
 		
 		var pages = document.querySelector('core-pages');
 		var bchange = false;
 		var page = parseInt(document.querySelector('#page').value);		
 		var debug = document.querySelector('#debug');
 		var lastpage = parseInt(document.querySelector('#lastpage').value);
-		var lock = parseInt(document.querySelector('#lock').value);
+		var lock = parseInt(document.querySelector('#lock').value);		
 		
 		if (lock == 1) return;
 		
 		if  (target.className == "contain" || target.nodeName == "IMG"){
-			if (parseInt(page) + 1 >  lastpage) {
+			if (parseInt(page) + step >  lastpage) {
 				document.querySelector('#lock').value = 1;
-				var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
+				var data = {command:'loaddata',page: parseInt(page) + step,book:book};			
 				//socket.emit('commands',data );
 				send(data,true);
 				debug.innerText = "loading...";
@@ -314,7 +325,7 @@
 			} else {
 				//pages.selected = (parseInt(pages.selected) + 1) % pages.children.length;
 				pages.selected = (parseInt(pages.selected) + 1);
-				page ++;
+				page = page + step;
 				bchange = true;	
 				if (document.querySelector('#autotts').value == 1) {
 					document.querySelector('#page').value = page;
@@ -329,12 +340,12 @@
 			if ((pages.selected - 1) >= 0) {
 				//pages.selected = (parseInt(pages.selected) - 1) % pages.children.length;
 				pages.selected = (parseInt(pages.selected) - 1)
-				page --;
+				page = page - step;
 				bchange = true;
 			} else {
 				if (parseInt(page) -2 >= -1) {
 					document.querySelector('#lock').value = 1;
-					var data = {command:'loaddata',page: parseInt(page) -1 , book:book};			
+					var data = {command:'loaddata',page: parseInt(page) - step , book:book};			
 					//socket.emit('commands',data );
 					send(data,true);
 					debug.innerText = "loading...";
@@ -374,7 +385,7 @@
 	
 	
 	
-	window.addEventListener('load',function(e) {	
+	window.addEventListener('load',function(e) {
 		var pos = document.querySelector('#pos');
 		if (pos)
 			window.scrollTo(0, pos.value  );
@@ -411,6 +422,7 @@
 			send(data,false);
 		}
 		else {
+			
 			clickprocess(e);
 			click(e);
 			/*window.scrollTo(0, 0);
@@ -420,6 +432,8 @@
 			//socket.connect();
 			socket.emit('commands',data );*/
 		}
+		
+		
 	});
 	
 	/*window.addEventListener('focus', function(e) {		
@@ -446,9 +460,9 @@
 				var active = document.querySelector('.core-selected .contain a');
 				if (active) {								
 					if (autolinkwindow) {
-						autolinkwindow.location.href = active.href;
+						autolinkwindow.location.replace(active.href);
 					} else {
-						autolinkwindow = window.open(active.href, 'qread');						
+						autolinkwindow = window.open(active.href, 'qread','',true);						
 					}
 				}
 			}		
@@ -498,6 +512,7 @@
  function send(data,traceback) {	
 	var timestamp = Number(new Date());	
 	data["id"] = timestamp;
+	data["step"] = step;
 	//console.log(data);
 	socket.emit('commands',data);	
 	

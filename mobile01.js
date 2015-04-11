@@ -4,6 +4,8 @@ var FeedParser = require('feedparser')
 var	redis = require('redis');
 var db = redis.createClient();
 var newcount = 0;
+var block = 0;
+var record ;
 
 function fetch(feed,callback) {
   // Define our streams
@@ -17,36 +19,52 @@ function fetch(feed,callback) {
 
   // Define our handlers
   req.on('error', done);
-  req.on('response', function(res) {
+  req.on('response', function(res) {	
     if (res.statusCode != 200) return this.emit('error', new Error('Bad status code'));   
     res.pipe(feedparser);
   });
 
   feedparser.on('error', done);
   feedparser.on('end', function() {
-	    //console.log(  '-------------------------- end');
-	    callback();
+	    console.log(  '-------------------------- end');
+	   // callback();
   }); 
   feedparser.on('readable', function() { 
-    //console.log(  '-------------------------- readable');
-	 dbprocess(this,function() {});	
+     console.log(  '-------------------------- readable');
+	 if (block == 0) 
+		dbprocess(this,function(result) {
+			if (result == 'end')
+				callback();
+		});	
   });
 }  
 
+
 function dbprocess(streamdata , callback)  {
 	(function addOne() {
-		var record = streamdata.read(); // get the first record of coll and reduce coll by one
-		try {
-		 // console.log(record.id);
-		  if (record == null) {
-			  callback();
+		if (block == 0) {
+			block = 1;
+			record = streamdata.read(); // get the first record of coll and reduce coll by one
+		}		
+		
+		try {		   
+		  if (record == null) {			 
+			  callback('end');
+			  console.log('null return');
 			  return;
-		  }
+		  }		  
 		  var pos1 = record.link.indexOf('&t=');
 		  if (pos1 >= 0) {
+			  
+			  //var pos2 = record.link.indexOf('?f=');
+			  //var pos3 = record.link.indexOf('&',pos2);
 			  var id = record.link.substring(pos1+3,record.link.length);
+			 // var id2 = record.link.substring(pos2+3,pos3);
+			 // id = id2 + "-" + id;
+			  console.log(record.link);
 			  db.sadd('savemobile01key',id, function(err,dbresult) {
-				if (err) { callback(err); return }
+				  //console.log('--' + record.link);
+				if (err) {  console.log(err); callback(err); return; }
 				
 					if (dbresult > 0) {	
 						
@@ -57,15 +75,17 @@ function dbprocess(streamdata , callback)  {
 						
 						console.log(record.title);
 						db.rpush("datamobile01"  ,text ,function(err,dbdata){});	
-						newcount ++;
+						newcount ++;						
 						
 					} else {
 						console.log('exist:' +  id + ' ' + record.title);
 					}
+					
+					record = streamdata.read();
 					addOne();
 				
 			  });
-		  }
+		  }  
 		} catch (exception) {
 		  callback(exception);
 		}
@@ -84,8 +104,9 @@ db.exists("savemobile01" ,function(err,dbdata) {
 					if (dbdata == 0) {
 						db.hset("savemobile01"  ,"page",0);
 						db.hset("savemobile01"  ,"pos",0);
-					}	
-					fetch('http://www.mobile01.com/rss/hottopics.xml',function() {				
+					} 	
+					//fetch('http://www.mobile01.com/rss/newtopics.xml',function() {
+					fetch('http://www.mobile01.com/rss/hottopics.xml',function() {
 						console.log('done : ' + newcount);
 						if (newcount > 0) {
 							var rtn = {command:'newdata',book:'mobile01'};

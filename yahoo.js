@@ -4,6 +4,8 @@ var FeedParser = require('feedparser')
 var	redis = require('redis');
 var db = redis.createClient();
 var newcount = 0;
+var block = 0;
+var record ;
 
 function fetch(feed,callback) {
   // Define our streams
@@ -25,21 +27,29 @@ function fetch(feed,callback) {
   feedparser.on('error', done);
   feedparser.on('end', function() {
 	    //console.log(  '-------------------------- end');
-	    callback();
+	    //callback();
   }); 
   feedparser.on('readable', function() { 
     //console.log(  '-------------------------- readable');
-	yahoodbprocess(this,function() {});	
+	if (block == 0) 
+		dbprocess(this,function(result) {
+			if (result == 'end')
+				callback();
+		});		
   });
 }  
 
-function yahoodbprocess(streamdata , callback)  {
+function dbprocess(streamdata , callback)  {
 	(function addOne() {
-		var record = streamdata.read(); // get the first record of coll and reduce coll by one
+		if (block == 0) {
+			block = 1;
+			record = streamdata.read(); // get the first record of coll and reduce coll by one
+		}		
 		try {
 		 // console.log(record.id);
 		  if (record == null) {
-			  callback();
+			  callback('end');
+			  console.log('null return');
 			  return;
 		  }
 		  db.sadd('saveyahookey',record.guid, function(err,dbresult) {
@@ -64,6 +74,8 @@ function yahoodbprocess(streamdata , callback)  {
 				} else {
 					console.log('exist:' + record.guid + ' ' + record.title);
 				}
+				
+				record = streamdata.read();
 				addOne();
 			
 		  });
@@ -86,17 +98,14 @@ db.exists("saveyahoo" ,function(err,dbdata) {
 						db.hset("saveyahoo"  ,"page",0);
 						db.hset("saveyahoo"  ,"pos",0);
 					}	
-			fetch('https://tw.news.yahoo.com/rss/',function() {
-				fetch('https://tw.news.yahoo.com/rss/technology',function () {
-					fetch('https://tw.news.yahoo.com/rss/world',function() {
-						console.log('done : ' + newcount);
-						
+			fetch('https://tw.news.yahoo.com/rss/information-3c',function() {
+				fetch('https://tw.news.yahoo.com/rss/technology',function () {					
+						console.log('done : ' + newcount);						
 						if (newcount > 0) {
 							var rtn = {command:'newdata',book:'yahoo'};
 							db.publish("events",JSON.stringify(rtn));					
 						}
-						process.exit();
-					});
+						process.exit();					
 				});
 			});			
 });

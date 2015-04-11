@@ -4,8 +4,7 @@ var FeedParser = require('feedparser')
 var	redis = require('redis');
 var db = redis.createClient();
 var newcount = 0;
-var block = 0;
-var record ;
+var keyprefix = "flickr";
 
 function fetch(feed,callback) {
   // Define our streams
@@ -27,53 +26,52 @@ function fetch(feed,callback) {
   feedparser.on('error', done);
   feedparser.on('end', function() {
 	    //console.log(  '-------------------------- end');
-	   // callback();
+	    callback();
   }); 
   feedparser.on('readable', function() { 
     //console.log(  '-------------------------- readable');
-	 if (block == 0) 
-		dbprocess(this,function(result) {
-			if (result == 'end')
-				callback();
-		});	
+	 dbprocess(this,function() {});	
   });
 }  
 
 function dbprocess(streamdata , callback)  {
 	(function addOne() {
-		if (block == 0) {
-			block = 1;
-			record = streamdata.read(); // get the first record of coll and reduce coll by one
-		}		
+		var record = streamdata.read(); // get the first record of coll and reduce coll by one
 		try {
-		 // console.log(record.id);
+		  //console.log(record.enclosures[0].url);
+		  
+		 
 		  if (record == null) {
-			  callback('end');
-			  console.log('null return');
+			  callback();
 			  return;
 		  }
-		  db.sadd('saveapplekey',record.guid, function(err,dbresult) {
-			if (err) { callback(err); return }
-			
-				if (dbresult > 0) {	
-					
-					var text = record.title;
-					var desc = record.description;
-					desc = desc.replace("<a","<a target='new' ");					
-					text = desc;				
-					
-					console.log(record.title);
-					db.rpush("dataapple"  ,text ,function(err,dbdata){});	
-					newcount ++;
-					
-				} else {
-					console.log('exist:' + record.guid + ' ' + record.title);
-				}
+		
+			  var id = record.guid;
+			  db.sadd('save' + keyprefix + 'key',id, function(err,dbresult) {
+				if (err) { callback(err); return }				
+					if (dbresult > 0) {	
+						
+						var text = record.title;  
+						var desc = "<img src='" + record.enclosures[0].url + "'/>";
+						desc += "<a href='" + record.link + "'>Link</a>";
+						//desc = desc + " <a target='new' href='" + record.link + "'>Link</a>";	
+
+						if (text != null) {
+							text = text + ":" + desc;
+						} else 
+							text = desc;
+						
+						console.log(record.title);
+						db.rpush("data" + keyprefix  ,text ,function(err,dbdata){});	
+						newcount ++;
+						
+					} else {
+						console.log('exist:' +  id + ' ' + record.title);
+					}
+					addOne();
 				
-				record = streamdata.read();
-				addOne();
-			
-		  });
+			  });
+		 
 		} catch (exception) {
 		  callback(exception);
 		}
@@ -88,15 +86,15 @@ function done(err) {
   process.exit();
 }
 
-db.exists("saveapple" ,function(err,dbdata) {					
+db.exists("save" + keyprefix ,function(err,dbdata) {					
 					if (dbdata == 0) {
-						db.hset("saveapple"  ,"page",0);
-						db.hset("saveapple"  ,"pos",0);
+						db.hset("save" + keyprefix  ,"page",0);
+						db.hset("save" + keyprefix  ,"pos",0);
 					}	
-			fetch('http://www.appledaily.com.tw/rss/newcreate/kind/rnews/type/new',function() {				
+					fetch('https://api.flickr.com/services/feeds/photos_public.gne?format=rss2',function() {				
 						console.log('done : ' + newcount);
 						if (newcount > 0) {
-							var rtn = {command:'newdata',book:'apple'};
+							var rtn = {command:'newdata',book:keyprefix};
 							db.publish("events",JSON.stringify(rtn));					
 						}
 						
