@@ -252,7 +252,7 @@ var http = require('http'),
 								 }						 
 								 				 
 								 var dataarr = [];
-								if (data.length > 0) {
+								if (dbdata.length > 0) {
 									dataarr.push(datamerge);
 								} else {
 									dataarr = 	dbdata;								
