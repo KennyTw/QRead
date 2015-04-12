@@ -215,7 +215,7 @@ var http = require('http'),
 					db.hget("save" + book ,"page",function(err,dbdata) {
 						//var currentpage = dbdata;	
 						console.log("step : " + data.step);	
-						if (data.page > total - parseInt(data.step) || Math.abs(data.page - dbdata) > parseInt(data.step)  ) {
+						if (data.page > total - 1 || Math.abs(data.page - dbdata) > parseInt(data.step)  ) {
 							console.log("data.page : " + data.page  + ", dbdata : " + dbdata);
 							var rtn = {command:'reload',book:book,id:data.id};
 							io.sockets.emit('events', rtn);	
