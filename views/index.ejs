@@ -59,6 +59,14 @@
 		}
 	</style>
 	<% } %>
+	
+	<%if (fontsize) {%>
+		<style>
+		p {		
+			font-size: <%=fontsize%>rem;
+		}
+		</style>
+	<% } %>
   </head>
   <body  fullbleed vertical layout unresolved > 
 	<div id="debug" class="centerp height5"></div>	

@@ -27,12 +27,13 @@ var http = require('http'),
 		var qobj = req.query;
 		var mode = qobj.m;
 		var a = qobj.a;
+		var z = qobj.z;
 		if (qobj.s)
 			step = parseInt(qobj.s)
 		else
 			step = 1;
 		
-		res.render('all', {  mode : mode , autolink : a , step : step});									
+		res.render('all', {  mode : mode , autolink : a , step : step , fontsize : z});									
 	});
 	
 	app.get('/', function(req, res) {		
@@ -41,6 +42,7 @@ var http = require('http'),
 		var font = qobj.f;
 		var mode = qobj.m;
 		var a = qobj.a;
+		var z = qobj.z;
 		var pageurl = qobj.i;
 		
 		if (qobj.s)
@@ -68,7 +70,7 @@ var http = require('http'),
 						
 						db.lrange("data" + book ,pageurl,pageurl+1,function(err,data){
 								 //console.log(data);								 
-								 res.render('index', { data: data ,pos : 0 ,page:pageurl ,total : total ,firstpage: pageurl ,template:template , book : book , font : font , mode : mode , autostatus : 'auto off' , autolink : a});
+								 res.render('index', { data: data ,pos : 0 ,page:pageurl ,total : total ,firstpage: pageurl ,template:template , book : book , font : font , mode : mode , autostatus : 'auto off' , autolink : a , fontsize : z});
 								 
 								 db.hset("save" + book ,"page",pageurl);
 								 var rtn = {command:'newdata',book:'apple'};
@@ -110,7 +112,7 @@ var http = require('http'),
 								 
 								 currentpage = page;
 								 currentbook = book;
-								 res.render('index', { data: dataarr ,pos : pos ,page:page ,total : total ,firstpage: page ,template:template , book : book , font : font , mode : mode , autostatus : 'auto off' , autolink : a , step : step});									
+								 res.render('index', { data: dataarr ,pos : pos ,page:page ,total : total ,firstpage: page ,template:template , book : book , font : font , mode : mode , autostatus : 'auto off' , autolink : a , step : step , fontsize : z});									
 						}); 							
 					});						
 				});
