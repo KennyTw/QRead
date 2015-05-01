@@ -12,6 +12,7 @@
 	"request" : "*",
 	"html-to-text" : "*",
 	"readability-api" : "*",
-	"soap" : "*"
+	"soap" : "*",
+	"node-gcm" : "*"	
   }
 }

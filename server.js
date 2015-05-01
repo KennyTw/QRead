@@ -5,6 +5,7 @@ var http = require('http'),
 	evt = redis.createClient(),
 	socket = require('socket.io');	
 	var soap = require('soap');
+	var gcm = require('node-gcm');
 	
 	
 	var template = require('fs').readFileSync('./views/item.ejs', 'utf-8');
@@ -34,6 +35,26 @@ var http = require('http'),
 			step = 1;
 		
 		res.render('all', {  mode : mode , autolink : a , step : step , fontsize : z});									
+	});
+	
+	app.get('/gcm', function(req, res) {
+		
+		var message = new gcm.Message();
+		message.addData('key1', 'msg1');
+
+		var regIds = ['APA91bGUtIKbnzPCo3Lth4JDy_uMS4_VH5UrCwpIR8ds4XBgI4NwETE74RhMTGKw2Dh5pm3OQbMK2SJQrTw7oiI0afqabfvKxSVyLOpbC7CXA4lORXadQu14LwUqzSaMls5-CZa8Q76MTBjsm8hRpm2cDQMO4YkLrUev4P9BIWvJMO6TxoWjElI'];
+		//var regIds = ['285027108615'];
+
+		
+		
+		var sender = new gcm.Sender('AIzaSyD4Iba2-V5a_KRdx5tHbDmRhGhvVnZsO7g');
+
+		sender.send(message, regIds, function (err, result) {
+			if(err) console.log(err);
+			else    console.log(result);
+		});
+		
+		res.end();
 	});
 	
 	app.get('/', function(req, res) {		
