@@ -1,0 +1,21 @@
+{
+  "manifest_version": 2,
+  "name": "QRead",
+  "description": "QRead",
+  "version": "1.0",
+
+  "background": {
+    "scripts": ["qread.js"],
+    "persistent": true
+  },   
+  "browser_action": { 
+	"default_icon": "Lite-Icon-icon.png" ,
+	"default_popup": "popup.html"
+  },
+  "permissions": [
+        "webRequest",
+		"webNavigation",
+		"tabs",
+		"storage"	
+    ]
+}

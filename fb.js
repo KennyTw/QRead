@@ -3,6 +3,9 @@ var	redis = require('redis');
 var db = redis.createClient();
 var fs = require('fs');
 var newcount = 0;
+//var gcmstring = "";
+//var gcmindex = 0;
+//var gcm = require('node-gcm');
 
 /*
 FB.api('oauth/access_token', {
@@ -25,9 +28,12 @@ FB.api('oauth/access_token', {
 
 fs.readFile('fbtoken', 'utf8', function (err,token) {
   if (err) {
+	process.exit(0);   
 	return console.log(err);
   }
   console.log("token:" + token);
+  gcmstring = "";
+  gcmindex = 0;
   
   FB.api('oauth/access_token', {
 	client_id: '470891803068657',
@@ -37,6 +43,7 @@ fs.readFile('fbtoken', 'utf8', function (err,token) {
 	}, function (res) {
 		if(!res || res.error) {
 			console.log(!res ? 'error occurred' : res.error);
+			process.exit(0); 
 			return;
 		}
 
@@ -51,9 +58,21 @@ fs.readFile('fbtoken', 'utf8', function (err,token) {
 					console.log('done : ' + newcount);
 					if (newcount > 0) {
 							var rtn = {command:'newdata',book:'fb'};
-							db.publish("events",JSON.stringify(rtn));					
+							db.publish("events",JSON.stringify(rtn));
+
+							/*var message = new gcm.Message();
+							message.addData('key1', gcmstring);
+							var regIds = ['APA91bEdiFgl9ySFKpIN87T7eySjeFa1dGcZ9yiqlA5sD3Q71rTjV921ASoVnKHo35gRofuBj9_IuhbyIt_85crCYKpdmR78yy5cGVcH8YsUi8tSAufX4VNxn-n2BVP6upyycfflcvvl2nS2UwPeUwTqh-ycFpeqWQ'];
+							var sender = new gcm.Sender('AIzaSyD4Iba2-V5a_KRdx5tHbDmRhGhvVnZsO7g');
+							sender.send(message, regIds, function (err, result) {
+								if(err) console.log(err);
+								else    console.log(result);
+								process.exit(0);
+							});*/
+							process.exit(0); 
+					} else {					
+						process.exit(0); 				
 					}
-					process.exit(0); 				
 			});
 		});
 	}
@@ -82,6 +101,7 @@ function getdata(filter) {
 			console.log(res.data.length);
 				for (var i = res.data.length -1  ; i >= 0  ; i-- ) {
 					fbtext = res.data[i].from.name;
+					gcmstring = gcmstring + res.data[i].from.name;
 					  
 					//if (typeof res.data[i].actions == "undefined")
 					//	continue;
@@ -91,8 +111,10 @@ function getdata(filter) {
 					  fbtext = fbtext + res.data[i].story;
 					}
 					  
-					if (typeof res.data[i].message != "undefined")
+					if (typeof res.data[i].message != "undefined"){
 						fbtext = fbtext + " : " + res.data[i].message;
+						gcmstring = gcmstring + " : " + res.data[i].message + "\n\n";
+					}
 					
 					if (typeof res.data[i].name != "undefined")
 						fbtext = fbtext + " " + res.data[i].name;
@@ -117,7 +139,9 @@ function getdata(filter) {
 					if (typeof res.data[i].link != "undefined") {
 						fbtext = fbtext + " <a href='" + res.data[i].link + "' target='new'>Link</a>"						
 					}			
-					 
+					
+					
+					
 					var d = new Date(res.data[i].created_time);  
 					var msgid = d.valueOf();
 					console.log(msgid + ":" + res.data[i].story);
@@ -153,26 +177,36 @@ function fbdbprocess(datalist , callback) {
 			  callback();
 			} else {
 				if (dbresult > 0) {	
-					
+					//gcmstring = "";
 					fbtext = record.from.name;
+					//gcmindex += 1;
+					gcmstring = gcmstring +  record.from.name;
 					  
 					//if (typeof res.data[i].actions == "undefined")
 					//	continue;
 					  
-					if (typeof record.story != "undefined"){
-					  fbtext = fbtext + " : ";				  
-					  fbtext = fbtext + record.story;
+					if (typeof record.story != "undefined"){			
+					  fbtext = fbtext + " : " + record.story;
+					  gcmstring = gcmstring + " , " + record.story;
 					}
 					  
-					if (typeof record.message != "undefined")
+					if (typeof record.message != "undefined") {
 						fbtext = fbtext + " : " + record.message;
+						gcmstring = gcmstring + " , " + record.message ;
+					}
 					
-					if (typeof record.name != "undefined")
+					if (typeof record.name != "undefined") {
 						fbtext = fbtext + " " + record.name;
+						gcmstring = gcmstring + " , " + record.name ;
+					}
 					
-					if (typeof record.description != "undefined")
+					if (typeof record.description != "undefined") {
 						fbtext = fbtext + " " + record.description;
+						
+						gcmstring = gcmstring + " , " +  record.description ;
+					}
 					
+					gcmstring = gcmstring + "\n\n";
 					
 					//http://graph.facebook.com/550529951716677/picture?type=normal
 					/*if (typeof res.data[i].picture != "undefined") {

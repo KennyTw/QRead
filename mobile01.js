@@ -6,6 +6,8 @@ var db = redis.createClient();
 var newcount = 0;
 var block = 0;
 var record ;
+//var gcmstring = "";
+//var gcm = require('node-gcm');
 
 function fetch(feed,callback) {
   // Define our streams
@@ -71,7 +73,17 @@ function dbprocess(streamdata , callback)  {
 						var text = record.title;
 						var desc = record.description;
 						desc = desc + " <a target='new' href='" + record.link + "'>Link</a>";									
-						text = text + ":" + desc;				
+						text = text + ":" + desc;
+						//gcmstring = record.title + " : " + record.description + "\r\n" + "\r\n";
+						
+						/*var message = new gcm.Message();
+						message.addData('key1', gcmstring);
+						var regIds = ['APA91bEdiFgl9ySFKpIN87T7eySjeFa1dGcZ9yiqlA5sD3Q71rTjV921ASoVnKHo35gRofuBj9_IuhbyIt_85crCYKpdmR78yy5cGVcH8YsUi8tSAufX4VNxn-n2BVP6upyycfflcvvl2nS2UwPeUwTqh-ycFpeqWQ'];
+						var sender = new gcm.Sender('AIzaSyD4Iba2-V5a_KRdx5tHbDmRhGhvVnZsO7g');
+						sender.send(message, regIds, function (err, result) {
+							if(err) console.log(err);
+							else    console.log(result);							
+						});*/
 						
 						console.log(record.title);
 						db.rpush("datamobile01"  ,text ,function(err,dbdata){});	
@@ -105,14 +117,15 @@ db.exists("savemobile01" ,function(err,dbdata) {
 						db.hset("savemobile01"  ,"page",0);
 						db.hset("savemobile01"  ,"pos",0);
 					} 	
+					
+							
 					//fetch('http://www.mobile01.com/rss/newtopics.xml',function() {
 					fetch('http://www.mobile01.com/rss/hottopics.xml',function() {
 						console.log('done : ' + newcount);
 						if (newcount > 0) {
-							var rtn = {command:'newdata',book:'mobile01'};
-							db.publish("events",JSON.stringify(rtn));					
-						}
-						
+							var rtn = {command:'newdata',book:'mobile01'};						
+							db.publish("events",JSON.stringify(rtn));
+						} 				
 						process.exit();
 					});
 			
