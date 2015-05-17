@@ -141,7 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	
 	OpenFb.addEventListener('click', function() {
         //chrome.windows.create({ url: 'http://104.155.234.188/?b=fb&m=n&a=1&z=1.2', width: 420, height: 230, type: 'panel'});	
-		var book='fb';
+		book='fb';
 		BGPage.setBook(book);
 		var data = {command:'sync',book:'fb'};
 	    send(data);
