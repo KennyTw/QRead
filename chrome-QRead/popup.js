@@ -28,7 +28,8 @@ socket.on('events', function(evt) {
 		page = evt.page;
 		total = evt.total;
 		pageidx.innerText = parseInt(page)+1 + "/" + total;
-		showLink.innerHTML = evt.dbdata[0];		
+		var data = evt.dbdata[0].replace("<br><br>","");
+		showLink.innerHTML = data;		
 		var links = showLink.querySelectorAll('a');
 		if (links) {
 			for (var i = 0 ; i < links.length ;  i++) {
