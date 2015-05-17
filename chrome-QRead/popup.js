@@ -36,12 +36,19 @@ socket.on('events', function(evt) {
 						code: 'history.replaceState({}, "", " ");'
 					});});
 				});*/
+				
+
 				if (i == 0) {
-					chrome.tabs.query({currentWindow: true, active: true}, function (tab) {				
-						chrome.tabs.executeScript(tab.id,{
-							code: 'location.replace("' +  links[0].href+ '");'
-						});
+					chrome.tabs.getSelected(null,function(tab) {						
+						if (tab.url != links[0].href) {
+							chrome.tabs.query({currentWindow: true, active: true}, function (tab) {				
+								chrome.tabs.executeScript(tab.id,{
+									code: 'location.replace("' +  links[0].href+ '");'
+								});
+							});							
+						}
 					});
+					
 				}
 			}
 		}		
