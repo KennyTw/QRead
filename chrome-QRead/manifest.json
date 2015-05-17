@@ -9,7 +9,7 @@
     "persistent": true
   },   
   "browser_action": { 
-	"default_icon": "Lite-Icon-icon.png" ,
+	"default_icon": "20150517091556222_easyicon_net_64.png" ,
 	"default_popup": "popup.html"
   },
   "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdn.socket.io; object-src 'self'",
