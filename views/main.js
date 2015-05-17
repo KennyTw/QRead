@@ -464,6 +464,11 @@
 					} else {
 						autolinkwindow = window.open(active.href, 'qread','',true);						
 					}
+					
+					/*var chromeurl = window.parent.document.querySelector('#goURL');
+					if (chromeurl) {
+						chromeurl.innerText = active.href;
+					}*/
 				}
 			}		
 	});

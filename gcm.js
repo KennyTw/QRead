@@ -34,18 +34,23 @@ db.llen("dataapple" , function(err,totalapple) {
 					db.hget("savemobile01","page",function(err,pagemobile01) {
 						db.hget("savetwitter","page",function(err,pagetwitter) {
 							db.hget("savefb","page",function(err,pagefb) {
-								var msg = "twitter : " + pagetwitter + "/" + totaltwitter + "\r\n";
-								msg += "fb : " + pagefb + "/" + totalfb + "\r\n";
-								msg += "apple : " + pageapple + "/" + totalapple + "\r\n";
-								msg += "mobile01 : " + pagemobile01 + "/" + totalmobile01 + "\r\n";
-								message.addData('key1', msg);								
 								
-								sender.send(message, regIds, function (err, result) {
-									if(err) console.log(err);
-									else    console.log(result);
+								if (parseInt(totaltwitter) - parseInt(pagetwitter) > 50) {
+									var msg = "twitter : " + pagetwitter + "/" + totaltwitter + "\r\n";
+									msg += "fb : " + pagefb + "/" + totalfb + "\r\n";
+									msg += "apple : " + pageapple + "/" + totalapple + "\r\n";
+									msg += "mobile01 : " + pagemobile01 + "/" + totalmobile01 + "\r\n";
+									message.addData('key1', msg);								
 									
+									sender.send(message, regIds, function (err, result) {
+										if(err) console.log(err);
+										else    console.log(result);
+										
+										process.exit(0);
+									});								
+								} else {
 									process.exit(0);
-								});
+								}
 							});
 						});
 					});

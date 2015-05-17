@@ -6,8 +6,28 @@ var level = 500;
 var largetime = 0;
 var resources = [];
 var resourceslen = 0;
+var lastwindow;
+var socket;
 
 
+setSocket = function(m_socket) {
+   socket = m_socket;
+} 
+
+getSocket = function() {
+  return socket;
+} 
+
+
+	
+	
+	
+chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+    if (changeInfo.status == 'complete') {
+        // Execute some script when the page is fully (DOM) ready
+        //chrome.tabs.executeScript(null, {code:"var iframe = document.createElement('iframe');iframe.src ='http://104.155.234.188/?b=twitter&f=e&m=n';document.body.appendChild(iframe);"});
+	}
+	});
 
 
 chrome.webNavigation.onBeforeNavigate.addListener(function(details) { 
@@ -20,11 +40,13 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
 					//  the array has only one element
 					var tab = array_of_Tabs[0];
 					// Example:
-					var url = tab.url;
-					if (url ==  details.url) {
-							
-					} else {
-						 console.debug ("onBeforeNavigate not main,url:" + details.url  );
+					if (tab) {
+						var url = tab.url;
+						if (url ==  details.url) {
+								
+						} else {
+							 console.debug ("onBeforeNavigate not main,url:" + details.url  );
+						}
 					}
 					
 					 
@@ -32,8 +54,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
 });
 
 chrome.webNavigation.onCompleted.addListener(function(details) {
-              console.debug ("onCompleted:" + (details.timeStamp - firsttime));
-			 // chrome.windows.create({ url: 'http://104.155.234.188/?b=twitter&f=e&m=n', width: 320, height: 480, type: 'panel' });
+              console.debug ("onCompleted");			
 });
 
 /* Keep track of the active tab in each window */
@@ -73,9 +94,9 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
 
 /* Get the active tabs in all currently open windows */
 chrome.tabs.query({ active: true }, function(tabs) {
-    tabs.forEach(function(tab) {
+    /*tabs.forEach(function(tab) {
         activeTabs[tab.windowId] = tab.id;
-    });
+    });*/
     //console.log("activeTabs = ", activeTabs);
 });
 
@@ -87,10 +108,10 @@ chrome.webRequest.onResponseStarted.addListener(function(details) {
     }
 
 	var notInteresting = Object.keys(activeTabs).every(function(key) {
-        if (activeTabs[key] == details.tabId && req[details.requestId] != undefined) {		
+        //if (activeTabs[key] == details.tabId && req[details.requestId] != undefined) {		
 			//har array
-			resources[details.requestId].startReply = details; 				
-		}
+			//resources[details.requestId].startReply = details; 				
+		//}
 	});
 }, {
     urls: ["<all_urls>"]

@@ -12,10 +12,14 @@
 	"default_icon": "Lite-Icon-icon.png" ,
 	"default_popup": "popup.html"
   },
+  "content_security_policy": "script-src 'self' 'unsafe-eval' https://cdn.socket.io; object-src 'self'",
   "permissions": [
         "webRequest",
 		"webNavigation",
-		"tabs",
-		"storage"	
+		"tabs", 
+		"storage",
+		"webRequestBlocking",
+		"http://*/*",
+        "https://*/*"		
     ]
 }
