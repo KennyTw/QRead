@@ -1,13 +1,15 @@
 var BGPage = chrome.extension.getBackgroundPage();
 var page;
-var book;
+var book = BGPage.getBook();
 var total;
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 
 socket.on('connect', function() {
 	//alert('connect');
-	book='twitter';
-	var data = {command:'sync',book:'twitter'};
+	if (!book)
+		book='twitter';
+	
+	var data = {command:'sync',book:book};
 	send(data);	
 });
 
@@ -114,6 +116,7 @@ document.addEventListener('DOMContentLoaded', function() {
 		});*/
 		
 		book='twitter';
+		BGPage.setBook(book);
 		var data = {command:'sync',book:'twitter'};
 		send(data);	
 		
@@ -122,6 +125,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	OpenApple.addEventListener('click', function() {
        // chrome.windows.create({ url: 'http://104.155.234.188/?b=apple&m=n&a=1&z=1.2', width: 420, height: 230, type: 'panel'});	
 	   book='apple';
+	   BGPage.setBook(book);
 	   var data = {command:'sync',book:'apple'};
 	   send(data);	
     });
@@ -129,6 +133,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	OpenMobile01.addEventListener('click', function() {
         //chrome.windows.create({ url: 'http://104.155.234.188/?b=mobile01&m=n&a=1&z=1.2', width: 420, height: 230, type: 'panel'});	
 		book='mobile01';
+		BGPage.setBook(book);
 		var data = {command:'sync',book:'mobile01'};
 	    send(data);
     });
@@ -136,6 +141,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	OpenFb.addEventListener('click', function() {
         //chrome.windows.create({ url: 'http://104.155.234.188/?b=fb&m=n&a=1&z=1.2', width: 420, height: 230, type: 'panel'});	
 		var book='fb';
+		BGPage.setBook(book);
 		var data = {command:'sync',book:'fb'};
 	    send(data);
     });

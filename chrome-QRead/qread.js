@@ -7,15 +7,15 @@ var largetime = 0;
 var resources = [];
 var resourceslen = 0;
 var lastwindow;
-var socket;
+var book;
 
 
-setSocket = function(m_socket) {
-   socket = m_socket;
+setBook = function(m_book) {
+   book = m_book;
 } 
 
-getSocket = function() {
-  return socket;
+getBook = function() {
+  return book;
 } 
 
 
