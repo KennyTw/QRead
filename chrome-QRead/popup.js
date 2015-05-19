@@ -28,8 +28,14 @@ socket.on('events', function(evt) {
 		page = evt.page;
 		total = evt.total;
 		pageidx.innerText = parseInt(page)+1 + "/" + total;
-		var data = evt.dbdata[0].replace("<br><br>","");
-		showLink.innerHTML = data;		
+		var data = evt.dbdata[0].replace("<br><br>","");		
+		showLink.innerHTML = data;	
+
+		var images = showLink.querySelectorAll('img');
+		for (var i = 0 ; i < images.length ;  i++) {
+			images[i].parentNode.removeChild(images[i]);
+		}		
+		
 		var links = showLink.querySelectorAll('a');
 		if (links) {
 			for (var i = 0 ; i < links.length ;  i++) {
@@ -43,11 +49,11 @@ socket.on('events', function(evt) {
 
 				if (i == 0) {
 					chrome.tabs.getSelected(null,function(tab) {						
-						if (tab.url != links[0].href) {
-							chrome.tabs.query({currentWindow: true, active: true}, function (tab) {				
-								chrome.tabs.executeScript(tab.id,{
-									code: 'location.replace("' +  links[0].href+ '");'
-								});
+						if (tab.url != links[0].href && links[0].href.substring(0,4).toLowerCase() == 'http') {
+							chrome.tabs.query({currentWindow: true, active: true}, function (tab) {								
+									chrome.tabs.executeScript(tab.id,{
+										code: 'location.replace("' +  links[0].href+ '");'
+										});								 
 							});							
 						}
 					});

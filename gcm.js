@@ -7,6 +7,9 @@ if (args.length > 0) {
 		process.exit(0);
 		return;
 	}
+	
+	var h = date.getHours();
+	
 }
 
 
@@ -34,6 +37,11 @@ db.llen("dataapple" , function(err,totalapple) {
 					db.hget("savemobile01","page",function(err,pagemobile01) {
 						db.hget("savetwitter","page",function(err,pagetwitter) {
 							db.hget("savefb","page",function(err,pagefb) {
+								
+								if (h == 5) {
+									//auto update page
+									db.hset("saveapple","page",parseInt(totalapple)-1);									
+								}
 								
 								if (parseInt(totaltwitter) - parseInt(pagetwitter) > 50) {
 									var msg = "twitter : " + pagetwitter + "/" + totaltwitter + "\r\n";
