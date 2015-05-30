@@ -8,7 +8,20 @@ var resources = [];
 var resourceslen = 0;
 var lastwindow;
 var book;
+var page;
+var total;
 
+var socket = io.connect("http://104.155.234.188",{'forceNew':true });
+
+
+function send(data) {	
+	var timestamp = Number(new Date());	
+	data["id"] = timestamp;
+	data["step"] = 1;
+	console.log(data);
+	socket.emit('commands',data);
+}
+ 
 
 setBook = function(m_book) {
    book = m_book;
@@ -18,16 +31,103 @@ getBook = function() {
   return book;
 } 
 
+socket.on('connect', function() {
+			//alert('connect');
+			/*if (!book)
+				book='twitter';
+			
+			var data = {command:'sync',book:book};
+			send(data);*/	
+		});
 
+socket.on('disconnect', function() {
+	alert('disconnect');
+});
+
+socket.on('events', function(evt) {	
+	//alert('events : ' + JSON.stringify(evt));	
+	
+	//chrome.tabs.executeScript(null, {code:"var QueueReadContent = document.getElementById('QueueReadContent');QueueReadContent.innerText='" + JSON.stringify(evt) + "';"});
+	
+	//chrome.tabs.executeScript(null, {code:"alert('" + JSON.stringify(evt) + "');"});
+	
+	//chrome.tabs.executeScript(null, {code:"var div1 = document.createElement('div');div1.innerHTML = '" + JSON.stringify(evt) + "';div1.setAttribute('id','QueueReadContent');  div1.style.cssText = 'color:white ;background:black;height:20px;z-index:999999;text-align:center;width:40%;position: relative ;top:0px';document.body.insertBefore(div1,document.body.firstChild);"});
+	
+	function go() {
+		page = evt.page;
+		total = evt.total;
+		book = evt.book;
+		var data = evt.dbdata[0].replace("<br><br>","");
+		//data = data.replace(/<a\b[^>]*>/i,"");
+		//data = data.replace(/<\/a>/i, "");
+		//data = data.replace("Link", "");
+	
+		var code = "var QueueReadContent = document.getElementById('QueueReadContent'); ";
+		code += " if (QueueReadContent) {QueueReadContent.innerHTML = " + JSON.stringify(data)+ "; var anchors = QueueReadContent.querySelectorAll('a');";
+		code += " for (var i = 0 ; i < anchors.length ;  i++) { anchors[i].setAttribute('target', '');}}";
+		code += "  ";
+		chrome.tabs.executeScript(null, {code:code});
+		
+	}
+	
+	if (evt.command == 'sync') {
+		go();
+	} else if (evt.command == 'click') {
+		var data = {command:'loaddata',page: parseInt(evt.page) ,book: evt.book , memo:'noclick'};			
+		send(data);	
+	} else if (evt.command == 'data') {		
+		go();		
+		if (evt.memo != 'noclick') {
+			var data = {command:'click',page : parseInt(evt.page),book:book};						
+			send(data);	
+		}
+		
+	}
+	
+	console.log('events : ' + JSON.stringify(evt));
+
+});
 	
 	
 	
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+	//console.debug (tab.url  );
     if (changeInfo.status == 'complete') {
         // Execute some script when the page is fully (DOM) ready
         //chrome.tabs.executeScript(null, {code:"var iframe = document.createElement('iframe');iframe.src ='http://104.155.234.188/?b=twitter&f=e&m=n';document.body.appendChild(iframe);"});
+		//chrome.tabs.executeScript(null, {code:"var script1 = document.createElement('script');script1.setAttribute('src', 'https://cdn.socket.io/socket.io-1.3.5.js'); document.head.appendChild(script1); script1.onload = function() { alert('Script loaded and ready');var socket = io.connect('http://104.155.234.188',{'forceNew':true });};"});
+		var code = "var QueueReadContent = document.getElementById('QueueReadContent');";
+		code += "if (!QueueReadContent) { var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = 'cursor:pointer; color:white ; opacity: 0.9; background:black;height:22px;z-index:999999;text-align:center;width:50%;position: fixed ; bottom:0px ; right: 20%;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);";
+		code += "QueueReadContent = document.getElementById('QueueReadContent');  QueueReadContent.addEventListener('click', function() { location.href='#QueueReadClick';});}";
+		chrome.tabs.executeScript(null, {code:code});
 		
-		chrome.tabs.executeScript(null, {code:"var div1 = document.createElement('div');div1.innerHTML = 'hello QueueRead'; div1.style.cssText = 'color:white ;background:black;height:20px;z-index:999999;text-align:center;width:100%;position: fixed ;bottom:0px';document.body.insertBefore(div1,document.body.firstChild);"});
+		if (tab.url.indexOf("#QueueReadClick") >= 0) {
+			
+			//var code = " window.history.pushState('', document.title, window.location.pathname); btn.disabled = !(location.hash || location.href.slice(-1) == '#');";			
+			//chrome.tabs.executeScript(null, {code:code});			
+			
+			if (parseInt(page)+1 < parseInt(total)) {			
+				var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
+				send(data);
+			}		
+			
+		} else {
+			if (!book)
+			book='twitter';
+			
+			var data = {command:'sync',book:book};
+			send(data);
+		}
+		//chrome.tabs.executeScript(null, {code:"setTimeout(function(){var socket = io.connect('http://104.155.234.188',{'forceNew':true });socket.on('connect', function() {alert('connect');});},3000) "});
+		
+		/*if (!book)
+			book='twitter';
+			
+			var data = {command:'sync',book:book};
+			send(data);
+		*/	
+		//chrome.tabs.executeScript(null, {code:"var div1 = document.createElement('div');div1.innerHTML = 'Queue Read';  div1.setAttribute('id','QueueReadContent'); div1.style.cssText = 'color:white ;background:black;height:20px;z-index:999999;text-align:center;width:100%;position: relative ;top:0px';document.body.insertBefore(div1,document.body.firstChild);"});
+		 
 		
 	}
 	});
