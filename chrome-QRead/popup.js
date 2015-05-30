@@ -34,33 +34,21 @@ socket.on('events', function(evt) {
 		var images = showLink.querySelectorAll('img');
 		for (var i = 0 ; i < images.length ;  i++) {
 			images[i].parentNode.removeChild(images[i]);
-		}		
-		
+		}	
+
 		var links = showLink.querySelectorAll('a');
 		if (links) {
+			if (links.length == 0) {
+				showLink.style.backgroundColor = 'gray';
+			} else {
+				showLink.style.backgroundColor = '#1B1B1B';
+			}
+		
 			for (var i = 0 ; i < links.length ;  i++) {
 				links[i].style.display = "none";
-				/*chrome.tabs.query({currentWindow: true, active: true}, function (tab) {
-					chrome.tabs.update(tab.id, {url: link.href} , function(tab) { chrome.tabs.executeScript({
-						code: 'history.replaceState({}, "", " ");'
-					});});
-				});*/
-				
-
-				if (i == 0) {
-					chrome.tabs.getSelected(null,function(tab) {						
-						if (tab.url != links[0].href && links[0].href.substring(0,4).toLowerCase() == 'http') {
-							chrome.tabs.query({currentWindow: true, active: true}, function (tab) {								
-									chrome.tabs.executeScript(tab.id,{
-										code: 'location.replace("' +  links[0].href+ '");'
-										});								 
-							});							
-						}
-					});
-					
-				}
 			}
-		}		
+		}
+		
 	}
 	
 	if (evt.command == 'sync') {
@@ -81,6 +69,43 @@ socket.on('events', function(evt) {
 	}
 });
 
+
+function golink() {
+	var links = showLink.querySelectorAll('a');
+	if (links) {
+		/*if (links.length == 0) {
+			showLink.style.backgroundColor = 'gray';
+		} else {
+			showLink.style.backgroundColor = '#1B1B1B';
+		}*/
+		
+		for (var i = 0 ; i < links.length ;  i++) {
+			//links[i].style.display = "none";
+			/*chrome.tabs.query({currentWindow: true, active: true}, function (tab) {
+				chrome.tabs.update(tab.id, {url: link.href} , function(tab) { chrome.tabs.executeScript({
+					code: 'history.replaceState({}, "", " ");'
+				});});
+			});*/
+			
+
+			if (i == 0) {
+				chrome.tabs.getSelected(null,function(tab) {						
+					if (tab.url != links[0].href && links[0].href.substring(0,4).toLowerCase() == 'http') {
+						chrome.tabs.query({currentWindow: true, active: true}, function (tab) {								
+								chrome.tabs.executeScript(tab.id,{
+									code: 'location.replace("' +  links[0].href+ '");'
+									});								 
+						});							
+					}
+				});
+				
+			}
+		}
+	} 
+	
+}
+
+
  function send(data) {	
 	var timestamp = Number(new Date());	
 	data["id"] = timestamp;
@@ -97,6 +122,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	var OpenFb = document.getElementById('OpenFb');
 	var showLink = document.getElementById('showLink');	
 	var pageidx = document.getElementById('pageidx');
+	var ViewWeb = document.getElementById('ViewWeb');
 	
 	pageidx.addEventListener('click', function() {
 		if (parseInt(page) - 1 >= 0) {
@@ -152,5 +178,9 @@ document.addEventListener('DOMContentLoaded', function() {
 		var data = {command:'sync',book:'fb'};
 	    send(data);
     });
+	
+	ViewWeb.addEventListener('click', function() {		
+		golink();
+	});
 });
 

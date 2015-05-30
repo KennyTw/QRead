@@ -53,12 +53,12 @@ db.llen("dataapple" , function(err,totalapple) {
 									db.hset("savefb","page",parseInt(totalfb)-1);									
 								}
 								
-								if (parseInt(totaltwitter) - parseInt(pagetwitter) > 2000) {
+								if (parseInt(totaltwitter) - parseInt(pagetwitter) > 200) {
 									//auto update page
 									db.hset("savetwitter","page",parseInt(totaltwitter)-1);									
 								}
 								
-								if (parseInt(totaltwitter) - parseInt(pagetwitter) > 50) {
+								if (parseInt(totaltwitter) - parseInt(pagetwitter) > 100) {
 									var msg = "twitter : " + pagetwitter + "/" + totaltwitter + "\r\n";
 									msg += "fb : " + pagefb + "/" + totalfb + "\r\n";
 									msg += "apple : " + pageapple + "/" + totalapple + "\r\n";

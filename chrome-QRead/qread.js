@@ -26,6 +26,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status == 'complete') {
         // Execute some script when the page is fully (DOM) ready
         //chrome.tabs.executeScript(null, {code:"var iframe = document.createElement('iframe');iframe.src ='http://104.155.234.188/?b=twitter&f=e&m=n';document.body.appendChild(iframe);"});
+		
+		chrome.tabs.executeScript(null, {code:"var div1 = document.createElement('div');div1.innerHTML = 'hello QueueRead'; div1.style.cssText = 'color:white ;background:black;height:20px;z-index:999999;text-align:center;width:100%;position: fixed ;bottom:0px';document.body.insertBefore(div1,document.body.firstChild);"});
+		
 	}
 	});
 

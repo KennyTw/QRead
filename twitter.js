@@ -47,25 +47,32 @@ function getdata() {
 					//console.log(tweets[i]); 
 					
 					var tweet = tweets[i].text;
-					tweet = tweet.replace(/\&amp;/g,"&");
-					tweet = tweet.replace(/(https?:\/\/[\w-\.]+(:\d+)?(\/[\w\/\.]*)?(\?\S*)?(#\S*)?)/g,  '<a href="$1" target="new" >$1</a>');
-					tweet = tweet.replace(/\#(\w+)/g,"");
-					tweet = tweet.replace(/\@(\w+)/g,"");
-					tweet = tweets[i].user.name	+ " : " + tweet;
-					console.log(tweet); 
+					//tweet = tweet.replace(/\&amp;/g,"&");
+					//tweet2 = tweet.replace(/(https?:\/\/[\w-\.]+(:\d+)?(\/[\w\/\.]*)?(\?\S*)?(#\S*)?)/g,  '<a href="$1" target="new" >$1</a>');
+					tweet = tweet.replace(/(https?:\/\/[\w-\.]+(:\d+)?(\/[\w\/\.]*)?(\?\S*)?(#\S*)?)/g,  '');
+					//tweet = tweet.replace(/\#(\w+)/g,"");
+					//tweet = tweet.replace(/\@(\w+)/g,"");
+					var tweetlink="";
+					if (tweets[i].entities.urls[0]){ //ignore none url
+						tweetlink = '<a href="' + tweets[i].entities.urls[0].expanded_url + '" target="new" >Link</a>' ;
+						//console.log(tweetlink);					
 					
-					if (dbdata == undefined ){					
-						db.hset("savetwitter"  ,"page",0);
-						db.hset("savetwitter"  ,"pos",0);
-						db.hset("savetwitter"  ,"lastid",tweets[i].id);
-						
-						db.hset("savetwitter"  ,"lastid",tweets[i].id);					
-						db.rpush("datatwitter"  ,tweet ,function(err,dbdata){});
-					}  else					
-					if ((tweets[i].id) > parseInt(dbdata)) {
-						db.hset("savetwitter"  ,"lastid",tweets[i].id);					
-						db.rpush("datatwitter"  ,tweet,function(err,dbdata){});	
-						newcount++;
+						tweet = tweets[i].user.name	+ " : " + tweet + tweetlink;
+						console.log(tweet); 
+					
+						if (dbdata == undefined ){					
+							db.hset("savetwitter"  ,"page",0);
+							db.hset("savetwitter"  ,"pos",0);
+							db.hset("savetwitter"  ,"lastid",tweets[i].id);
+							
+							db.hset("savetwitter"  ,"lastid",tweets[i].id);					
+							db.rpush("datatwitter"  ,tweet ,function(err,dbdata){});
+						}  else					
+						if ((tweets[i].id) > parseInt(dbdata)) {
+							db.hset("savetwitter"  ,"lastid",tweets[i].id);					
+							db.rpush("datatwitter"  ,tweet,function(err,dbdata){});	
+							newcount++;
+						}
 					}
 				}
 				//console.log(dbdata);
