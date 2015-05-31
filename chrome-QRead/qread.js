@@ -25,6 +25,12 @@ function send(data) {
 
 setBook = function(m_book) {
    book = m_book;
+   
+    if (!book)
+		book='twitter';
+	
+	var data = {command:'sync',book:book};
+	send(data);
 } 
 
 getBook = function() {
@@ -33,11 +39,11 @@ getBook = function() {
 
 socket.on('connect', function() {
 			//alert('connect');
-			/*if (!book)
+			if (!book)
 				book='twitter';
 			
 			var data = {command:'sync',book:book};
-			send(data);*/	
+			send(data);
 		});
 
 socket.on('disconnect', function() {
@@ -72,7 +78,7 @@ socket.on('events', function(evt) {
 	}
 	
 	if (evt.command == 'sync') {
-		if (!book || (book && book == evt.book)) {
+		if (!book || (book && book == evt.book) || (parseInt(page) + 1  == parseInt(total)) ) {
 			go();
 		};
 	} else if (evt.command == 'click') {
