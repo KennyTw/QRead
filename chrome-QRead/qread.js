@@ -61,17 +61,20 @@ socket.on('events', function(evt) {
 		//data = data.replace(/<a\b[^>]*>/i,"");
 		//data = data.replace(/<\/a>/i, "");
 		//data = data.replace("Link", "");
+		data = "[<a href='#QueueReadBack'>" + (parseInt(page) + 1) + "/" + total + "</a>] " + data;
 	
 		var code = "var QueueReadContent = document.getElementById('QueueReadContent'); ";
 		code += " if (QueueReadContent) {QueueReadContent.innerHTML = " + JSON.stringify(data)+ "; var anchors = QueueReadContent.querySelectorAll('a');";
-		code += " for (var i = 0 ; i < anchors.length ;  i++) { anchors[i].setAttribute('target', '');}}";
-		code += "  ";
+		code += " for (var i = 0 ; i < anchors.length ;  i++) { anchors[i].setAttribute('target', ''); anchors[i].style.cssText='color:white;  text-decoration: underline;'}";
+		code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].parentNode.removeChild(images[i]);}}";	
 		chrome.tabs.executeScript(null, {code:code});
 		
 	}
 	
 	if (evt.command == 'sync') {
-		go();
+		if (!book || (book && book == evt.book)) {
+			go();
+		};
 	} else if (evt.command == 'click') {
 		var data = {command:'loaddata',page: parseInt(evt.page) ,book: evt.book , memo:'noclick'};			
 		send(data);	
@@ -95,21 +98,27 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
     if (changeInfo.status == 'complete') {
         // Execute some script when the page is fully (DOM) ready
         //chrome.tabs.executeScript(null, {code:"var iframe = document.createElement('iframe');iframe.src ='http://104.155.234.188/?b=twitter&f=e&m=n';document.body.appendChild(iframe);"});
-		//chrome.tabs.executeScript(null, {code:"var script1 = document.createElement('script');script1.setAttribute('src', 'https://cdn.socket.io/socket.io-1.3.5.js'); document.head.appendChild(script1); script1.onload = function() { alert('Script loaded and ready');var socket = io.connect('http://104.155.234.188',{'forceNew':true });};"});
+		//chrome.tabs.executeScript(null, {ode:"var script1 = document.createElement('script');script1.setAttribute('src', 'https://cdn.socket.io/socket.io-1.3.5.js'); document.head.appendChild(script1); script1.onload = function() { alert('Script loaded and ready');var socket = io.connect('http://104.155.234.188',{'forceNew':true });};"});
 		var code = "var QueueReadContent = document.getElementById('QueueReadContent');";
-		code += "if (!QueueReadContent) { var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = 'cursor:pointer; color:white ; opacity: 0.9; background:black;height:22px;z-index:999999;text-align:center;width:50%;position: fixed ; bottom:0px ; right: 20%;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);";
-		code += "QueueReadContent = document.getElementById('QueueReadContent');  QueueReadContent.addEventListener('click', function() { location.href='#QueueReadClick';});}";
-		chrome.tabs.executeScript(null, {code:code});
+		code += "if (!QueueReadContent) { var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = '   -webkit-box-orient: vertical; -webkit-line-clamp: 3;  display: -webkit-box; text-overflow: ellipsis;  overflow: hidden; line-height: initial; font-size: 15px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 0.87; padding: 5px ; background:black;min-height: 22px; height:auto ; z-index:999999;text-align:center;width:50%;position: fixed ; bottom:0px ; right: 20%;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);";		
+		code += "QueueReadContent = document.getElementById('QueueReadContent');  QueueReadContent.addEventListener('click', function(e) { if (e.target.nodeName == 'A') {return;} location.href='#QueueReadClick';});}";
+		chrome.tabs.executeScript(null, {code:code});		
 		
-		if (tab.url.indexOf("#QueueReadClick") >= 0) {
+		if (tab.url.indexOf("#QueueRead") >= 0 ) {
 			
 			//var code = " window.history.pushState('', document.title, window.location.pathname); btn.disabled = !(location.hash || location.href.slice(-1) == '#');";			
 			//chrome.tabs.executeScript(null, {code:code});			
-			
-			if (parseInt(page)+1 < parseInt(total)) {			
-				var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
-				send(data);
-			}		
+			if (tab.url.indexOf("#QueueReadClick") >= 0 ) {
+				if (parseInt(page)+1 < parseInt(total)) {			
+					var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
+					send(data);
+				}		
+			} else if ( tab.url.indexOf("#QueueReadBack") >= 0 ) {
+				if (parseInt(page) - 1 >= 0) {			
+					var data = {command:'loaddata',page: parseInt(page) - 1,book:book};			
+					send(data);
+				}		
+			}
 			
 		} else {
 			if (!book)
