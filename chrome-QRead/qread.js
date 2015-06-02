@@ -159,9 +159,11 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
 					var tab = array_of_Tabs[0];
 					// Example:
 					if (tab) {
-						var url = tab.url;
+						var url = tab.url;						
 						if (url ==  details.url) {
-								
+								if (url.indexOf("#QueueRead") >= 0) {									
+									  chrome.tabs.update(details.tabId, {url:  url.replace("#QueueReadBack","").replace("#QueueReadClick","")});
+								}
 						} else {
 							 console.debug ("onBeforeNavigate not main,url:" + details.url  );
 						}
