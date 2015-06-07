@@ -72,7 +72,10 @@ socket.on('events', function(evt) {
 		var code = "var QueueReadContent = document.getElementById('QueueReadContent'); ";
 		code += " if (QueueReadContent) {QueueReadContent.innerHTML = " + JSON.stringify(data)+ "; var anchors = QueueReadContent.querySelectorAll('a');";
 		code += " for (var i = 0 ; i < anchors.length ;  i++) { anchors[i].setAttribute('target', ''); anchors[i].style.cssText='color:white;  text-decoration: underline;'}";
-		code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].parentNode.removeChild(images[i]);}}";	
+		code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].parentNode.removeChild(images[i]);}" ;
+		code += " document.onclick = function(e) {if (e.ctrlKey && e.which == 1) {location.href='#QueueReadClick';} else if (e.altKey && e.which == 1) {location.href='#QueueReadBack';} else if (e.shiftKey && e.which == 1) {var _a=document.createElement('a');_a.href=anchors[anchors.length-1].href;_a.target='new'; _a.click();} };";
+		code += " document.onkeydown = function(e) {if (e.keyCode == 37 && e.ctrlKey) {location.href='#QueueReadBack';} else if (e.keyCode == 39 && e.ctrlKey) {location.href='#QueueReadClick';} else if (e.keyCode == 38 && e.ctrlKey) {location.href= anchors[anchors.length-1].href;}};";
+		code += "}";	
 		chrome.tabs.executeScript(null, {code:code});
 		
 	}
@@ -102,50 +105,57 @@ socket.on('events', function(evt) {
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	//console.debug (tab.url  );
     if (changeInfo.status == 'complete') {
-        // Execute some script when the page is fully (DOM) ready
-        //chrome.tabs.executeScript(null, {code:"var iframe = document.createElement('iframe');iframe.src ='http://104.155.234.188/?b=twitter&f=e&m=n';document.body.appendChild(iframe);"});
-		//chrome.tabs.executeScript(null, {ode:"var script1 = document.createElement('script');script1.setAttribute('src', 'https://cdn.socket.io/socket.io-1.3.5.js'); document.head.appendChild(script1); script1.onload = function() { alert('Script loaded and ready');var socket = io.connect('http://104.155.234.188',{'forceNew':true });};"});
-		var code = "var QueueReadContent = document.getElementById('QueueReadContent');";
-		code += "if (!QueueReadContent) { var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = '   -webkit-box-orient: vertical; -webkit-line-clamp: 3;  display: -webkit-box; text-overflow: ellipsis;  overflow: hidden; line-height: initial; font-size: 15px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 0.87; padding: 5px ; background:black;min-height: 22px; height:auto ; z-index:999999;text-align:center;width:50%;position: fixed ; bottom:0px ; right: 20%;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);";		
-		code += "QueueReadContent = document.getElementById('QueueReadContent');  QueueReadContent.addEventListener('click', function(e) { if (e.target.nodeName == 'A') {return;} location.href='#QueueReadClick';});}";
-		chrome.tabs.executeScript(null, {code:code});		
 		
-		if (tab.url.indexOf("#QueueRead") >= 0 ) {
-			
-			//var code = " window.history.pushState('', document.title, window.location.pathname); btn.disabled = !(location.hash || location.href.slice(-1) == '#');";			
-			//chrome.tabs.executeScript(null, {code:code});			
-			if (tab.url.indexOf("#QueueReadClick") >= 0 ) {
-				if (parseInt(page)+1 < parseInt(total)) {			
-					var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
+		Object.keys(activeTabs).every(function(key) {
+			if (activeTabs[key] == tabId) {
+				/* We are interested in this request */
+				// Execute some script when the page is fully (DOM) ready
+				//chrome.tabs.executeScript(null, {code:"var iframe = document.createElement('iframe');iframe.src ='http://104.155.234.188/?b=twitter&f=e&m=n';document.body.appendChild(iframe);"});
+				//chrome.tabs.executeScript(null, {ode:"var script1 = document.createElement('script');script1.setAttribute('src', 'https://cdn.socket.io/socket.io-1.3.5.js'); document.head.appendChild(script1); script1.onload = function() { alert('Script loaded and ready');var socket = io.connect('http://104.155.234.188',{'forceNew':true });};"});
+				var code = "var QueueReadContent = document.getElementById('QueueReadContent');";
+				code += "if (!QueueReadContent) { var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = '   -webkit-box-orient: vertical; -webkit-line-clamp: 3;  display: -webkit-box; text-overflow: ellipsis;  overflow: hidden; line-height: initial; font-size: 15px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 0.87; padding: 5px ; background:black;min-height: 22px; height:auto ; z-index:999999;text-align:center;width:50%;position: fixed ; bottom:0px ; right: 20%;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);";		
+				code += "QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) { if (e.target.nodeName == 'A') {return;} location.href='#QueueReadClick';});}";
+				chrome.tabs.executeScript(null, {code:code});		
+				
+				if (tab.url.indexOf("#QueueRead") >= 0 ) {
+					
+					//var code = " window.history.pushState('', document.title, window.location.pathname); btn.disabled = !(location.hash || location.href.slice(-1) == '#');";			
+					//chrome.tabs.executeScript(null, {code:code});			
+					if (tab.url.indexOf("#QueueReadClick") >= 0 ) {
+						if (parseInt(page)+1 < parseInt(total)) {			
+							var data = {command:'loaddata',page: parseInt(page) + 1,book:book};			
+							send(data);
+						}		
+					} else if ( tab.url.indexOf("#QueueReadBack") >= 0 ) {
+						if (parseInt(page) - 1 >= 0) {			
+							var data = {command:'loaddata',page: parseInt(page) - 1,book:book};			
+							send(data);
+						}		
+					}
+					
+				} else {
+					if (!book)
+					book='twitter';
+					
+					var data = {command:'sync',book:book};
 					send(data);
-				}		
-			} else if ( tab.url.indexOf("#QueueReadBack") >= 0 ) {
-				if (parseInt(page) - 1 >= 0) {			
-					var data = {command:'loaddata',page: parseInt(page) - 1,book:book};			
+				}
+				//chrome.tabs.executeScript(null, {code:"setTimeout(function(){var socket = io.connect('http://104.155.234.188',{'forceNew':true });socket.on('connect', function() {alert('connect');});},3000) "});
+				
+				/*if (!book)
+					book='twitter';
+					
+					var data = {command:'sync',book:book};
 					send(data);
-				}		
+				*/	
+				//chrome.tabs.executeScript(null, {code:"var div1 = document.createElement('div');div1.innerHTML = 'Queue Read';  div1.setAttribute('id','QueueReadContent'); div1.style.cssText = 'color:white ;background:black;height:20px;z-index:999999;text-align:center;width:100%;position: relative ;top:0px';document.body.insertBefore(div1,document.body.firstChild);"});
+				
 			}
-			
-		} else {
-			if (!book)
-			book='twitter';
-			
-			var data = {command:'sync',book:book};
-			send(data);
-		}
-		//chrome.tabs.executeScript(null, {code:"setTimeout(function(){var socket = io.connect('http://104.155.234.188',{'forceNew':true });socket.on('connect', function() {alert('connect');});},3000) "});
-		
-		/*if (!book)
-			book='twitter';
-			
-			var data = {command:'sync',book:book};
-			send(data);
-		*/	
-		//chrome.tabs.executeScript(null, {code:"var div1 = document.createElement('div');div1.innerHTML = 'Queue Read';  div1.setAttribute('id','QueueReadContent'); div1.style.cssText = 'color:white ;background:black;height:20px;z-index:999999;text-align:center;width:100%;position: relative ;top:0px';document.body.insertBefore(div1,document.body.firstChild);"});
-		 
-		
+		});
+	
+       
 	}
-	});
+});
 
 
 chrome.webNavigation.onBeforeNavigate.addListener(function(details) { 
@@ -206,10 +216,10 @@ chrome.webRequest.onBeforeRequest.addListener(function(details) {
         }
     });
 
-    if (notInteresting) {
+   // if (notInteresting) {
         /* We are not interested in this request */
         //console.log("Just ignore this one:", details);
-    }
+   // }
 }, { urls: ["<all_urls>"] });
 
 /* Get the active tabs in all currently open windows */
