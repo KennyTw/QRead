@@ -37,6 +37,19 @@ var http = require('http'),
 		res.render('all', {  mode : mode , autolink : a , step : step , fontsize : z});									
 	});
 	
+	app.get('/list', function(req, res) {
+		var qobj = req.query;
+		var mode = qobj.m;
+		var a = qobj.a;
+		var z = qobj.z;
+		if (qobj.s)
+			step = parseInt(qobj.s)
+		else
+			step = 1;
+		
+		res.render('list', {  mode : mode , autolink : a , step : step , fontsize : z});									
+	});
+	
 	
 	app.get('/', function(req, res) {		
 		var qobj = req.query;

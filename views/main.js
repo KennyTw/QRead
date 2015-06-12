@@ -82,6 +82,7 @@
 			var content = document.getElementById('content').innerHTML;			
 			debug.innerText = "";
 			document.querySelector('#lock').value = 0;
+			document.querySelector('#total').value = evt.total;
 			
 			if (Math.abs(parseInt(document.querySelector('#page').value) -  evt.page)  > step  ) {				
 					var data = {command:'reload',book: book};			
@@ -100,6 +101,7 @@
 				/*
 				var range = document.createRange();
 				var frag = range.createContextualFragment(html);*/
+				
 				
 				if (parseInt(evt.page) < firstpage) {
 					pages.firstChild.parentNode.insertBefore(frag, pages.firstChild);
@@ -141,7 +143,7 @@
 				return;
 			}
 				
-			
+			document.querySelector('#total').value = evt.total;
 			var content = document.getElementById('content').innerHTML;
 			//var debug = document.querySelector('#debug');
 			debug.innerText = "";
@@ -315,17 +317,29 @@
 		if (lock == 1) return;
 		
 		if  (target.className == "contain" || target.nodeName == "IMG"){
-			if (parseInt(page) + step >  lastpage) {
-				document.querySelector('#lock').value = 1;
-				var data = {command:'loaddata',page: parseInt(page) + step,book:book};			
+			
+			var sendstep = step;
+			var total = parseInt(document.querySelector('#total').value);				
+			if (parseInt(page) + step >= total ) {
+					sendstep = total - parseInt(page) -1 ;					
+			}		
+
+			if (sendstep <= 0) {
+				sendstep = 1;
+			}
+				
+			if (parseInt(page) + sendstep >  lastpage) {
+				document.querySelector('#lock').value = 1;				
+				
+				var data = {command:'loaddata',page: parseInt(page) + sendstep,book:book};			
 				//socket.emit('commands',data );
 				send(data,true);
-				debug.innerText = "loading...";
-				
+				debug.innerText = "loading...";							
+			
 			} else {
 				//pages.selected = (parseInt(pages.selected) + 1) % pages.children.length;
 				pages.selected = (parseInt(pages.selected) + 1);
-				page = page + step;
+				page = page + sendstep;
 				bchange = true;	
 				if (document.querySelector('#autotts').value == 1) {
 					document.querySelector('#page').value = page;
