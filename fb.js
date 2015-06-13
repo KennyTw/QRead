@@ -153,11 +153,13 @@ function getdata(filter) {
 							
 							db.hset("savefb"  ,"lastid",msgid);					
 							db.rpush("datafb"  ,fbtext ,function(err,dbdata){});
+							db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});
 						}  else					
 						if ((msgid) > parseInt(dbdata)) {
 							dbdata = msgid;
 							db.hset("savefb"  ,"lastid",msgid);					
-							db.rpush("datafb"  ,fbtext,function(err,dbdata){});				  
+							db.rpush("datafb"  ,fbtext,function(err,dbdata){});
+							db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});							
 						}						
 				} 
 					
@@ -228,6 +230,7 @@ function fbdbprocess(datalist , callback) {
 					
 					console.log(record.id + ":" + record.story);
 					db.rpush("datafb"  ,fbtext ,function(err,dbdata){});
+					db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});
 					newcount ++;
 					
 				} else {

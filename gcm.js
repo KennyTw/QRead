@@ -33,57 +33,65 @@ db.llen("dataapple" , function(err,totalapple) {
 	db.llen("datamobile01" , function(err,totalmobile01) {
 		db.llen("datatwitter" , function(err,totaltwitter) {
 			db.llen("datafb" , function(err,totalfb) {
-				db.hget("saveapple","page",function(err,pageapple) {
-					db.hget("savemobile01","page",function(err,pagemobile01) {
-						db.hget("savetwitter","page",function(err,pagetwitter) {
-							db.hget("savefb","page",function(err,pagefb) {
-								
-								if (parseInt(totalapple) - parseInt(pageapple) > 200) {
-									//auto update page
-									db.hset("saveapple","page",parseInt(totalapple)-1);									
-								}
-								
-								if (parseInt(totalmobile01) - parseInt(pagemobile01) > 200) {
-									//auto update page
-									db.hset("savemobile01","page",parseInt(totalmobile01)-1);									
-								}
-								
-								if (parseInt(totalfb) - parseInt(pagefb) > 200) {
-									//auto update page
-									db.hset("savefb","page",parseInt(totalfb)-1);									
-								}
-								
-								if (parseInt(totaltwitter) - parseInt(pagetwitter) > 200) {
-									//auto update page
-									db.hset("savetwitter","page",parseInt(totaltwitter)-1);									
-								}
-								
-								if (parseInt(totaltwitter) - parseInt(pagetwitter) > 100) {
-									var msg = "twitter : " + pagetwitter + "/" + totaltwitter + "\r\n";
-									msg += "fb : " + pagefb + "/" + totalfb + "\r\n";
-									msg += "apple : " + pageapple + "/" + totalapple + "\r\n";
-									msg += "mobile01 : " + pagemobile01 + "/" + totalmobile01 + "\r\n";
-									message.addData('key1', msg);								
-									
-									sender.send(message, regIds, function (err, result) {
-										if(err) console.log(err);
-										else    console.log(result);
+				db.llen("datakenny" , function(err,totalkenny) {
+					db.hget("saveapple","page",function(err,pageapple) {
+						db.hget("savemobile01","page",function(err,pagemobile01) {
+							db.hget("savetwitter","page",function(err,pagetwitter) {
+								db.hget("savefb","page",function(err,pagefb) {
+									db.hget("savekenny","page",function(err,pagekenny) {								
+										if (parseInt(totalapple) - parseInt(pageapple) > 200) {
+											//auto update page
+											db.hset("saveapple","page",parseInt(totalapple)-1);									
+										}
 										
-										setTimeout(function(){ 
-											//auto exit
-											process.exit(0);
-										}, 1 * 30 * 1000);
-									});								
-								} else {
-										setTimeout(function(){ 
-											//auto exit
-											process.exit(0);
-										}, 1 * 30 * 1000);
-								}
+										if (parseInt(totalmobile01) - parseInt(pagemobile01) > 200) {
+											//auto update page
+											db.hset("savemobile01","page",parseInt(totalmobile01)-1);									
+										}
+										
+										if (parseInt(totalfb) - parseInt(pagefb) > 200) {
+											//auto update page
+											db.hset("savefb","page",parseInt(totalfb)-1);									
+										}
+										
+										if (parseInt(totaltwitter) - parseInt(pagetwitter) > 200) {
+											//auto update page
+											db.hset("savetwitter","page",parseInt(totaltwitter)-1);									
+										}
+										
+										if (parseInt(totalkenny) - parseInt(pagekenny) > 500) {
+											//auto update page
+											db.hset("savekenny","page",parseInt(totalkenny)-1);									
+										}
+										
+										if (parseInt(totalkenny) - parseInt(pagekenny) > 500) {
+											var msg = "twitter : " + pagetwitter + "/" + totaltwitter + "\r\n";
+											msg += "fb : " + pagefb + "/" + totalfb + "\r\n";
+											msg += "apple : " + pageapple + "/" + totalapple + "\r\n";
+											msg += "mobile01 : " + pagemobile01 + "/" + totalmobile01 + "\r\n";
+											message.addData('key1', msg);								
+											
+											sender.send(message, regIds, function (err, result) {
+												if(err) console.log(err);
+												else    console.log(result);
+												
+												setTimeout(function(){ 
+													//auto exit
+													process.exit(0);
+												}, 1 * 30 * 1000);
+											});								
+										} else {
+												setTimeout(function(){ 
+													//auto exit
+													process.exit(0);
+												}, 1 * 30 * 1000);
+										}
+									});
+								});
 							});
 						});
 					});
-				});
+			  });
 			});
 		});
 	});

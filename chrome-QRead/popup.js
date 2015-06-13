@@ -7,7 +7,7 @@ var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 socket.on('connect', function() {
 	//alert('connect');
 	if (!book)
-		book='twitter';
+		book='kenny';
 	
 	var data = {command:'sync',book:book};
 	send(data);	
@@ -120,6 +120,7 @@ document.addEventListener('DOMContentLoaded', function() {
 	var OpenApple = document.getElementById('OpenApple');
 	var OpenMobile01 = document.getElementById('OpenMobile01');
 	var OpenFb = document.getElementById('OpenFb');
+	var OpenKenny = document.getElementById('OpenKenny');
 	var showLink = document.getElementById('showLink');	
 	var pageidx = document.getElementById('pageidx');
 	var ViewWeb = document.getElementById('ViewWeb');
@@ -176,6 +177,14 @@ document.addEventListener('DOMContentLoaded', function() {
 		book='fb';
 		BGPage.setBook(book);
 		var data = {command:'sync',book:'fb'};
+	    send(data);
+    });
+	
+	OpenKenny.addEventListener('click', function() {
+        //chrome.windows.create({ url: 'http://104.155.234.188/?b=fb&m=n&a=1&z=1.2', width: 420, height: 230, type: 'panel'});	
+		book='kenny';
+		BGPage.setBook(book);
+		var data = {command:'sync',book:'kenny'};
 	    send(data);
     });
 	

@@ -67,10 +67,12 @@ function getdata() {
 							
 							db.hset("savetwitter"  ,"lastid",tweets[i].id);					
 							db.rpush("datatwitter"  ,tweet ,function(err,dbdata){});
+							db.rpush("datakenny"  ,tweet ,function(err,dbdata){});
 						}  else					
 						if ((tweets[i].id) > parseInt(dbdata)) {
 							db.hset("savetwitter"  ,"lastid",tweets[i].id);					
 							db.rpush("datatwitter"  ,tweet,function(err,dbdata){});	
+							db.rpush("datakenny"  ,tweet ,function(err,dbdata){});
 							newcount++;
 						}
 					}

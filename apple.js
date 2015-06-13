@@ -70,7 +70,8 @@ function dbprocess(streamdata , callback)  {
 					//gcmstring += record.title + "\r\n\r\n";
 					
 					console.log(record.title);
-					db.rpush("dataapple"  ,text ,function(err,dbdata){});	
+					db.rpush("dataapple"  ,text ,function(err,dbdata){});
+					db.rpush("datakenny"  ,text ,function(err,dbdata){});	
 					newcount ++;
 					
 				} else {

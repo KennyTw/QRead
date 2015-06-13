@@ -71,6 +71,13 @@ var http = require('http'),
 		if (!book)
 			book = "";	
 		
+		db.exists("save" + book ,function(err,dbdata) {					
+			if (dbdata == 0) {
+				db.hset("save" + book  ,"page",0);
+				db.hset("save" + book  ,"pos",0);
+			}}
+		);	
+		
 		if (pageurl)  { //no js render				
 			db.llen("data" + book, function(err,total) {
 				if (parseInt(pageurl) <= total) {
@@ -365,7 +372,23 @@ var http = require('http'),
 							io.sockets.emit('events', rtn)							
 						});							
 					}); 
-					});					
+			});	
+
+			db.hget("savekenny","page",function(err,data) {
+					if(!data) {
+						res.send('No Data');
+						return;
+					}
+					
+					var page = data;					
+					db.llen("datakenny" ,function(err,dbdata) {
+						var total = dbdata;						
+						db.lrange("datakenny"  , page, page,function(err,dbdata){
+							var rtn = {command:'sync',dbdata:dbdata,page:page,pos:0,total:total,book:"kenny",id:0};
+							io.sockets.emit('events', rtn)							
+						});							
+					}); 
+			});		
 		}		
 	});
 

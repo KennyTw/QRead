@@ -261,7 +261,7 @@
 	function clickprocess(e) {
 		var target =  e.target;
 		finalcountdown = countdownini;		
-		if (target.id == "auto") {
+		if (target.id == "auto" && (e.type == "click")) {
 			if (intervalobj != undefined) {
 				clearInterval(intervalobj);
 				intervalobj = undefined;

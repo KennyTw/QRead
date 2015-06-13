@@ -69,13 +69,14 @@
 	<% } %>
   </head>
   <body  fullbleed vertical layout unresolved > 
-	<div id="debug" class="centerp height5"></div>
-	<span id="auto" class="auto centerp" style="cursor:pointer;"><%=autostatus%></span>
+	<div id="debug" class="centerp height5"></div>		
 	<core-pages selected=<%=page - firstpage%> id="card">	
 		<% for(var i=0; i< data.length ; i++) {%>			
 			<%- include item.ejs %>
 		<% } %>			
 	</core-pages>	
+	<div id="auto" class="centerp auto" style="cursor:pointer;"><%=autostatus%></div>
+	
 	<input type='hidden' id="pos" value=<%=pos%>>
 	<input type='hidden' id="page" value=<%=page%>>
 	<input type='hidden' id="book" value=<%=book%>>

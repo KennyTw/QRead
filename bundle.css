@@ -72,8 +72,12 @@ p  img{
 }
 
 .auto {
-	bottom: 20px;
-    position: absolute;
+	height: 50px;
+}
+
+core-pages .core-selected {
+    position: relative;
+    display: block;
 }
 
 @media only screen and  (min-width: 1024px) {
