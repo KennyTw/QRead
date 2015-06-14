@@ -63,6 +63,9 @@ socket.on('events', function(evt) {
 	
 	function go() {
 		page = evt.page;
+		var totalchange = false
+		if (evt.total != total)
+			totalchange = true;
 		total = evt.total;
 		book = evt.book;
 		//var data = evt.dbdata[0].replace("<br><br>","");
@@ -88,9 +91,13 @@ socket.on('events', function(evt) {
 		code += " for (var i = 0 ; i < anchors.length ;  i++) { anchors[i].setAttribute('target', ''); anchors[i].style.cssText='color:white;  text-decoration: underline;'}";
 		//code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].parentNode.removeChild(images[i]);}" ;
 		code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].style.width='100%';}" ;
-		code += " document.onclick = function(e) {QueueReadContent.scrollTop=0;if (e.ctrlKey && e.which == 1) {if (QueueReadContent.style.maxHeight == '96%') {QueueReadContent.style.maxHeight = '5px'} else {QueueReadContent.style.maxHeight = '96%';} } else if (e.altKey && e.which == 1) {location.href='#QueueReadClick';} else if (e.shiftKey && e.which == 1) {var _a=document.createElement('a');_a.href=anchors[anchors.length-1].href;_a.target='new'; _a.click();} };";
+		code += " document.onclick = function(e) {QueueReadContent.scrollTop=0;if (e.altKey && e.which == 1) {if (QueueReadContent.style.maxHeight == '96%') {QueueReadContent.style.maxHeight = '10px'} else {QueueReadContent.style.maxHeight = '96%';} }  };";
+		code += " QueueReadContent.onmouseenter = function(e) { QueueReadContent.style.maxHeight = '96%';};";
+		code += " QueueReadContent.onmouseleave = function(e) { QueueReadContent.style.maxHeight = '10px';};";
 		code += " QueueReadContent.onmousewheel = function(e) { e.currentTarget.scrollTop -= (e.wheelDelta);e.preventDefault();e.returnValue=false;};";		
-		code += " } ";
+		if (totalchange)
+			code += " QueueReadContent.style.maxHeight = '96%'; ";
+		code += " } ";		
 		
 		chrome.tabs.executeScript(null, {code:code});
 		
@@ -100,9 +107,9 @@ socket.on('events', function(evt) {
 		//if (!book || (book && book == evt.book) || (parseInt(page)  == parseInt(total) -1) ) {
 		if (!book || (book && book == evt.book)  ) {
 			//go();
-			page = evt.page;
-			total = evt.total;
-			book = evt.book;
+			//page = evt.page;
+			//total = evt.total;
+			//book = evt.book;
 			
 			var data = {command:'loaddata',page: parseInt(evt.page) ,book: evt.book , memo:'noclick'};			
 			send(data);	
@@ -142,9 +149,10 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 				
 				var code = "var QueueReadContent = document.getElementById('QueueReadContent');";
 				code += "if (!QueueReadContent) { ";
+				code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = '#QueueReadContent::-webkit-scrollbar { width: 6px; height: 6px; } #QueueReadContent::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	} '; document.body.appendChild(css);";
 				//code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = 'html { transform: translate(340px,0px); }'; document.body.appendChild(css);";
 				//  box-shadow: -5px 0 20px rgba(50,50,50,.5)
-				code += " var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = ' box-shadow: -5px -5px 20px rgba(50,50,50,.2),5px 0 20px rgba(50,50,50,.2);   zoom: reset; max-height: 96%;  overflow-x: hidden;overflow-y: auto; line-height: initial; font-size: 18px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 1; padding: 5px ; background:black;min-height: 22px; height:auto ; z-index:9999999999;text-align:center;width:30%;position: fixed ; bottom:0px ; right: 10px;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);"
+				code += " var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = ' box-shadow: -2px -2px 20px rgba(50,50,50,.2),2px 0 20px rgba(50,50,50,.2);   zoom: reset; max-height: 10px;  overflow-x: hidden;overflow-y: auto; line-height: initial; font-size: 18px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 1; padding: 10px ; background:black;min-height: 22px; height:auto ; z-index:9999999999;text-align:center;width:30%;position: fixed ; bottom:0px ; right: 10px;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);"
 				code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {return;} location.href='#QueueReadClick';});";
 				code += " }";
 				chrome.tabs.executeScript(null, {code:code});
