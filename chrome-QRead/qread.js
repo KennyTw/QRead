@@ -64,17 +64,18 @@ socket.on('events', function(evt) {
 	function go() {
 		page = evt.page;
 		var totalchange = false
-		if (evt.total != total)
+		if (evt.total != total && total-1 ==  page)
 			totalchange = true;
 		total = evt.total;
 		book = evt.book;
 		//var data = evt.dbdata[0].replace("<br><br>","");
 		var data = evt.dbdata[0];
+		data = data.replace(/\<br><br>/g,'<hr>')
 		//data = data.replace(/<a\b[^>]*>/i,"");
 		//data = data.replace(/<\/a>/i, "");
 		//data = data.replace("Link", "");
-		//data = "[<a href='#QueueReadBack'>" + (parseInt(page) + 1) + "/" + total + "</a>] <br><br>" + data;
-		data = "[<a href='#QueueReadBack'>" + (parseInt(page) + 1) + "/" + total + "</a>] <br><br>" + data;
+		//data = "[<a href='#QueueReadBack'>" + (parseInt(page) + 1) + "/" + total + "</a>] <br><br>" + data;		
+		data = "[<a href='#QueueReadBack'>" + (parseInt(page) + 1) + "/" + total + "</a>] [" +  (parseInt(total) -  (parseInt(page) + 1))  + "] <br><hr>" + data;
 	
 		/*var code = "var stopscroll=false; var QueueReadContent = document.getElementById('QueueReadContent'); ";
 		code += " if (QueueReadContent) {QueueReadContent.innerHTML = " + JSON.stringify(data)+ "; var anchors = QueueReadContent.querySelectorAll('a');";
@@ -88,7 +89,7 @@ socket.on('events', function(evt) {
 		code += " if (QueueReadContent) {";		
 		code += " QueueReadContent.innerHTML = " + JSON.stringify(data)+ "; ";
 		code += " var anchors = QueueReadContent.querySelectorAll('a');";
-		code += " for (var i = 0 ; i < anchors.length ;  i++) { anchors[i].setAttribute('target', ''); anchors[i].style.cssText='color:white;  text-decoration: underline;'}";
+		code += " for (var i = 0 ; i < anchors.length ;  i++) { if (i > 0) {anchors[i].setAttribute('target', 'qread');} anchors[i].style.cssText='color:white;  text-decoration: underline;'}";
 		//code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].parentNode.removeChild(images[i]);}" ;
 		code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].style.width='100%';}" ;
 		code += " document.onclick = function(e) {QueueReadContent.scrollTop=0;if (e.altKey && e.which == 1) {if (QueueReadContent.style.maxHeight == '96%') {QueueReadContent.style.maxHeight = '10px'} else {QueueReadContent.style.maxHeight = '96%';} }  };";
@@ -149,10 +150,10 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 				
 				var code = "var QueueReadContent = document.getElementById('QueueReadContent');";
 				code += "if (!QueueReadContent) { ";
-				code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = '#QueueReadContent::-webkit-scrollbar { width: 6px; height: 6px; } #QueueReadContent::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	} '; document.body.appendChild(css);";
+				code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = '#QueueReadContent hr {  border: 0;  height: 1px;  background-color: #732D2D;   margin: 8px 0px 8px 0px;}  #QueueReadContent::-webkit-scrollbar { width: 6px; height: 6px; } #QueueReadContent::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	} '; document.body.appendChild(css);";
 				//code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = 'html { transform: translate(340px,0px); }'; document.body.appendChild(css);";
 				//  box-shadow: -5px 0 20px rgba(50,50,50,.5)
-				code += " var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = 'box-sizing: content-box; box-shadow: -2px -2px 20px rgba(50,50,50,.2),2px 0 20px rgba(50,50,50,.2);   zoom: reset; max-height: 10px;  overflow-x: hidden;overflow-y: auto; line-height: initial; font-size: 18px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 1; padding: 10px ; background:black;min-height: 22px; height:auto ; z-index:9999999999;text-align:center;width:30%;position: fixed ; bottom:0px ; right: 10px;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);"
+				code += " var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = 'box-sizing: content-box; box-shadow: -2px -2px 20px rgba(50,50,50,.2),2px 0 20px rgba(50,50,50,.2);   zoom: reset; max-height: 10px;  overflow-x: hidden;overflow-y: auto; line-height: 29px; font-size: 18px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 1; padding: 10px ; background:black;min-height: 20px; height:auto ; z-index:9999999999;text-align:left;width:30%;position: fixed ; bottom:0px ; right: 10px;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);"
 				code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {return;} location.href='#QueueReadClick';});";
 				code += " }";
 				chrome.tabs.executeScript(null, {code:code});

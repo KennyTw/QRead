@@ -52,13 +52,17 @@ function getdata() {
 					tweet = tweet.replace(/(https?:\/\/[\w-\.]+(:\d+)?(\/[\w\/\.]*)?(\?\S*)?(#\S*)?)/g,  '');
 					//tweet = tweet.replace(/\#(\w+)/g,"");
 					//tweet = tweet.replace(/\@(\w+)/g,"");
+					var mediaimg="";
+					if (tweets[i].entities.media && tweets[i].entities.media[0])
+						mediaimg =  "<img src='" + tweets[i].entities.media[0].media_url + "'>";
+					
 					var tweetlink="";
 					if (tweets[i].entities.urls[0]){ //ignore none url
 						tweetlink = '<a href="' + tweets[i].entities.urls[0].expanded_url + '" target="new" >Link</a>' ;
 						//console.log(tweetlink);					
 					
-						tweet = tweets[i].user.name	+ " : " + tweet + tweetlink;
-						console.log(tweet); 
+						tweet = tweets[i].user.name	+ " : " + tweet +   mediaimg + tweetlink;
+						//console.log(JSON.stringify(tweets[i])); 
 					
 						if (dbdata == undefined ){					
 							db.hset("savetwitter"  ,"page",0);
