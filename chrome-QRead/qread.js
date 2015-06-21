@@ -13,9 +13,30 @@ var total;
 var step = 5;
 
 
+// send data to qread
+function appendToQueue(info,tab)
+{
+	var selecttext = info.selectionText;
+	selecttext += "<br><a href='" + tab.url + "'>" + tab.title + "</a>";
+	
+	var data = {command:'append',content : selecttext  , book: "kennyq"};		
+	send(data);
+	
+	/*var code = " var selection = window.getSelection ();"
+    code += "if (selection.rangeCount > 0) {";
+    code += " range = selection.getRangeAt(0);";
+    code += " var clonedSelection = range.cloneContents();";
+    code += " var div = document.createElement('div');";
+    code += " div.appendChild(clonedSelection);";
+    code += "      alert( div.innerHTML); chrome.runtime.sendMessage({event:\"test\"});";
+    code += "    }";
+	chrome.tabs.executeScript(null, {code:code});*/
+}
+
+chrome.contextMenus.create({title: "Append to QRead", contexts:["selection"], onclick: appendToQueue});
+
+
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
-
-
 function send(data) {	
 	var timestamp = Number(new Date());	
 	data["id"] = timestamp;
@@ -23,7 +44,27 @@ function send(data) {
 	console.log(data);
 	socket.emit('commands',data);
 }
- 
+
+
+//page communication
+chrome.runtime.onMessage.addListener(function(message, sender, sendResponse) {
+	//alert(message.event );
+    if(message.event == "QueueReadClick") {
+		if (parseInt(page)+step < parseInt(total)) {			
+			var data = {command:'loaddata',page: parseInt(page) + step,book:book};			
+			send(data);
+		} else if (parseInt(page)+1 < parseInt(total)){
+			var newstep = parseInt(total) - parseInt(page) -1;
+			var data = {command:'loaddata',page: parseInt(page) + newstep,book:book};			
+			send(data);
+		}
+	} else if (message.event == "QueueReadBack") {
+		if (parseInt(page) - step >= 0) {			
+			var data = {command:'loaddata',page: parseInt(page) - step,book:book};			
+			send(data);
+		}	
+	}
+});
 
 setBook = function(m_book) {
    book = m_book;
@@ -62,6 +103,7 @@ socket.on('events', function(evt) {
 	//chrome.tabs.executeScript(null, {code:"var div1 = document.createElement('div');div1.innerHTML = '" + JSON.stringify(evt) + "';div1.setAttribute('id','QueueReadContent');  div1.style.cssText = 'color:white ;background:black;height:20px;z-index:999999;text-align:center;width:40%;position: relative ;top:0px';document.body.insertBefore(div1,document.body.firstChild);"});
 	
 	function go() {
+		if (evt.book == "kennyq") return;
 		page = evt.page;
 		var totalchange = false
 		if (evt.total != total && total-1 ==  page)
@@ -75,7 +117,7 @@ socket.on('events', function(evt) {
 		//data = data.replace(/<\/a>/i, "");
 		//data = data.replace("Link", "");
 		//data = "[<a href='#QueueReadBack'>" + (parseInt(page) + 1) + "/" + total + "</a>] <br><br>" + data;		
-		data = "[<a href='#QueueReadBack'>" + (parseInt(page) + 1) + "/" + total + "</a>] [" +  (parseInt(total) -  (parseInt(page) + 1))  + "] <br><hr>" + data;
+		data = "[<a href='javascript:' id=QueueReadBack>" + (parseInt(page) + 1) + "/" + total + "</a>] [" +  (parseInt(total) -  (parseInt(page) + 1))  + "] <br><hr>" + data;
 	
 		/*var code = "var stopscroll=false; var QueueReadContent = document.getElementById('QueueReadContent'); ";
 		code += " if (QueueReadContent) {QueueReadContent.innerHTML = " + JSON.stringify(data)+ "; var anchors = QueueReadContent.querySelectorAll('a');";
@@ -125,6 +167,8 @@ socket.on('events', function(evt) {
 			send(data);	
 		}
 		
+	} else if (evt.command == 'appendok') {	
+		alert('appendok');
 	}
 	
 	console.log('events : ' + JSON.stringify(evt));
@@ -150,19 +194,20 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 				
 				var code = "var QueueReadContent = document.getElementById('QueueReadContent');";
 				code += "if (!QueueReadContent) { ";
-				code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = '#QueueReadContent hr {  border: 0;  height: 1px;  background-color: #732D2D;   margin: 8px 0px 8px 0px;}  #QueueReadContent::-webkit-scrollbar { width: 6px; height: 6px; } #QueueReadContent::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	} '; document.body.appendChild(css);";
+				code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = '#QueueReadContent hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D;   margin: 8px 0px 8px 0px;}  #QueueReadContent::-webkit-scrollbar { width: 6px; height: 6px; } #QueueReadContent::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	} '; document.body.appendChild(css);";
 				//code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = 'html { transform: translate(340px,0px); }'; document.body.appendChild(css);";
 				//  box-shadow: -5px 0 20px rgba(50,50,50,.5)
 				code += " var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = 'box-sizing: content-box; box-shadow: -2px -2px 20px rgba(50,50,50,.2),2px 0 20px rgba(50,50,50,.2);   zoom: reset; max-height: 10px;  overflow-x: hidden;overflow-y: auto; line-height: 29px; font-size: 18px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 1; padding: 10px ; background:black;min-height: 20px; height:auto ; z-index:9999999999;text-align:left;width:30%;position: fixed ; bottom:0px ; right: 10px;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);"
-				code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {return;} location.href='#QueueReadClick';});";
+				//code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {return;} location.href='#QueueReadClick';});";
+				code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {if(e.target.id == 'QueueReadBack'){chrome.runtime.sendMessage({event:\"QueueReadBack\"});} return;} chrome.runtime.sendMessage({event:\"QueueReadClick\"});});";
 				code += " }";
 				chrome.tabs.executeScript(null, {code:code});
 				
-				if (tab.url.indexOf("#QueueRead") >= 0 ) {
+				//if (tab.url.indexOf("#QueueRead") >= 0 ) {
 					
 					//var code = " window.history.pushState('', document.title, window.location.pathname); btn.disabled = !(location.hash || location.href.slice(-1) == '#');";			
 					//chrome.tabs.executeScript(null, {code:code});			
-					if (tab.url.indexOf("#QueueReadClick") >= 0 ) {
+					/*if (tab.url.indexOf("#QueueReadClick") >= 0 ) {
 						if (parseInt(page)+step < parseInt(total)) {			
 							var data = {command:'loaddata',page: parseInt(page) + step,book:book};			
 							send(data);
@@ -176,15 +221,15 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 							var data = {command:'loaddata',page: parseInt(page) - step,book:book};			
 							send(data);
 						}		
-					}
+					}*/
 					
-				} else {
+				//} else {
 					if (!book)
 					book='kenny';
 					
 					var data = {command:'sync',book:book};
 					send(data);
-				}
+				//}
 				//chrome.tabs.executeScript(null, {code:"setTimeout(function(){var socket = io.connect('http://104.155.234.188',{'forceNew':true });socket.on('connect', function() {alert('connect');});},3000) "});
 				
 				/*if (!book)

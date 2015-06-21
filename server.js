@@ -315,7 +315,36 @@ var http = require('http'),
 						});						
 					}					
 				});			
-			} else if (data.command == 'sync') {
+			} else if (data.command == 'append') {
+				db.llen("data" + book ,function(err,dbdata) {
+					if (!dbdata) {
+						dbdata = 0;
+						db.hmset("save" + book , "pos" , 0 , "page",0);
+					}					
+					
+					//insert
+					db.rpush("data" + book ,data.content,function(err,dbdata){
+					var rtn = {command:'appendok',page:dbdata,book:book,id:data.id};
+							socket.emit('events', rtn);							
+					});						
+					
+					db.hget("save" + book,"page",function(err,pagedata) {
+						if(!pagedata) {
+							res.send('No Data');
+							return;
+						}
+						
+						db.lrange("data" + book , pagedata, pagedata ,function(err,dbdatasync){
+							var total = parseInt(dbdata) + 1;
+							var dataarr = [];
+							dataarr.push(dbdatasync);
+							var rtn = {command:'sync',dbdata:dataarr,page:pagedata,pos:0,total:total,book:book,id:data.id};
+							io.sockets.emit('events', rtn);		
+						});									
+					});				
+				});			
+			}
+			else if (data.command == 'sync') {
 					db.hget("save" + book,"page",function(err,data) {
 					if(!data) {
 						res.send('No Data');
