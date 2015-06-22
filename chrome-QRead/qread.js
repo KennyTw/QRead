@@ -35,7 +35,6 @@ function appendToQueue(info,tab)
 
 chrome.contextMenus.create({title: "Append to QRead", contexts:["selection"], onclick: appendToQueue});
 
-
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 function send(data) {	
 	var timestamp = Number(new Date());	
@@ -181,8 +180,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	//console.debug (tab.url  );
 	//alert(changeInfo.status + ":" + tab.url);
     if (changeInfo.status == 'complete') {		
-		Object.keys(activeTabs).every(function(key) {
-			if (activeTabs[key] == tabId ) {				
+		
+		//Object.keys(activeTabs).every(function(key) {			
+			//if (activeTabs[key] == tabId ) {				
 				/* We are interested in this request */
 				// Execute some script when the page is fully (DOM) ready
 				//chrome.tabs.executeScript(null, {code:"var iframe = document.createElement('iframe');iframe.src ='http://104.155.234.188/?b=twitter&f=e&m=n';document.body.appendChild(iframe);"});
@@ -240,8 +240,8 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 				*/	
 				//chrome.tabs.executeScript(null, {code:"var div1 = document.createElement('div');div1.innerHTML = 'Queue Read';  div1.setAttribute('id','QueueReadContent'); div1.style.cssText = 'color:white ;background:black;height:20px;z-index:999999;text-align:center;width:100%;position: relative ;top:0px';document.body.insertBefore(div1,document.body.firstChild);"});
 				
-			}
-		});
+			//}
+		//});
 	
        
 	}
