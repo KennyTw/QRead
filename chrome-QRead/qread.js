@@ -133,9 +133,9 @@ socket.on('events', function(evt) {
 		code += " for (var i = 0 ; i < anchors.length ;  i++) { if (i > 0) {anchors[i].setAttribute('target', 'qread');} anchors[i].style.cssText='color:white;  text-decoration: underline;'}";
 		//code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].parentNode.removeChild(images[i]);}" ;
 		code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].style.width='100%';}" ;
-		code += " document.onclick = function(e) {QueueReadContent.scrollTop=0;if (e.altKey && e.which == 1) {if (QueueReadContent.style.maxHeight == '96%') {QueueReadContent.style.maxHeight = '10px'} else {QueueReadContent.style.maxHeight = '96%';} }  };";
+		code += " document.onclick = function(e) {if (e.altKey && e.which == 1) {if (QueueReadContent.style.maxHeight == '96%') {QueueReadContent.style.maxHeight = '10px'} else {QueueReadContent.style.maxHeight = '96%';} }  };";
 		code += " QueueReadContent.onmouseenter = function(e) { QueueReadContent.style.maxHeight = '96%';};";
-		code += " QueueReadContent.onmouseleave = function(e) { QueueReadContent.style.maxHeight = '10px';};";
+		code += " QueueReadContent.onmouseleave = function(e) { QueueReadContent.style.maxHeight = '10px';QueueReadContent.scrollTop=0;};";
 		code += " QueueReadContent.onmousewheel = function(e) { e.currentTarget.scrollTop -= (e.wheelDelta);e.preventDefault();e.returnValue=false;};";		
 		if (totalchange)
 			code += " QueueReadContent.style.maxHeight = '96%'; ";
