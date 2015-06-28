@@ -330,7 +330,7 @@ var http = require('http'),
 					
 					db.hget("save" + book,"page",function(err,pagedata) {
 						if(!pagedata) {
-							res.send('No Data');
+							//res.send('No Data');
 							return;
 						}
 						
@@ -347,7 +347,7 @@ var http = require('http'),
 			else if (data.command == 'sync') {
 					db.hget("save" + book,"page",function(err,data) {
 					if(!data) {
-						res.send('No Data');
+						//res.send('No Data');
 						return;
 					}
 					
@@ -363,7 +363,7 @@ var http = require('http'),
 			} else if (data.command == 'checksync') {
 				db.hget("save" + book,"page",function(err,dbdata) {
 				if(!dbdata) {
-						res.send('No Data');
+						//res.send('No Data');
 						return;
 				}
 				
@@ -389,7 +389,7 @@ var http = require('http'),
 		if (message.command == "newdata") {			
 			db.hget("save" + message.book,"page",function(err,data) {
 					if(!data) {
-						res.send('No Data');
+						//res.send('No Data');
 						return;
 					}
 					
@@ -405,7 +405,7 @@ var http = require('http'),
 
 			db.hget("savekenny","page",function(err,data) {
 					if(!data) {
-						res.send('No Data');
+						//res.send('No Data');
 						return;
 					}
 					

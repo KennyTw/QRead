@@ -2,6 +2,8 @@ var Twitter = require('twitter');
 var	redis = require('redis');
 var db = redis.createClient();
 var newcount = 0;
+var gcmstring = "";
+var gcm = require('node-gcm');
 
 
 var client = new Twitter({
@@ -50,6 +52,7 @@ function getdata() {
 					//tweet = tweet.replace(/\&amp;/g,"&");
 					//tweet2 = tweet.replace(/(https?:\/\/[\w-\.]+(:\d+)?(\/[\w\/\.]*)?(\?\S*)?(#\S*)?)/g,  '<a href="$1" target="new" >$1</a>');
 					tweet = tweet.replace(/(https?:\/\/[\w-\.]+(:\d+)?(\/[\w\/\.]*)?(\?\S*)?(#\S*)?)/g,  '');
+					var orgtweet = tweet;
 					//tweet = tweet.replace(/\#(\w+)/g,"");
 					//tweet = tweet.replace(/\@(\w+)/g,"");
 					var mediaimg="";
@@ -61,8 +64,10 @@ function getdata() {
 						tweetlink = '<a href="' + tweets[i].entities.urls[0].expanded_url + '" target="new" >Link</a>' ;
 						//console.log(tweetlink);					
 					
-						tweet = tweets[i].user.name	+ " : " + tweet +   mediaimg + tweetlink;
+						tweet =  tweets[i].user.name + " : " + tweet +   mediaimg + tweetlink ;
 						//console.log(JSON.stringify(tweets[i])); 
+						
+						
 					
 						if (dbdata == undefined ){					
 							db.hset("savetwitter"  ,"page",0);
@@ -73,11 +78,23 @@ function getdata() {
 							db.rpush("datatwitter"  ,tweet ,function(err,dbdata){});
 							db.rpush("datakenny"  ,tweet ,function(err,dbdata){});
 						}  else					
-						if ((tweets[i].id) > parseInt(dbdata)) {
+						if (parseInt(tweets[i].id) > parseInt(dbdata)) {
 							db.hset("savetwitter"  ,"lastid",tweets[i].id);					
 							db.rpush("datatwitter"  ,tweet,function(err,dbdata){});	
 							db.rpush("datakenny"  ,tweet ,function(err,dbdata){});
 							newcount++;
+							//gcmstring += tweets[i].user.name	+ " : " + orgtweet  + "\r\n\r\n";
+							var message = new gcm.Message();
+							message.addData('content', tweets[i].user.name	+ " : " + orgtweet);
+							message.addData('url',tweets[i].entities.urls[0].expanded_url);
+							message.addData('img',mediaimg);
+							
+							var regIds = ['APA91bEdiFgl9ySFKpIN87T7eySjeFa1dGcZ9yiqlA5sD3Q71rTjV921ASoVnKHo35gRofuBj9_IuhbyIt_85crCYKpdmR78yy5cGVcH8YsUi8tSAufX4VNxn-n2BVP6upyycfflcvvl2nS2UwPeUwTqh-ycFpeqWQ'];
+							var sender = new gcm.Sender('AIzaSyD4Iba2-V5a_KRdx5tHbDmRhGhvVnZsO7g');
+							sender.send(message, regIds, function (err, result) {
+								if(err) console.log(err);
+								else    console.log(result);								
+							});
 						}
 					}
 				}
@@ -88,7 +105,11 @@ function getdata() {
 							db.publish("events",JSON.stringify(rtn));					
 				}
 				
-				process.exit(0);
+				
+				setTimeout(function(){ 
+					//auto exit
+					process.exit(0);
+				}, 1 * 30 * 1000);
 				
 			});				
 		});

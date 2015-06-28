@@ -10,7 +10,7 @@ var lastwindow;
 var book;
 var page;
 var total;
-var step = 5;
+var step = 50;
 
 
 // send data to qread
@@ -105,13 +105,17 @@ socket.on('events', function(evt) {
 		if (evt.book == "kennyq") return;
 		page = evt.page;
 		var totalchange = false
-		if (evt.total != total && total-1 ==  page)
+		//if (evt.total != total && total-1 ==  page)
+		if (evt.total != total )
 			totalchange = true;
 		total = evt.total;
 		book = evt.book;
 		//var data = evt.dbdata[0].replace("<br><br>","");
 		var data = evt.dbdata[0];
 		data = data.replace(/\<br><br>/g,'<hr>')
+		
+		
+		
 		//data = data.replace(/<a\b[^>]*>/i,"");
 		//data = data.replace(/<\/a>/i, "");
 		//data = data.replace("Link", "");
@@ -135,10 +139,12 @@ socket.on('events', function(evt) {
 		code += " var images = QueueReadContent.querySelectorAll('img'); for (var i = 0 ; i < images.length ;  i++) {images[i].style.width='100%';}" ;
 		code += " document.onclick = function(e) {if (e.altKey && e.which == 1) {if (QueueReadContent.style.maxHeight == '96%') {QueueReadContent.style.maxHeight = '10px'} else {QueueReadContent.style.maxHeight = '96%';} }  };";
 		code += " QueueReadContent.onmouseenter = function(e) { QueueReadContent.style.maxHeight = '96%';};";
-		code += " QueueReadContent.onmouseleave = function(e) { QueueReadContent.style.maxHeight = '10px';QueueReadContent.scrollTop=0;};";
-		code += " QueueReadContent.onmousewheel = function(e) { e.currentTarget.scrollTop -= (e.wheelDelta);e.preventDefault();e.returnValue=false;};";		
+		//code += " QueueReadContent.onmouseleave = function(e) { QueueReadContent.style.maxHeight = '10px';QueueReadContent.scrollTop=0;};";
+		code += " QueueReadContent.onmouseleave = function(e) { QueueReadContent.style.maxHeight = '10px';};";
+		code += " QueueReadContent.onmousewheel = function(e) { e.currentTarget.scrollTop -= (e.wheelDelta);e.preventDefault();e.returnValue=false;};";	
+		code += " QueueReadContent.onmousewheel = function(e) { e.currentTarget.scrollTop -= (e.wheelDelta);e.preventDefault();e.returnValue=false;};";			
 		if (totalchange)
-			code += " QueueReadContent.style.maxHeight = '96%'; ";
+			code += " QueueReadContent.style.maxHeight = '96%';QueueReadContent.scrollTop=QueueReadContent.scrollHeight; ";
 		code += " } ";		
 		
 		chrome.tabs.executeScript(null, {code:code});
@@ -194,7 +200,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 				
 				var code = "var QueueReadContent = document.getElementById('QueueReadContent');";
 				code += "if (!QueueReadContent) { ";
-				code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = '#QueueReadContent hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D;   margin: 8px 0px 8px 0px;}  #QueueReadContent::-webkit-scrollbar { width: 6px; height: 6px; } #QueueReadContent::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	} '; document.body.appendChild(css);";
+				code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = '#QueueReadContent hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D;   margin: 8px 0px 8px 0px;}   #QueueReadContent::-webkit-scrollbar { width: 6px; height: 6px; } #QueueReadContent::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	} '; document.body.appendChild(css);";
 				//code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = 'html { transform: translate(340px,0px); }'; document.body.appendChild(css);";
 				//  box-shadow: -5px 0 20px rgba(50,50,50,.5)
 				code += " var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = 'box-sizing: content-box; box-shadow: -2px -2px 20px rgba(50,50,50,.2),2px 0 20px rgba(50,50,50,.2);   zoom: reset; max-height: 10px;  overflow-x: hidden;overflow-y: auto; line-height: 29px; font-size: 18px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 1; padding: 10px ; background:black;min-height: 20px; height:auto ; z-index:9999999999;text-align:left;width:30%;position: fixed ; bottom:0px ; right: 10px;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);"

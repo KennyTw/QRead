@@ -59,12 +59,12 @@ db.llen("dataapple" , function(err,totalapple) {
 											db.hset("savetwitter","page",parseInt(totaltwitter)-1);									
 										}
 										
-										if (parseInt(totalkenny) - parseInt(pagekenny) > 1000) {
+										if (parseInt(totalkenny) - parseInt(pagekenny) > 1500) {
 											//auto update page
 											db.hset("savekenny","page",parseInt(totalkenny)-1);									
 										}
 										
-										if (parseInt(totalkenny) - parseInt(pagekenny) > 250) {
+										/*if (parseInt(totalkenny) - parseInt(pagekenny) > 250) {
 											var msg = "twitter : " + pagetwitter + "/" + totaltwitter + "\r\n";
 											msg += "fb : " + pagefb + "/" + totalfb + "\r\n";
 											msg += "apple : " + pageapple + "/" + totalapple + "\r\n";
@@ -80,12 +80,12 @@ db.llen("dataapple" , function(err,totalapple) {
 													process.exit(0);
 												}, 1 * 30 * 1000);
 											});								
-										} else {
+										} else {*/
 												setTimeout(function(){ 
 													//auto exit
 													process.exit(0);
 												}, 1 * 30 * 1000);
-										}
+										/*}*/
 									});
 								});
 							});
