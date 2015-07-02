@@ -10,8 +10,7 @@ var lastwindow;
 var book;
 var page;
 var total;
-var step = 100;
-
+var step = 1;
 
 // send data to qread
 function appendToQueue(info,tab)
@@ -105,8 +104,8 @@ socket.on('events', function(evt) {
 		if (evt.book == "kennyq") return;
 		page = evt.page;
 		var totalchange = false
-		//if (evt.total != total && total-1 ==  page)
-		if (evt.total != total )
+		if (evt.total != total && total-page <=  step)
+		//if (evt.total != total )
 			totalchange = true;
 		total = evt.total;
 		book = evt.book;
@@ -141,10 +140,10 @@ socket.on('events', function(evt) {
 		code += " QueueReadContent.onmouseenter = function(e) { QueueReadContent.style.maxHeight = '96%';};";
 		//code += " QueueReadContent.onmouseleave = function(e) { QueueReadContent.style.maxHeight = '10px';QueueReadContent.scrollTop=0;};";
 		code += " QueueReadContent.onmouseleave = function(e) { QueueReadContent.style.maxHeight = '10px';};";
-		code += " QueueReadContent.onmousewheel = function(e) { e.currentTarget.scrollTop -= (e.wheelDelta);e.preventDefault();e.returnValue=false;};";	
+		//code += " QueueReadContent.onmousewheel = function(e) { e.currentTarget.scrollTop -= (e.wheelDelta);e.preventDefault();e.returnValue=false;};";	
 		code += " QueueReadContent.onmousewheel = function(e) { e.currentTarget.scrollTop -= (e.wheelDelta);e.preventDefault();e.returnValue=false;};";			
 		if (totalchange)
-			code += " QueueReadContent.style.maxHeight = '96%';setTimeout(function(){ QueueReadContent.scrollTop=QueueReadContent.scrollHeight;  }, 1000);";
+			code += " QueueReadContent.style.maxHeight = '96%';setTimeout(function(){ QueueReadContent.scrollTop=QueueReadContent.scrollHeight;  }, 1000);";		
 		code += " } ";		
 		
 		chrome.tabs.executeScript(null, {code:code});
@@ -185,7 +184,7 @@ socket.on('events', function(evt) {
 chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 	//console.debug (tab.url  );
 	//alert(changeInfo.status + ":" + tab.url);
-    if (changeInfo.status == 'complete') {		
+    if (changeInfo.status == 'complete' && tab.url.indexOf("http://104.155.234.188") < 0 ) {		
 		
 		//Object.keys(activeTabs).every(function(key) {			
 			//if (activeTabs[key] == tabId ) {				
@@ -203,9 +202,9 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 				code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = '#QueueReadContent hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D;   margin: 8px 0px 8px 0px;}   #QueueReadContent::-webkit-scrollbar { width: 6px; height: 6px; } #QueueReadContent::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	} '; document.body.appendChild(css);";
 				//code += " var css = document.createElement('style');css.type = 'text/css'; css.innerHTML = 'html { transform: translate(340px,0px); }'; document.body.appendChild(css);";
 				//  box-shadow: -5px 0 20px rgba(50,50,50,.5)
-				code += " var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = 'box-sizing: content-box; box-shadow: -2px -2px 20px rgba(50,50,50,.2),2px 0 20px rgba(50,50,50,.2);   zoom: reset; max-height: 10px;  overflow-x: hidden;overflow-y: auto; line-height: 25px; font-size: 16px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 1; padding: 5px ; background:black;min-height: 20px; height:auto ; z-index:9999999999;text-align:left;width:40%;position: fixed ; bottom:0px ; right: 10px;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);"
+				code += " var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = 'box-sizing: content-box; box-shadow: -2px -2px 20px rgba(50,50,50,.2),2px 0 20px rgba(50,50,50,.2);   zoom: reset; max-height: 10px;  overflow-x: hidden;overflow-y: auto; line-height: 25px; font-size: 16px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 1; padding: 7px ; background:black;min-height: 20px; height:auto ; z-index:9999999999;text-align:left;width:30%;position: fixed ; bottom:0px ; right: 10px;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);"
 				//code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {return;} location.href='#QueueReadClick';});";
-				code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {if(e.target.id == 'QueueReadBack'){chrome.runtime.sendMessage({event:\"QueueReadBack\"});} return;} chrome.runtime.sendMessage({event:\"QueueReadClick\"});});";
+				code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {if(e.target.id == 'QueueReadBack'){chrome.runtime.sendMessage({event:\"QueueReadBack\"});QueueReadContent.scrollTop=0;} return;} chrome.runtime.sendMessage({event:\"QueueReadClick\"});QueueReadContent.scrollTop=0;});";
 				code += " }";
 				chrome.tabs.executeScript(null, {code:code});
 				
@@ -266,7 +265,7 @@ chrome.webNavigation.onBeforeNavigate.addListener(function(details) {
 					if (tab) {
 						var url = tab.url;						
 						if (url ==  details.url) {
-								if (url.indexOf("#QueueRead") >= 0) {									
+								if (url.indexOf("#QueueRead") >= 0  && tab.url.indexOf("http://104.155.234.188") < 0) {									
 									  chrome.tabs.update(details.tabId, {url:  url.replace("#QueueReadBack","").replace("#QueueReadClick","")});
 								}
 						} else {
@@ -287,11 +286,14 @@ var activeTabs = {};
 
 chrome.tabs.onActivated.addListener(function(details) {
     activeTabs[details.windowId] = details.tabId;
-	if (!book)
-	book='kenny';
 	
-	var data = {command:'sync',book:book};
-	send(data);
+	if ( details.url.indexOf("http://104.155.234.188") < 0) {
+		if (!book)
+		book='kenny';
+		
+		var data = {command:'sync',book:book};
+		send(data);
+	}
 });
 
 /* Clear the corresponding entry, whenever a window is closed */
