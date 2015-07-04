@@ -1,7 +1,9 @@
 ﻿var book;
 var page;
 var total;
-var step = 14;
+var savetotal=0;
+var step = parseInt(document.getElementById('step').value);
+
 
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
@@ -33,16 +35,28 @@ socket.on('events', function(evt) {
 	function go() {
 		if (evt.book == "kennyq") return;
 		page = evt.page;
-		var totalchange = false
-		if (evt.total != total && total-page <=  step)
-		//if (evt.total != total )
-			totalchange = true;
+		//var totalchange = false
+		//if (evt.total != total && total-page <=  step)	
+		//	totalchange = true;		
+		if (savetotal == 0)
+			savetotal = evt.total;
+		
+		if (evt.total > savetotal) {
+			var oldtitle = window.parent.document.title;
+			var pos1 = oldtitle.indexOf(') ');
+			if (pos1 > 0) {
+				oldtitle = oldtitle.substring(pos1 + 2,oldtitle.length);
+			} 					
+			window.parent.document.title = "(" + (evt.total - savetotal) + ") " + oldtitle;	
+		}
+		
+		
 		total = evt.total;
 		book = evt.book;
 		//var data = evt.dbdata[0].replace("<br><br>","");
 		var data = evt.dbdata[0];
 		data = data.replace(/\<br><br>/g,'<hr>');
-		data = "[<a href='javascript:' id=QueueReadBack>" + (parseInt(page) + 1) + "/" + total + "</a>] [" +  (parseInt(total) -  (parseInt(page) + 1))  + "] <br><hr>" + data;
+		data = "<span id='QreadCounter'>[<a href='javascript:' id=QueueReadBack>" + (parseInt(page) + 1) + "/" + total + "</a>] [" +  (parseInt(total) -  (parseInt(page) + 1))  + "] </span><br><hr>" + data;
 		//var QueueReadContent = document.getElementById('QueueReadContent');
 		QueueReadContent.innerHTML = data;
 		
@@ -66,12 +80,12 @@ socket.on('events', function(evt) {
 	} else if (evt.command == 'click') {
 		var data = {command:'loaddata',page: parseInt(evt.page) ,book: evt.book , memo:'noclick'};			
 		send(data);	
-	} else if (evt.command == 'data') {		
-		go();		
-		if (evt.memo != 'noclick') {
+	} else if (evt.command == 'data') {	
+		go();
+		if (evt.memo != 'noclick') {			
 			var data = {command:'click',page : parseInt(evt.page),book:book};						
 			send(data);	
-		}
+		} 
 		
 	}
 	
@@ -110,3 +124,9 @@ window.onmousewheel = function(e) {
 	e.preventDefault();
 	e.returnValue=false;
 };
+
+document.addEventListener("visibilitychange", function() {		
+	if ( document.visibilityState == 'visible') {
+		savetotal = total;
+		window.parent.document.title = "QRead list";
+	}});
