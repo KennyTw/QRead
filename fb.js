@@ -140,6 +140,9 @@ function getdata(filter) {
 						fbtext = fbtext + " <a href='" + res.data[i].link + "' target='new'>Link</a>"						
 					}			
 					
+					var now = new Date();
+					var nowstr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
+					fbtext = fbtext + " " + nowstr;
 					
 					
 					var d = new Date(res.data[i].created_time);  
@@ -227,6 +230,9 @@ function fbdbprocess(datalist , callback) {
 						fbtext = fbtext + " <a href='" + record.link + "' target='new'>Link</a>"						
 					}			
 					 
+					var now = new Date();
+					var nowstr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
+					fbtext = fbtext + " " + nowstr;
 					
 					console.log(record.id + ":" + record.story);
 					db.rpush("datafb"  ,fbtext ,function(err,dbdata){});

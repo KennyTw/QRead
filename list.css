@@ -15,10 +15,11 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
   /* max-height: 10px; */
   /* overflow-x: hidden; */
   /* overflow-y: auto; */
+  overflow-x: auto;  
   line-height: 26px;
   font-size: 17px;
   font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif;
-  cursor: pointer;
+  /*cursor: pointer;*/
   color: white;
   /* opacity: 1; */
   padding: 7px;
@@ -32,7 +33,13 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
   bottom: 0px;
   /* right: 10px; */
   border-radius: 5px 5px 0px 0px;
-  min-height: 97%;
+  min-height: 99%;
   -webkit-column-count: 4;
   -webkit-column-gap: 40px;
+  /*-webkit-column-width: 300px;*/
+}
+
+body {
+	overflow-y: hidden; 
+	overflow-x: hidden; 
 }

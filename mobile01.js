@@ -74,6 +74,10 @@ function dbprocess(streamdata , callback)  {
 						var desc = record.description;
 						desc = desc + " <a target='new' href='" + record.link + "'>Link</a>";									
 						text = text + ":" + desc;
+						
+						var now = new Date();
+						var nowstr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
+						text = text + " " + nowstr;
 						//gcmstring = record.title + " : " + record.description + "\r\n" + "\r\n";
 						
 						/*var message = new gcm.Message();

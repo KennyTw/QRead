@@ -67,7 +67,9 @@ function getdata() {
 						tweet =  tweets[i].user.name + " : " + tweet +   mediaimg + tweetlink ;
 						//console.log(JSON.stringify(tweets[i])); 
 						
-						
+						var now = new Date();
+						var nowstr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
+						tweet += " " + nowstr;						
 					
 						if (dbdata == undefined ){					
 							db.hset("savetwitter"  ,"page",0);

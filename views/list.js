@@ -2,6 +2,7 @@
 var page;
 var total;
 var savetotal=0;
+var savetotal2=0;
 var step = parseInt(document.getElementById('step').value);
 
 
@@ -41,6 +42,9 @@ socket.on('events', function(evt) {
 		if (savetotal == 0)
 			savetotal = evt.total;
 		
+		if (savetotal2 == 0)
+			savetotal2 = evt.total;
+		
 		if (evt.total > savetotal) {
 			var oldtitle = window.parent.document.title;
 			var pos1 = oldtitle.indexOf(') ');
@@ -48,8 +52,7 @@ socket.on('events', function(evt) {
 				oldtitle = oldtitle.substring(pos1 + 2,oldtitle.length);
 			} 					
 			window.parent.document.title = "(" + (evt.total - savetotal) + ") " + oldtitle;	
-		}
-		
+		} 
 		
 		total = evt.total;
 		book = evt.book;
@@ -58,7 +61,10 @@ socket.on('events', function(evt) {
 		data = data.replace(/\<br><br>/g,'<hr>');
 		data = "<span id='QreadCounter'>[<a href='javascript:' id=QueueReadBack>" + (parseInt(page) + 1) + "/" + total + "</a>] [" +  (parseInt(total) -  (parseInt(page) + 1))  + "] </span><br><hr>" + data;
 		//var QueueReadContent = document.getElementById('QueueReadContent');
+		if (evt.total <= savetotal2) 
+			unfade(QueueReadContent);
 		QueueReadContent.innerHTML = data;
+		//QueueReadContent.insertAdjacentHTML( 'beforeend', data );
 		
 		var anchors = QueueReadContent.querySelectorAll('a');
 		for (var i = 0 ; i < anchors.length ;  i++) { 
@@ -69,7 +75,12 @@ socket.on('events', function(evt) {
 		var images = QueueReadContent.querySelectorAll('img'); 
 		for (var i = 0 ; i < images.length ;  i++) {images[i].style.width='100%';}
 		
+		if (evt.total <= savetotal2) 
+				QueueReadContent.scrollLeft = 0;
 		
+			//window.scrollTo(0,0);
+			
+		savetotal2 = evt.total;
 	}
 	
 	if (evt.command == 'sync') {		
@@ -94,7 +105,7 @@ socket.on('events', function(evt) {
 });
 
 QueueReadContent.addEventListener('click', function(e) {  
-		    if (e.target.nodeName == 'A') {
+		    /*if (e.target.nodeName == 'A') {
 				if(e.target.id == 'QueueReadBack'){
 					window.scrollTo(0,0);
 					if (parseInt(page) - step >= 0) {			
@@ -104,6 +115,12 @@ QueueReadContent.addEventListener('click', function(e) {
 				} 
 				return;
 			} 
+			
+			if (window.getSelection().toString() != ""){
+				e.stopPropagation();
+				e.preventDefault();
+				return;
+			}
 				
 			//next
 			window.scrollTo(0,0);
@@ -114,16 +131,69 @@ QueueReadContent.addEventListener('click', function(e) {
 				var newstep = parseInt(total) - parseInt(page) -1;
 				var data = {command:'loaddata',page: parseInt(page) + newstep,book:book};			
 				send(data);
-			}		
+			}	*/	
 		});
 		
-window.onmousewheel = function(e) { 
+function unfade(element) {
+    var op = 0.1;  // initial opacity
+    element.style.display = 'block';
+    var timer = setInterval(function () {
+        if (op >= 1){
+            clearInterval(timer);
+        }
+        element.style.opacity = op;
+        element.style.filter = 'alpha(opacity=' + op * 100 + ")";
+        op += op * 0.1;
+        
+    }, 20);
+}
+		
+//window.onmousewheel = function(e) { 
+QueueReadContent.addEventListener('mousewheel', function(e) {  
+	if (e.wheelDelta < 0) {
+		//if (document.body.scrollWidth - document.body.clientWidth - document.body.scrollLeft < 1) {
+		if (QueueReadContent.scrollWidth - QueueReadContent.clientWidth - QueueReadContent.scrollLeft < 2) {
+			//move to right end
+			//window.scrollTo(0,0);
+			if (parseInt(page)+step < parseInt(total)) {			
+				var data = {command:'loaddata',page: parseInt(page) + step,book:book};			
+				send(data);
+			} else if (parseInt(page)+1 < parseInt(total)){
+				var newstep = parseInt(total) - parseInt(page) -1;
+				var data = {command:'loaddata',page: parseInt(page) + newstep,book:book};			
+				send(data);
+			}		
+		} 
+	} else if ( e.wheelDelta > 0) {
+		//if (document.body.scrollLeft == 0) {
+		if (QueueReadContent.scrollLeft == 0) {
+			//move to left end
+			//window.scrollTo(0,0);
+			if (parseInt(page) - step >= 0) {			
+				var data = {command:'loaddata',page: parseInt(page) - step,book:book};			
+				send(data);
+			}	
+			
+		}
+	}
 	
-	window.scrollBy(e.wheelDelta * -3.2,0);
+	//window.scrollBy(e.wheelDelta * -3.2,0);
+	var dir = 1;
+	if (e.wheelDelta > 0)
+		dir = -1;	
+	
+	/*if (document.body.scrollWidth - document.body.clientWidth - document.body.scrollLeft  >  document.body.clientWidth ) 	
+		window.scrollBy(dir * document.body.clientWidth ,0)
+	else
+		window.scrollBy(e.wheelDelta * -1 ,0);*/
+	
+	//window.scrollBy(dir * 15 ,0);
+	
+	QueueReadContent.scrollLeft += e.wheelDelta * -3.2;
 	
 	e.preventDefault();
 	e.returnValue=false;
-};
+});
 
 document.addEventListener("visibilitychange", function() {		
 	if ( document.visibilityState == 'visible') {

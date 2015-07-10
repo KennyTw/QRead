@@ -64,8 +64,13 @@ function dbprocess(streamdata , callback)  {
 					
 					var text = record.title;
 					var desc = record.description;
-					desc = desc.replace("<a","<a target='new' ");					
-					text = desc;
+					desc = desc.replace("<a","<a target='new' ");
+					
+					var now = new Date();
+					var nowstr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
+					
+					desc += " " + nowstr;
+					text = desc; 
 
 					//gcmstring += record.title + "\r\n\r\n";
 					
