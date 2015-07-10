@@ -234,6 +234,7 @@ function fbdbprocess(datalist , callback) {
 					var nowstr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
 					fbtext = fbtext + " " + nowstr;
 					
+					fbtext = "<span>" + fbtext + "</span>";
 					console.log(record.id + ":" + record.story);
 					db.rpush("datafb"  ,fbtext ,function(err,dbdata){});
 					db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});

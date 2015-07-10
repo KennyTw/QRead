@@ -88,7 +88,7 @@ function dbprocess(streamdata , callback)  {
 							if(err) console.log(err);
 							else    console.log(result);							
 						});*/
-						
+						text = "<span>" + text + "</span>";
 						console.log(record.title);
 						db.rpush("datamobile01"  ,text ,function(err,dbdata){});
 						db.rpush("datakenny"  ,text ,function(err,dbdata){});

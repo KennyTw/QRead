@@ -4,7 +4,8 @@ var total;
 var savetotal=0;
 var savetotal2=0;
 var step = parseInt(document.getElementById('step').value);
-
+var stepdesc = 0;
+var laststep = step;
 
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
@@ -12,7 +13,7 @@ var QueueReadContent = document.getElementById('QueueReadContent');
 function send(data) {	
 	var timestamp = Number(new Date());	
 	data["id"] = timestamp;
-	data["step"] = step;
+	data["step"] = step ;
 	console.log(data);
 	socket.emit('commands',data);
 }
@@ -35,6 +36,8 @@ socket.on('events', function(evt) {
 
 	function go() {
 		if (evt.book == "kennyq") return;
+		
+		stepdesc = 0;
 		page = evt.page;
 		//var totalchange = false
 		//if (evt.total != total && total-page <=  step)	
@@ -69,7 +72,7 @@ socket.on('events', function(evt) {
 		var anchors = QueueReadContent.querySelectorAll('a');
 		for (var i = 0 ; i < anchors.length ;  i++) { 
 			if (i > 0) {anchors[i].setAttribute('target', 'qread');} 
-			anchors[i].style.cssText='color:white;  text-decoration: underline;'
+			anchors[i].style.cssText='color:white;  text-decoration: underline;';
 		}
 		
 		var images = QueueReadContent.querySelectorAll('img'); 
@@ -78,7 +81,21 @@ socket.on('events', function(evt) {
 		if (evt.total <= savetotal2) 
 				QueueReadContent.scrollLeft = 0;
 		
-			//window.scrollTo(0,0);
+			//window.scrollTo(0,0);		
+		window.setTimeout(function() {
+			
+			for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
+			var obj = QueueReadContent.childNodes[i];
+			if (obj.tagName == "SPAN") {
+				 var rect = obj.getBoundingClientRect();
+				 if (rect.left + (rect.width/2) >= window.screen.width)
+					 stepdesc ++;
+			}
+			}
+			
+			
+		},1000);
+		
 			
 		savetotal2 = evt.total;
 	}
@@ -145,32 +162,34 @@ function unfade(element) {
         element.style.filter = 'alpha(opacity=' + op * 100 + ")";
         op += op * 0.1;
         
-    }, 20);
+    }, 15);
 }
 		
 //window.onmousewheel = function(e) { 
 QueueReadContent.addEventListener('mousewheel', function(e) {  
 	if (e.wheelDelta < 0) {
 		//if (document.body.scrollWidth - document.body.clientWidth - document.body.scrollLeft < 1) {
-		if (QueueReadContent.scrollWidth - QueueReadContent.clientWidth - QueueReadContent.scrollLeft < 2) {
+		//if (QueueReadContent.scrollWidth - QueueReadContent.clientWidth - QueueReadContent.scrollLeft < 2) {
 			//move to right end
 			//window.scrollTo(0,0);
 			if (parseInt(page)+step < parseInt(total)) {			
-				var data = {command:'loaddata',page: parseInt(page) + step,book:book};			
+				var data = {command:'loaddata',page: parseInt(page) + step - stepdesc,book:book};			
+				laststep = step - stepdesc;
 				send(data);
 			} else if (parseInt(page)+1 < parseInt(total)){
 				var newstep = parseInt(total) - parseInt(page) -1;
-				var data = {command:'loaddata',page: parseInt(page) + newstep,book:book};			
+				laststep = newstep - stepdesc;
+				var data = {command:'loaddata',page: parseInt(page) + newstep - stepdesc ,book:book};			
 				send(data);
 			}		
-		} 
+		//} 
 	} else if ( e.wheelDelta > 0) {
 		//if (document.body.scrollLeft == 0) {
 		if (QueueReadContent.scrollLeft == 0) {
 			//move to left end
 			//window.scrollTo(0,0);
-			if (parseInt(page) - step >= 0) {			
-				var data = {command:'loaddata',page: parseInt(page) - step,book:book};			
+			if (parseInt(page) - laststep >= 0) {			
+				var data = {command:'loaddata',page: parseInt(page) - laststep,book:book};			
 				send(data);
 			}	
 			

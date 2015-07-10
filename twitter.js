@@ -69,7 +69,8 @@ function getdata() {
 						
 						var now = new Date();
 						var nowstr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
-						tweet += " " + nowstr;						
+						tweet += " " + nowstr;	
+						tweet = "<span>" + tweet + "</span>";
 					
 						if (dbdata == undefined ){					
 							db.hset("savetwitter"  ,"page",0);

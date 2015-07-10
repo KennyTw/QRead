@@ -70,7 +70,8 @@ function dbprocess(streamdata , callback)  {
 					var nowstr = now.getFullYear() + "-" + (now.getMonth() + 1) + "-" + now.getDate() + " " + now.getHours() + ":" + now.getMinutes();
 					
 					desc += " " + nowstr;
-					text = desc; 
+					text = desc;
+					text = "<span>" + text + "</span>";
 
 					//gcmstring += record.title + "\r\n\r\n";
 					
