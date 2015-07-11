@@ -88,15 +88,17 @@ socket.on('events', function(evt) {
 			var obj = QueueReadContent.childNodes[i];
 			if (obj.tagName == "SPAN") {
 				 var rect = obj.getBoundingClientRect();
-				 if (rect.left + (rect.width/2) >= window.screen.width)
-					 stepdesc ++;
+				 if (rect.left + (rect.width/3) >= window.screen.width) {
+					obj.style.opacity = 0.3; 
+					stepdesc ++;
+				 }
 			}
 			}
 			
 			
-		},1000);
+		},3000);
 		
-			
+		
 		savetotal2 = evt.total;
 	}
 	
@@ -197,9 +199,9 @@ QueueReadContent.addEventListener('mousewheel', function(e) {
 	}
 	
 	//window.scrollBy(e.wheelDelta * -3.2,0);
-	var dir = 1;
-	if (e.wheelDelta > 0)
-		dir = -1;	
+	//var dir = 1;
+	//if (e.wheelDelta > 0)
+		//dir = -1;	
 	
 	/*if (document.body.scrollWidth - document.body.clientWidth - document.body.scrollLeft  >  document.body.clientWidth ) 	
 		window.scrollBy(dir * document.body.clientWidth ,0)
@@ -208,7 +210,7 @@ QueueReadContent.addEventListener('mousewheel', function(e) {
 	
 	//window.scrollBy(dir * 15 ,0);
 	
-	QueueReadContent.scrollLeft += e.wheelDelta * -3.2;
+	//QueueReadContent.scrollLeft += e.wheelDelta * -3.2;
 	
 	e.preventDefault();
 	e.returnValue=false;
