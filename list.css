@@ -15,7 +15,7 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
   /* max-height: 10px; */
   /* overflow-x: hidden; */
   /* overflow-y: auto; */
-  overflow-x: auto;  
+  overflow-x: hidden;  
   line-height: 26px;
   font-size: 17px;
   font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif;
