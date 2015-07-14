@@ -62,7 +62,7 @@ socket.on('events', function(evt) {
 		//var data = evt.dbdata[0].replace("<br><br>","");
 		var data = evt.dbdata[0];
 		data = data.replace(/\<br><br>/g,'<hr>');
-		data = "<span id='QreadCounter'>[<a href='javascript:' id=QueueReadBack>" + (parseInt(page) + 1) + "/" + total + "</a>] [" +  (parseInt(total) -  (parseInt(page) + 1))  + "] </span><br><hr>" + data;
+		data = "<span id='QreadCounter'>[<a href='javascript:' id=QueueReadNext>" + (parseInt(page) + 1) + "/" + total + "</a>] [<a href='javascript:' id=QueueReadBack>" +  (parseInt(total) -  (parseInt(page) + 1))  + "</a>] </span><br><hr>" + data;
 		//var QueueReadContent = document.getElementById('QueueReadContent');
 		if (evt.total <= savetotal2) 
 			unfade(QueueReadContent);
@@ -83,12 +83,13 @@ socket.on('events', function(evt) {
 		
 			//window.scrollTo(0,0);		
 		window.setTimeout(function() {
-			
+			//var ratio = window.devicePixelRatio || 1;
 			for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
 			var obj = QueueReadContent.childNodes[i];
 			if (obj.tagName == "SPAN") {
 				 var rect = obj.getBoundingClientRect();
-				 if (rect.left + (rect.width/3) >= window.screen.width) {
+				 //if (rect.left + (rect.width/3) >= window.screen.width * ratio) {
+				if (rect.left + (rect.width) >= window.innerWidth ) {
 					obj.style.opacity = 0.3; 
 					stepdesc ++;
 				 }
@@ -123,7 +124,42 @@ socket.on('events', function(evt) {
 	
 });
 
+function next() {
+	if (parseInt(page)+step < parseInt(total)) {			
+				var data = {command:'loaddata',page: parseInt(page) + step - stepdesc,book:book};			
+				laststep = step - stepdesc;
+				send(data);
+	} else if (parseInt(page)+1 < parseInt(total)){
+				var newstep = parseInt(total) - parseInt(page) -1;
+				laststep = newstep - stepdesc;
+				var data = {command:'loaddata',page: parseInt(page) + newstep - stepdesc ,book:book};			
+				send(data);
+	}
+}	
+
+function prev() {
+	if (QueueReadContent.scrollLeft == 0) {
+			//move to left end
+			//window.scrollTo(0,0);
+			if (parseInt(page) - laststep >= 0) {			
+				var data = {command:'loaddata',page: parseInt(page) - laststep,book:book};			
+				send(data);
+			}			
+	}	
+}
+
 QueueReadContent.addEventListener('click', function(e) {  
+
+			if (e.target.nodeName == 'A') {
+				if(e.target.id == 'QueueReadBack'){
+					prev();
+				}  else if (e.target.id == 'QueueReadNext') {
+					next();					
+				}
+				return;
+			} 
+			
+			
 		    /*if (e.target.nodeName == 'A') {
 				if(e.target.id == 'QueueReadBack'){
 					window.scrollTo(0,0);
@@ -166,7 +202,8 @@ function unfade(element) {
         
     }, 15);
 }
-		
+	
+
 //window.onmousewheel = function(e) { 
 QueueReadContent.addEventListener('mousewheel', function(e) {  
 	if (e.wheelDelta < 0) {
@@ -174,28 +211,12 @@ QueueReadContent.addEventListener('mousewheel', function(e) {
 		//if (QueueReadContent.scrollWidth - QueueReadContent.clientWidth - QueueReadContent.scrollLeft < 2) {
 			//move to right end
 			//window.scrollTo(0,0);
-			if (parseInt(page)+step < parseInt(total)) {			
-				var data = {command:'loaddata',page: parseInt(page) + step - stepdesc,book:book};			
-				laststep = step - stepdesc;
-				send(data);
-			} else if (parseInt(page)+1 < parseInt(total)){
-				var newstep = parseInt(total) - parseInt(page) -1;
-				laststep = newstep - stepdesc;
-				var data = {command:'loaddata',page: parseInt(page) + newstep - stepdesc ,book:book};			
-				send(data);
-			}		
+			
 		//} 
+		next();
 	} else if ( e.wheelDelta > 0) {
 		//if (document.body.scrollLeft == 0) {
-		if (QueueReadContent.scrollLeft == 0) {
-			//move to left end
-			//window.scrollTo(0,0);
-			if (parseInt(page) - laststep >= 0) {			
-				var data = {command:'loaddata',page: parseInt(page) - laststep,book:book};			
-				send(data);
-			}	
-			
-		}
+		prev();
 	}
 	
 	//window.scrollBy(e.wheelDelta * -3.2,0);
@@ -221,3 +242,38 @@ document.addEventListener("visibilitychange", function() {
 		savetotal = total;
 		window.parent.document.title = "QRead list";
 	}});
+	
+var startX,
+startY,
+dist,
+threshold = 50, //required min distance traveled to be considered swipe
+allowedTime = 200, // maximum time allowed to travel that distance
+elapsedTime,
+startTime;
+		
+QueueReadContent.addEventListener('touchstart', function(e){      
+        var touchobj = e.changedTouches[0]
+        dist = 0
+        startX = touchobj.pageX
+        startY = touchobj.pageY
+        startTime = new Date().getTime() // record time when finger first makes contact with surface
+        e.preventDefault()
+}, false)
+
+QueueReadContent.addEventListener('touchmove', function(e){
+    e.preventDefault() // prevent scrolling when inside DIV
+}, false)
+
+QueueReadContent.addEventListener('touchend', function(e){
+    var touchobj = e.changedTouches[0]
+    dist = touchobj.pageX - startX // get total dist traveled by finger while in contact with surface
+    elapsedTime = new Date().getTime() - startTime // get time elapsed
+    // check that elapsed time is within specified, horizontal dist traveled >= threshold, and vertical dist traveled <= 100
+    var swiperightBol = (elapsedTime <= allowedTime && dist >= threshold && Math.abs(touchobj.pageY - startY) <= 100)
+    if(swiperightBol) {
+		prev();
+	} else {
+		next();
+	}
+    e.preventDefault()
+}, false)

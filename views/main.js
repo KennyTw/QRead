@@ -316,7 +316,7 @@
 		
 		if (lock == 1) return;
 		
-		if  (target.className == "contain" || target.nodeName == "IMG"){
+		if  (target.className == "contain" || target.nodeName == "IMG" || target.nodeName == "SPAN"){
 			
 			var sendstep = step;
 			var total = parseInt(document.querySelector('#total').value);				

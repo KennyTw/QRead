@@ -43,3 +43,11 @@ body {
 	overflow-y: hidden; 
 	overflow-x: hidden; 
 }
+
+@media only screen and (min-width:0px) and (max-width: 1024px) {
+  #QueueReadContent {	
+	-webkit-column-count: 2;
+	font-size: 13px;
+	
+  }	
+}
