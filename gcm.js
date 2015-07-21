@@ -59,7 +59,7 @@ db.llen("dataapple" , function(err,totalapple) {
 											db.hset("savetwitter","page",parseInt(totaltwitter)-1);									
 										}
 										
-										if (parseInt(totalkenny) - parseInt(pagekenny) > 1500) {
+										if (parseInt(totalkenny) - parseInt(pagekenny) > 3000) {
 											//auto update page
 											db.hset("savekenny","page",parseInt(totalkenny)-1);									
 										}

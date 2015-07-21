@@ -4,6 +4,7 @@ var total;
 var savetotal=0;
 var savetotal2=0;
 var step = parseInt(document.getElementById('step').value);
+step = 40;
 var stepdesc = 0;
 var laststep = step;
 
@@ -37,7 +38,7 @@ socket.on('events', function(evt) {
 	function go() {
 		if (evt.book == "kennyq") return;
 		
-		stepdesc = 0;
+
 		page = evt.page;
 		//var totalchange = false
 		//if (evt.total != total && total-page <=  step)	
@@ -81,15 +82,18 @@ socket.on('events', function(evt) {
 		if (evt.total <= savetotal2) 
 				QueueReadContent.scrollLeft = 0;
 		
+		
 			//window.scrollTo(0,0);		
 		window.setTimeout(function() {
 			//var ratio = window.devicePixelRatio || 1;
+			stepdesc = 0;
 			for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
 			var obj = QueueReadContent.childNodes[i];
 			if (obj.tagName == "SPAN") {
 				 var rect = obj.getBoundingClientRect();
 				 //if (rect.left + (rect.width/3) >= window.screen.width * ratio) {
-				if (rect.left + (rect.width) >= window.innerWidth ) {
+				if (rect.left + (rect.width) >= window.innerWidth || 
+					rect.top + (rect.height) >= window.innerHeight) {
 					obj.style.opacity = 0.3; 
 					stepdesc ++;
 				 }
@@ -126,13 +130,18 @@ socket.on('events', function(evt) {
 
 function next() {
 	if (parseInt(page)+step < parseInt(total)) {			
-				var data = {command:'loaddata',page: parseInt(page) + step - stepdesc,book:book};			
-				laststep = step - stepdesc;
+				laststep = step - stepdesc ;
+				if (laststep <= 0)
+					laststep = 1;
+				var data = {command:'loaddata',page: parseInt(page) + laststep,book:book};			
+				
 				send(data);
 	} else if (parseInt(page)+1 < parseInt(total)){
 				var newstep = parseInt(total) - parseInt(page) -1;
-				laststep = newstep - stepdesc;
-				var data = {command:'loaddata',page: parseInt(page) + newstep - stepdesc ,book:book};			
+				laststep = newstep - stepdesc ;
+				if (laststep <= 0)
+					laststep = 1;
+				var data = {command:'loaddata',page: parseInt(page) + laststep ,book:book};			
 				send(data);
 	}
 }	
@@ -246,12 +255,13 @@ document.addEventListener("visibilitychange", function() {
 var startX,
 startY,
 dist,
-threshold = 50, //required min distance traveled to be considered swipe
-allowedTime = 200, // maximum time allowed to travel that distance
+threshold = 40, //required min distance traveled to be considered swipe
+allowedTime = 300, // maximum time allowed to travel that distance
 elapsedTime,
 startTime;
 		
-QueueReadContent.addEventListener('touchstart', function(e){      
+QueueReadContent.addEventListener('touchstart', function(e){ 
+		if (e.target.nodeName == "A") return;
         var touchobj = e.changedTouches[0]
         dist = 0
         startX = touchobj.pageX
@@ -261,19 +271,43 @@ QueueReadContent.addEventListener('touchstart', function(e){
 }, false)
 
 QueueReadContent.addEventListener('touchmove', function(e){
+	if (e.target.nodeName == "A") return;
     e.preventDefault() // prevent scrolling when inside DIV
 }, false)
 
 QueueReadContent.addEventListener('touchend', function(e){
+	if (e.target.nodeName == "A") return;
     var touchobj = e.changedTouches[0]
     dist = touchobj.pageX - startX // get total dist traveled by finger while in contact with surface
     elapsedTime = new Date().getTime() - startTime // get time elapsed
     // check that elapsed time is within specified, horizontal dist traveled >= threshold, and vertical dist traveled <= 100
-    var swiperightBol = (elapsedTime <= allowedTime && dist >= threshold && Math.abs(touchobj.pageY - startY) <= 100)
+    /*var swiperightBol = (elapsedTime <= allowedTime && dist >= threshold && Math.abs(touchobj.pageY - startY) <= 100)
     if(swiperightBol) {
-		prev();
+		//prev();
+		alert('back');
 	} else {
-		next();
+		//next();
+		alert('next');
+	}*/
+	
+	if (elapsedTime <= allowedTime &&  Math.abs(touchobj.pageY - startY) <= 200) {
+		//alert("in:" + elapsedTime + ":" + dist);
+		if (Math.abs(dist) >= threshold) {
+			//alert('inin');
+			if (dist  > 0) {
+				prev();
+			} else {
+				next();
+			}
+		}
+	} else {
+		alert(elapsedTime + ":" + dist);
 	}
+	
     e.preventDefault()
 }, false)
+
+document.onkeydown = function(e) {
+	if (e.keyCode == 39) {next();} 
+	else if (e.keyCode == 37 ) {prev();} 
+};

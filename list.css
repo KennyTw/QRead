@@ -47,7 +47,18 @@ body {
 @media only screen and (min-width:0px) and (max-width: 1024px) {
   #QueueReadContent {	
 	-webkit-column-count: 2;
-	font-size: 13px;
+	font-size: 14px;	
+	line-height: 17.5px;
+	-webkit-column-gap: 8px;
 	
   }	
+  
+  body  {
+	margin:1px;
+  }
+  
+  hr {
+	margin-top:5px;
+	margin-bottom:5px;
+  }
 }
