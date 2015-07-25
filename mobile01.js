@@ -91,7 +91,7 @@ function dbprocess(streamdata , callback)  {
 						text = "<span>" + text + "</span>";
 						console.log(record.title);
 						db.rpush("datamobile01"  ,text ,function(err,dbdata){});
-						db.rpush("datakenny"  ,text ,function(err,dbdata){});
+						//db.rpush("datakenny"  ,text ,function(err,dbdata){});
 						newcount ++;						
 						
 					} else {

@@ -42,12 +42,14 @@ var http = require('http'),
 		var mode = qobj.m;
 		var a = qobj.a;
 		var z = qobj.z;
+		var book = qobj.b;
+		
 		if (qobj.s)
 			step = parseInt(qobj.s)
 		else
-			step = 20;
+			step = 40;
 		
-		res.render('list', {  mode : mode , autolink : a , step : step , fontsize : z});									
+		res.render('list', {  mode : mode , autolink : a , step : step , fontsize : z, book:book});									
 	});
 	
 	

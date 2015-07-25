@@ -61,10 +61,10 @@ function getdata() {
 					
 					var tweetlink="";
 					if (tweets[i].entities.urls[0]){ //ignore none url
-						tweetlink = '<a href="' + tweets[i].entities.urls[0].expanded_url + '" target="new" >Link</a>' ;
+						tweetlink = ' <a href="' + tweets[i].entities.urls[0].expanded_url + '" target="new" >Link</a>' ;
 						//console.log(tweetlink);					
 					
-						tweet =  tweets[i].user.name + " : " + tweet +   mediaimg + tweetlink ;
+						tweet =  tweet +   mediaimg + tweetlink + " (" + tweets[i].user.name + ")";
 						//console.log(JSON.stringify(tweets[i])); 
 						
 						var now = new Date();
@@ -79,12 +79,12 @@ function getdata() {
 							
 							db.hset("savetwitter"  ,"lastid",tweets[i].id);					
 							db.rpush("datatwitter"  ,tweet ,function(err,dbdata){});
-							db.rpush("datakenny"  ,tweet ,function(err,dbdata){});
+							//db.rpush("datakenny"  ,tweet ,function(err,dbdata){});
 						}  else					
 						if (parseInt(tweets[i].id) > parseInt(dbdata)) {
 							db.hset("savetwitter"  ,"lastid",tweets[i].id);					
 							db.rpush("datatwitter"  ,tweet,function(err,dbdata){});	
-							db.rpush("datakenny"  ,tweet ,function(err,dbdata){});
+							//db.rpush("datakenny"  ,tweet ,function(err,dbdata){});
 							newcount++;
 							//gcmstring += tweets[i].user.name	+ " : " + orgtweet  + "\r\n\r\n";
 							var message = new gcm.Message();

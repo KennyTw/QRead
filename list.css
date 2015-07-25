@@ -35,13 +35,18 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
   border-radius: 5px 5px 0px 0px;
   min-height: 99%;
   -webkit-column-count: 4;
-  -webkit-column-gap: 40px;
+  /*-webkit-column-gap: 40px;*/
   /*-webkit-column-width: 300px;*/
 }
 
 body {
 	overflow-y: hidden; 
 	overflow-x: hidden; 
+}
+
+.BigTitle {
+  font-size: x-large;
+  color: rgb(255, 220, 20);
 }
 
 @media only screen and (min-width:0px) and (max-width: 1024px) {
@@ -52,6 +57,11 @@ body {
 	-webkit-column-gap: 8px;
 	
   }	
+  
+  .BigTitle {
+	font-size: x-large;
+  /*color: rgb(255, 220, 20);*/
+  }
   
   body  {
 	margin:1px;

@@ -1,10 +1,10 @@
-﻿var book;
+﻿var book = document.getElementById('book').value;
 var page;
 var total;
 var savetotal=0;
 var savetotal2=0;
 var step = parseInt(document.getElementById('step').value);
-step = 40;
+//step = 40;
 var stepdesc = 0;
 var laststep = step;
 
@@ -33,7 +33,9 @@ socket.on('disconnect', function() {
 	alert('disconnect');
 });
 
-socket.on('events', function(evt) {	 
+socket.on('events', function(evt) {	
+
+	if (book != evt.book) return;
 
 	function go() {
 		if (evt.book == "kennyq") return;
@@ -78,6 +80,47 @@ socket.on('events', function(evt) {
 		
 		var images = QueueReadContent.querySelectorAll('img'); 
 		for (var i = 0 ; i < images.length ;  i++) {images[i].style.width='100%';}
+		
+		var spans = QueueReadContent.querySelectorAll('span'); 
+		for (var i = 1 ; i < spans.length ;  i++) {
+			var html = spans[i].innerHTML;			
+			//var pos1 = html.indexOf(" : ");
+			var pos1 = 0;
+			//var checkkey = html.substring(pos1 ,pos1 + 1);
+			
+			//var re1 = new RegExp("^[\u4E00-\uFA29]*$"); //Chinese character range 
+			//var re2 = new RegExp("^[\uE7C7-\uE7F3]*$"); //Chinese character range
+			
+			//if (re1.test(checkkey) || re2.test(checkkey))
+			//{
+				//spans[i].innerHTML = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos1  + 4) + "</span>" + html.substring(pos1  + 4, html.length);
+			//} else {
+				var pos2 = html.indexOf(" ",pos1);
+				if (pos2 < 0) pos2 = html.length;
+				
+				var pos21 = html.indexOf("　",pos1);
+				if (pos21 < 0) pos21 = html.length;
+				
+				var pos22 = html.indexOf(":",pos1);
+				if (pos22 < 0) pos22 = html.length;
+				
+				var pos23 = html.indexOf("?",pos1);
+				if (pos23 < 0) pos23 = html.length;	
+
+				var pos24 = html.indexOf("!",pos1);
+				if (pos24 < 0) pos24 = html.length;						
+				
+				pos2 = Math.min(pos2,pos21,pos22,pos23,pos24);
+				
+				var pos3 = html.indexOf("<",pos1); //html tag
+				if (pos2 > pos3) pos2 = pos3 ;
+				if (pos2 == 0) pos2 = pos3 ;
+				
+				//if (pos2 - pos1 > 20) pos2 = pos1 + 20;
+				spans[i].innerHTML = html.substring(0,pos1 ) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + html.substring(pos2, html.length);
+			//}
+			
+		}
 		
 		if (evt.total <= savetotal2) 
 				QueueReadContent.scrollLeft = 0;

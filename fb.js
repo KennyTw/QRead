@@ -80,6 +80,7 @@ fs.readFile('fbtoken', 'utf8', function (err,token) {
 });
 
 //me/home?filter=others
+
 function getdata(filter) {		  
 		db.hget("savefb" ,"lastid",function(err,dbdata) {
 			//console.log(dbdata);
@@ -156,13 +157,13 @@ function getdata(filter) {
 							
 							db.hset("savefb"  ,"lastid",msgid);					
 							db.rpush("datafb"  ,fbtext ,function(err,dbdata){});
-							db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});
+							//db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});
 						}  else					
 						if ((msgid) > parseInt(dbdata)) {
 							dbdata = msgid;
 							db.hset("savefb"  ,"lastid",msgid);					
 							db.rpush("datafb"  ,fbtext,function(err,dbdata){});
-							db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});							
+							//db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});							
 						}						
 				} 
 					
@@ -183,33 +184,39 @@ function fbdbprocess(datalist , callback) {
 			} else {
 				if (dbresult > 0) {	
 					//gcmstring = "";
-					fbtext = record.from.name;
+					fbtext = "";
 					//gcmindex += 1;
 					gcmstring = gcmstring +  record.from.name;
 					  
 					//if (typeof res.data[i].actions == "undefined")
 					//	continue;
-					  
-					if (typeof record.story != "undefined"){			
-					  fbtext = fbtext + " : " + record.story;
-					  gcmstring = gcmstring + " , " + record.story;
+				
+					if (typeof record.description != "undefined") {
+						fbtext = fbtext + " " + record.description;
+						
+						gcmstring = gcmstring + " , " +  record.description ;
 					}
 					  
+					
+
 					if (typeof record.message != "undefined") {
-						fbtext = fbtext + " : " + record.message;
+						fbtext = fbtext +  record.message;
 						gcmstring = gcmstring + " , " + record.message ;
 					}
+					
+					if (typeof record.story != "undefined"){			
+					  fbtext = fbtext +  record.story;
+					  gcmstring = gcmstring + " , " + record.story;
+					}	
 					
 					if (typeof record.name != "undefined") {
 						fbtext = fbtext + " " + record.name;
 						gcmstring = gcmstring + " , " + record.name ;
 					}
 					
-					if (typeof record.description != "undefined") {
-						fbtext = fbtext + " " + record.description;
-						
-						gcmstring = gcmstring + " , " +  record.description ;
-					}
+					
+					
+					fbtext = fbtext + "(" + record.from.name + ")";
 					
 					gcmstring = gcmstring + "\n\n";
 					
@@ -237,7 +244,7 @@ function fbdbprocess(datalist , callback) {
 					fbtext = "<span>" + fbtext + "</span>";
 					console.log(record.id + ":" + record.story);
 					db.rpush("datafb"  ,fbtext ,function(err,dbdata){});
-					db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});
+					//db.rpush("datakenny"  ,fbtext ,function(err,dbdata){});
 					newcount ++;
 					
 				} else {

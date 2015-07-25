@@ -77,7 +77,7 @@ function dbprocess(streamdata , callback)  {
 					
 					console.log(record.title);
 					db.rpush("dataapple"  ,text ,function(err,dbdata){});
-					db.rpush("datakenny"  ,text ,function(err,dbdata){});	
+					//db.rpush("datakenny"  ,text ,function(err,dbdata){});	
 					newcount ++;
 					
 				} else {
