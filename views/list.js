@@ -138,14 +138,24 @@ socket.on('events', function(evt) {
 				var pos25 = html.indexOf(" ",pos2+1);
 				if (pos25 < 0) pos25 = html.length;
 				
-				pos2 = Math.min(pos25,pos21,pos22,pos23,pos24);
+				var pos26 = html.indexOf("。",pos1);
+				if (pos26 < 0) pos26 = html.length;
+				
+				pos2 = Math.min(pos25,pos21,pos22,pos23,pos24,pos26);
 				
 				var pos3 = html.indexOf("<",pos1); //html tag
 				if (pos2 > pos3) pos2 = pos3 ;
 				if (pos2 == 0) pos2 = pos3 ;
 				
 				//if (pos2 - pos1 > 20) pos2 = pos1 + 20;
-				spans[i].innerHTML = html.substring(0,pos1 ) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + html.substring(pos2, html.length);
+				var content =  html.substring(pos2, html.length);
+				var contenttext = html.substring(pos2,pos3);
+				if (contenttext.length > 60) {
+					content = contenttext.substring(0, 60);
+					content = content + "..." + html.substring(pos3,html.length);
+				}
+				
+				spans[i].innerHTML = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
 			//}
 			
 		}
