@@ -284,7 +284,7 @@ var http = require('http'),
 									dataarr = 	dbdata;								
 								}
 								 
-								 var rtn = {command:'data',dbdata:dataarr,page: page,total : total,book:book,id:data.id,memo:data.memo,step:data.step};
+								 var rtn = {command:'data',dbdata:dataarr,page: page,total : total,book:book,id:data.id,memo:data.memo,step:data.step,id:data.id};
 								 //console.log(dbdata);
 								 //io.sockets.emit('events', rtn);	
 								 socket.emit('events', rtn);
@@ -347,17 +347,18 @@ var http = require('http'),
 				});			
 			}
 			else if (data.command == 'sync') {
-					db.hget("save" + book,"page",function(err,data) {
-					if(!data) {
+					db.hget("save" + book,"page",function(err,pagedata) {
+					if(!pagedata) {
 						//res.send('No Data');
 						return;
 					}
 					
-					page = data;					
+					page = pagedata;					
 					db.llen("data" + book ,function(err,dbdata) {
 						var total = dbdata;						
 						db.lrange("data" + book , page, page,function(err,dbdata){
 							var rtn = {command:'sync',dbdata:dbdata,page:page,pos:0,total:total,book:book,id:data.id};
+							//console.log(rtn);
 							socket.emit('events', rtn)							
 						});							
 					}); 

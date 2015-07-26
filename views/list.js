@@ -7,18 +7,36 @@ var step = parseInt(document.getElementById('step').value);
 //step = 40;
 var stepdesc = 0;
 var laststep = step;
+var sendqueue = [];
 
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
 
-function send(data) {	
+function send(data,traceback) {	
 	var timestamp = Number(new Date());	
 	data["id"] = timestamp;
 	data["step"] = step ;
 	console.log(data);
 	socket.emit('commands',data);
+	
+	if (!traceback){
+		//click no return
+		data["id"] = null;
+	} else {
+		timerobj = setTimeout("resendcheck(" + timestamp + ")",5000,timestamp);	
+		sendqueue[timestamp] = {id:timestamp,timeobj:timerobj,data:data};
+	}
+	
 }
 
+ function  resendcheck(timestamp) {
+	if (sendqueue[timestamp] != null) {					
+					socket.disconnect();
+					socket.connect();
+					
+					socket.emit('commands',sendqueue[timestamp].data);					
+	}	 
+ }
 
 socket.on('connect', function() {
 			//alert('connect');
@@ -26,16 +44,23 @@ socket.on('connect', function() {
 				book='kenny';
 			
 			var data = {command:'sync',book:book};
-			send(data);
+			send(data,true);
 		});
 
 socket.on('disconnect', function() {
-	alert('disconnect');
+	//alert('disconnect');
+	console.log('disconnect');
 });
 
 socket.on('events', function(evt) {	
 
 	if (book != evt.book) return;
+	
+	var sendobj = sendqueue[evt.id];
+	if (sendobj != null) {
+			clearTimeout(sendobj.timeobj);
+			sendqueue[evt.id] = null;
+	}
 
 	function go() {
 		if (evt.book == "kennyq") return;
@@ -108,9 +133,12 @@ socket.on('events', function(evt) {
 				if (pos23 < 0) pos23 = html.length;	
 
 				var pos24 = html.indexOf("!",pos1);
-				if (pos24 < 0) pos24 = html.length;						
+				if (pos24 < 0) pos24 = html.length;	
+
+				var pos25 = html.indexOf(" ",pos2+1);
+				if (pos25 < 0) pos25 = html.length;
 				
-				pos2 = Math.min(pos2,pos21,pos22,pos23,pos24);
+				pos2 = Math.min(pos25,pos21,pos22,pos23,pos24);
 				
 				var pos3 = html.indexOf("<",pos1); //html tag
 				if (pos2 > pos3) pos2 = pos3 ;
@@ -153,16 +181,16 @@ socket.on('events', function(evt) {
 	if (evt.command == 'sync') {		
 		if (!book || (book && book == evt.book)  ) {		
 			var data = {command:'loaddata',page: parseInt(evt.page) ,book: evt.book , memo:'noclick'};			
-			send(data);	
+			send(data,true);	
 		};
 	} else if (evt.command == 'click') {
 		var data = {command:'loaddata',page: parseInt(evt.page) ,book: evt.book , memo:'noclick'};			
-		send(data);	
+		send(data,true);	
 	} else if (evt.command == 'data') {	
 		go();
 		if (evt.memo != 'noclick') {			
 			var data = {command:'click',page : parseInt(evt.page),book:book};						
-			send(data);	
+			send(data,false);	
 		} 
 		
 	}
@@ -178,14 +206,14 @@ function next() {
 					laststep = 1;
 				var data = {command:'loaddata',page: parseInt(page) + laststep,book:book};			
 				
-				send(data);
+				send(data,true);
 	} else if (parseInt(page)+1 < parseInt(total)){
 				var newstep = parseInt(total) - parseInt(page) -1;
 				laststep = newstep - stepdesc ;
 				if (laststep <= 0)
 					laststep = 1;
 				var data = {command:'loaddata',page: parseInt(page) + laststep ,book:book};			
-				send(data);
+				send(data,true);
 	}
 }	
 
@@ -195,7 +223,7 @@ function prev() {
 			//window.scrollTo(0,0);
 			if (parseInt(page) - laststep >= 0) {			
 				var data = {command:'loaddata',page: parseInt(page) - laststep,book:book};			
-				send(data);
+				send(data,true);
 			}			
 	}	
 }

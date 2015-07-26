@@ -45,7 +45,7 @@ body {
 }
 
 .BigTitle {
-  font-size: x-large;
+  font-size: larger;
   color: rgb(255, 220, 20);
 }
 
@@ -59,7 +59,7 @@ body {
   }	
   
   .BigTitle {
-	font-size: x-large;
+	font-size: larger;
   /*color: rgb(255, 220, 20);*/
   }
   
