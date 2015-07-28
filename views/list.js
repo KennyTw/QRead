@@ -150,8 +150,8 @@ socket.on('events', function(evt) {
 				//if (pos2 - pos1 > 20) pos2 = pos1 + 20;
 				var content =  html.substring(pos2, html.length);
 				var contenttext = html.substring(pos2,pos3);
-				if (contenttext.length > 60) {
-					content = contenttext.substring(0, 60);
+				if (contenttext.length > 80) {
+					content = contenttext.substring(0, 80);
 					content = content + "..." + html.substring(pos3,html.length);
 				}
 				
