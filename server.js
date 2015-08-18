@@ -245,10 +245,19 @@ var http = require('http'),
 							io.sockets.emit('events', rtn);	
 							return;
 						}
+						
+						//read behaviour stat
+						if (data.page > dbdata) {							 
+							db.rpush("behaviour"  ,JSON.stringify({count:data.page-dbdata,time:Date.now()}) ,function(err,dbdata){});
+						}
+						
 						data.total = total;
 						db.hset("save" + book ,"page",data.page);
 						//io.sockets.emit('events', data);				
-						socket.broadcast.emit('events', data);					
+						socket.broadcast.emit('events', data);
+
+						
+						
 					});				
 				});
 			} else if (data.command == 'reload') {
@@ -289,7 +298,7 @@ var http = require('http'),
 								 //io.sockets.emit('events', rtn);	
 								 socket.emit('events', rtn);
 							}); 
-				});
+				});			
 				
 			}	else if (data.command == 'update') {
 				
@@ -406,7 +415,7 @@ var http = require('http'),
 					}); 
 			});	
 
-			db.hget("savekenny","page",function(err,data) {
+			/*db.hget("savekenny","page",function(err,data) {
 					if(!data) {
 						//res.send('No Data');
 						return;
@@ -420,7 +429,7 @@ var http = require('http'),
 							io.sockets.emit('events', rtn)							
 						});							
 					}); 
-			});		
+			});	*/	
 		}		
 	});
 

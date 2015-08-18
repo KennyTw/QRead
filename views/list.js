@@ -182,7 +182,7 @@ socket.on('events', function(evt) {
 			}
 			
 			
-		},3000);
+		},500);
 		
 		
 		savetotal2 = evt.total;
@@ -344,10 +344,26 @@ startTime;
 QueueReadContent.addEventListener('touchstart', function(e){ 
 		if (e.target.nodeName == "A") return;
         var touchobj = e.changedTouches[0]
+		
+		if (touchobj.pageX < (10 * 2)) {
+			prev();
+			e.preventDefault();
+			startX = null;
+			return;
+		}
+		else if (touchobj.pageX > (document.body.scrollWidth - 10 * 2)) {
+			next();
+			e.preventDefault();
+			startX = null;
+			return;
+		}
+		
         dist = 0
         startX = touchobj.pageX
         startY = touchobj.pageY
-        startTime = new Date().getTime() // record time when finger first makes contact with surface
+        startTime = new Date().getTime() // record time when finger first makes contact with surface	
+		
+		
         e.preventDefault()
 }, false)
 
@@ -358,6 +374,7 @@ QueueReadContent.addEventListener('touchmove', function(e){
 
 QueueReadContent.addEventListener('touchend', function(e){
 	if (e.target.nodeName == "A") return;
+	if (startX == null) return;
     var touchobj = e.changedTouches[0]
     dist = touchobj.pageX - startX // get total dist traveled by finger while in contact with surface
     elapsedTime = new Date().getTime() - startTime // get time elapsed
