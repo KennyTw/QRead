@@ -96,6 +96,24 @@ socket.on('events', function(evt) {
 			unfade(QueueReadContent);
 		QueueReadContent.innerHTML = data;
 		//QueueReadContent.insertAdjacentHTML( 'beforeend', data );
+		var allimg = document.querySelectorAll('img');
+		var loadcount = 0;
+		for (var i = 0; i < allimg.length; i++)        
+			allimg[i].addEventListener("load", function() { loadcount++; if (loadcount == allimg.length) {			
+				stepdesc = 0;
+				for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
+					var obj = QueueReadContent.childNodes[i];
+					if (obj.tagName == "SPAN") {
+						 var rect = obj.getBoundingClientRect();
+						 //if (rect.left + (rect.width/3) >= window.screen.width * ratio) {
+						if (rect.left + (rect.width) >= window.innerWidth || 
+							rect.top + (rect.height) >= window.innerHeight) {
+							obj.style.opacity = 0.3; 
+							stepdesc ++;
+						 }
+					}
+				}				
+			} });
 		
 		var anchors = QueueReadContent.querySelectorAll('a');
 		for (var i = 0 ; i < anchors.length ;  i++) { 
@@ -165,7 +183,7 @@ socket.on('events', function(evt) {
 		
 		
 			//window.scrollTo(0,0);		
-		window.setTimeout(function() {
+		/*window.setTimeout(function() {
 			//var ratio = window.devicePixelRatio || 1;
 			stepdesc = 0;
 			for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
@@ -182,7 +200,7 @@ socket.on('events', function(evt) {
 			}
 			
 			
-		},500);
+		},1500);*/
 		
 		
 		savetotal2 = evt.total;
@@ -409,3 +427,6 @@ document.onkeydown = function(e) {
 	if (e.keyCode == 39) {next();} 
 	else if (e.keyCode == 37 ) {prev();} 
 };
+
+
+

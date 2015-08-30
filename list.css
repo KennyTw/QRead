@@ -2,7 +2,10 @@ body {
 	background:black;
 }
 
-hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D;   margin: 8px 0px 8px 0px;}   
+/* hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D;   margin: 16px 0px 8px 0px;} */  
+
+
+hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D; }   
 
 ::-webkit-scrollbar { width: 6px; height: 6px; } 
 
@@ -39,6 +42,10 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
   /*-webkit-column-width: 300px;*/
 }
 
+
+
+
+
 body {
 	overflow-y: hidden; 
 	overflow-x: hidden; 
@@ -53,6 +60,36 @@ img {
 	max-height: 230px;   
 	object-fit: cover;
   }
+  
+
+  
+@media only screen and (min-width:1366px) and (max-width: 3200px) {
+	
+	#QueueReadContent {	
+		line-height: 18px;
+		font-size: 15px;
+		-webkit-column-count: 8;
+		-webkit-column-gap: 0px;
+		
+	}	
+	
+	#QueueReadContent >span {
+		height: 128px;
+		overflow-y: scroll;
+		display: inline-block;
+		padding: 2px 4px 0px 4px;
+	}
+	
+	#QueueReadContent >span:hover { 
+	   background: #353434;
+	}
+	
+    img {
+		max-height: 80px;   
+		object-fit: cover;
+	}
+  
+}  
 
 @media only screen and (min-width:0px) and (max-width: 760px) {
   #QueueReadContent {	
