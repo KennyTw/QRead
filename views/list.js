@@ -115,6 +115,24 @@ socket.on('events', function(evt) {
 				}				
 			} });
 		
+		if (allimg.length == 0) {
+			
+				stepdesc = 0;
+				for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
+				var obj = QueueReadContent.childNodes[i];
+				if (obj.tagName == "SPAN") {
+					 var rect = obj.getBoundingClientRect();
+					 //if (rect.left + (rect.width/3) >= window.screen.width * ratio) {
+					if (rect.left + (rect.width) >= window.innerWidth || 
+						rect.top + (rect.height) >= window.innerHeight) {
+						obj.style.opacity = 0.3; 
+						stepdesc ++;
+					 }
+				}
+				}
+			
+		}
+		
 		var anchors = QueueReadContent.querySelectorAll('a');
 		for (var i = 0 ; i < anchors.length ;  i++) { 
 			if (i > 0) {anchors[i].setAttribute('target', 'qread');} 

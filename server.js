@@ -47,7 +47,7 @@ var http = require('http'),
 		if (qobj.s)
 			step = parseInt(qobj.s)
 		else
-			step = 40;
+			step = 50;
 		
 		res.render('list', {  mode : mode , autolink : a , step : step , fontsize : z, book:book});									
 	});
