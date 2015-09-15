@@ -96,7 +96,7 @@ socket.on('events', function(evt) {
 			unfade(QueueReadContent);
 		QueueReadContent.innerHTML = data;
 		//QueueReadContent.insertAdjacentHTML( 'beforeend', data );
-		var allimg = document.querySelectorAll('img');
+		/*var allimg = document.querySelectorAll('img');
 		var loadcount = 0;
 		for (var i = 0; i < allimg.length; i++)        
 			allimg[i].addEventListener("load", function() { loadcount++; if (loadcount == allimg.length) {			
@@ -131,7 +131,7 @@ socket.on('events', function(evt) {
 				}
 				}
 			
-		}
+		}*/
 		
 		var anchors = QueueReadContent.querySelectorAll('a');
 		for (var i = 0 ; i < anchors.length ;  i++) { 
@@ -140,7 +140,10 @@ socket.on('events', function(evt) {
 		}
 		
 		var images = QueueReadContent.querySelectorAll('img'); 
-		for (var i = 0 ; i < images.length ;  i++) {images[i].style.width='100%';}
+		for (var i = 0 ; i < images.length ;  i++) {
+			images[i].style.width='100%';
+			images[i].style.maxHeight = window.innerHeight * 0.7;
+		}
 		
 		var spans = QueueReadContent.querySelectorAll('span'); 
 		for (var i = 1 ; i < spans.length ;  i++) {
@@ -186,10 +189,10 @@ socket.on('events', function(evt) {
 				//if (pos2 - pos1 > 20) pos2 = pos1 + 20;
 				var content =  html.substring(pos2, html.length);
 				var contenttext = html.substring(pos2,pos3);
-				if (contenttext.length > 80) {
+				/*if (contenttext.length > 80) {
 					content = contenttext.substring(0, 80);
 					content = content + "..." + html.substring(pos3,html.length);
-				}
+				}*/
 				
 				spans[i].innerHTML = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
 			//}
@@ -331,7 +334,7 @@ function unfade(element) {
 	
 
 //window.onmousewheel = function(e) { 
-QueueReadContent.addEventListener('mousewheel', function(e) {  
+document.addEventListener('mousewheel', function(e) {  
 	if (e.wheelDelta < 0) {
 		//if (document.body.scrollWidth - document.body.clientWidth - document.body.scrollLeft < 1) {
 		//if (QueueReadContent.scrollWidth - QueueReadContent.clientWidth - QueueReadContent.scrollLeft < 2) {
@@ -376,8 +379,9 @@ threshold = 40, //required min distance traveled to be considered swipe
 allowedTime = 300, // maximum time allowed to travel that distance
 elapsedTime,
 startTime;
-		
-QueueReadContent.addEventListener('touchstart', function(e){ 
+	
+	
+document.addEventListener('touchstart', function(e){ 
 		if (e.target.nodeName == "A") return;
         var touchobj = e.changedTouches[0]
 		
@@ -394,15 +398,17 @@ QueueReadContent.addEventListener('touchstart', function(e){
 			return;
 		}
 		
+		
+		
         dist = 0
         startX = touchobj.pageX
         startY = touchobj.pageY
         startTime = new Date().getTime() // record time when finger first makes contact with surface	
 		
 		
-        e.preventDefault()
+       // e.preventDefault()
 }, false)
-
+/*
 QueueReadContent.addEventListener('touchmove', function(e){
 	if (e.target.nodeName == "A") return;
     e.preventDefault() // prevent scrolling when inside DIV
@@ -415,14 +421,7 @@ QueueReadContent.addEventListener('touchend', function(e){
     dist = touchobj.pageX - startX // get total dist traveled by finger while in contact with surface
     elapsedTime = new Date().getTime() - startTime // get time elapsed
     // check that elapsed time is within specified, horizontal dist traveled >= threshold, and vertical dist traveled <= 100
-    /*var swiperightBol = (elapsedTime <= allowedTime && dist >= threshold && Math.abs(touchobj.pageY - startY) <= 100)
-    if(swiperightBol) {
-		//prev();
-		alert('back');
-	} else {
-		//next();
-		alert('next');
-	}*/
+   
 	
 	if (elapsedTime <= allowedTime &&  Math.abs(touchobj.pageY - startY) <= 200) {
 		//alert("in:" + elapsedTime + ":" + dist);
@@ -439,7 +438,7 @@ QueueReadContent.addEventListener('touchend', function(e){
 	}
 	
     e.preventDefault()
-}, false)
+}, false)*/
 
 document.onkeydown = function(e) {
 	if (e.keyCode == 39) {next();} 
