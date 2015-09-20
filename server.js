@@ -68,6 +68,21 @@ var http = require('http'),
 		res.render('list2', {  mode : mode , autolink : a , step : step , fontsize : z, book:book});									
 	});
 	
+	app.get('/list3', function(req, res) {
+		var qobj = req.query;
+		var mode = qobj.m;
+		var a = qobj.a;
+		var z = qobj.z;
+		var book = qobj.b;
+		
+		if (qobj.s)
+			step = parseInt(qobj.s)
+		else
+			step = 20;
+		
+		res.render('list3', {  mode : mode , autolink : a , step : step , fontsize : z, book:book});									
+	});
+	
 	
 	app.get('/', function(req, res) {		
 		var qobj = req.query;
