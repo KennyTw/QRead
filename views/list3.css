@@ -97,6 +97,9 @@ img {
 	
 	#QueueReadContent >span:hover { 
 	   background: #353434;
+	   background-size: contain !important;
+	   background-repeat: no-repeat;
+	   background-position: center center;
 	}
 	
     img {
