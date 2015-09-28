@@ -127,7 +127,7 @@ socket.on('events', function(evt) {
 		for (var i = 0 ; i < images.length ;  i++) {
 			images[i].style.width='100%';
 			//images[i].style.maxHeight = 100;
-			images[i].parentNode.style.backgroundImage = " linear-gradient(rgba(0, 0, 0, 0.9),rgba(0, 0, 0, 0.4)),url('" + images[i].src  + "')";
+			images[i].parentNode.style.backgroundImage = " linear-gradient(rgba(0, 0, 0, 0.9),rgba(0, 0, 0, 0.1)),url('" + images[i].src  + "')";
 			images[i].parentNode.style.textShadow = "2px 2px 5px #000000";
 			images[i].parentNode.style.backgroundSize = "cover";
 			images[i].parentNode.style.minHeight = "130px";

@@ -73,8 +73,7 @@ img {
 		/*line-height: 18px;*/
 		font-size: 17px;
 		/*-webkit-column-count: 7;
-		-webkit-column-gap: 0px;*/
-		
+		-webkit-column-gap: 0px;*/		
 	}	
 	
 	#QueueReadContent >span:first-child{
@@ -112,10 +111,11 @@ img {
 @media only screen and (min-width:0px) and (max-width: 760px) {
   #QueueReadContent {	
 	/*-webkit-column-count: 2;*/
-	font-size: 20px;
-    padding: 0px 17px 0px 17px;	
+	font-size: 14px;
+    padding: 0px 9px 0px 9px;	
 	/*line-height: 14px;*/
 	/*-webkit-column-gap: 8px;*/
+	margin-left: 0;
 	
   }	
   
@@ -126,7 +126,8 @@ img {
 	#QueueReadContent >span {
 		width: 100%;
 		display: inline-block;
-		padding: 2px 4px 0px 4px;
+		/*padding: 2px 4px 0px 4px;*/
+		margin: 4px 0px 4px 0px;
 		
 	}
   
