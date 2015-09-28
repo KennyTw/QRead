@@ -254,10 +254,14 @@ function next() {
 				
 				send(data,true);
 	} else if (parseInt(page)+1 < parseInt(total)){
-				var newstep = parseInt(total) - parseInt(page) -1;
+				var newstep = parseInt(total) - parseInt(page) ;
 				laststep = newstep - stepdesc ;
 				if (laststep <= 0)
 					laststep = 1;
+				
+				if (newstep <  step && stepdesc ==0) //for last page 
+					laststep --;
+					
 				var data = {command:'loaddata',page: parseInt(page) + laststep ,book:book};			
 				send(data,true);
 	}

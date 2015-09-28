@@ -273,6 +273,9 @@ function next() {
 				laststep = newstep - stepdesc ;
 				if (laststep <= 0)
 					laststep = 1;
+				
+				if (newstep <  step && stepdesc ==0) //for last page 
+					laststep --;
 				var data = {command:'loaddata',page: parseInt(page) + laststep ,book:book};			
 				send(data,true);
 	}
