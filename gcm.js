@@ -39,12 +39,12 @@ db.llen("dataapple" , function(err,totalapple) {
 							db.hget("savetwitter","page",function(err,pagetwitter) {
 								db.hget("savefb","page",function(err,pagefb) {
 									db.hget("savekenny","page",function(err,pagekenny) {								
-										if (parseInt(totalapple) - parseInt(pageapple) > 1000) {
+										if (parseInt(totalapple) - parseInt(pageapple) > 100) {
 											//auto update page
 											db.hset("saveapple","page",parseInt(totalapple)-1);									
 										}
 										
-										if (parseInt(totalmobile01) - parseInt(pagemobile01) > 1000) {
+										/*if (parseInt(totalmobile01) - parseInt(pagemobile01) > 1000) {
 											//auto update page
 											db.hset("savemobile01","page",parseInt(totalmobile01)-1);									
 										}
@@ -57,7 +57,7 @@ db.llen("dataapple" , function(err,totalapple) {
 										if (parseInt(totaltwitter) - parseInt(pagetwitter) > 3000) {
 											//auto update page
 											db.hset("savetwitter","page",parseInt(totaltwitter)-1);									
-										}
+										}*/
 										
 										/*if (parseInt(totalkenny) - parseInt(pagekenny) > 3000) {
 											//auto update page
