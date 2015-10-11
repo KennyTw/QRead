@@ -69,9 +69,11 @@ img {
 	
 	#QueueReadContent {	
 		/*line-height: 18px;*/
-		font-size: 35px;
+		font-size: 28px;
 		/*-webkit-column-count: 7;
 		-webkit-column-gap: 0px;*/
+		width: 70%;
+		margin: 0 auto;
 		
 	}	
 	

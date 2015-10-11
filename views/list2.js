@@ -142,7 +142,7 @@ socket.on('events', function(evt) {
 		var images = QueueReadContent.querySelectorAll('img'); 
 		for (var i = 0 ; i < images.length ;  i++) {
 			images[i].style.width='100%';
-			images[i].style.maxHeight = window.innerHeight * 0.7;
+			images[i].style.maxHeight = window.innerHeight * 0.6;
 		}
 		
 		var spans = QueueReadContent.querySelectorAll('span'); 
@@ -198,6 +198,18 @@ socket.on('events', function(evt) {
 			//}
 			
 		}
+		
+		var newScript = document.createElement('script');
+		newScript.type = 'text/javascript';
+		var sourceText = escape(document.getElementById("QueueReadContent").childNodes[3].innerText);
+		  // WARNING: be aware that YOUR-API-KEY inside html is viewable by all your users.
+		  // Restrict your key to designated domains or use a proxy to hide your key
+		  // to avoid misusage by other party.
+		var source = 'https://www.googleapis.com/language/translate/v2?key=AIzaSyB6SlunlYNvziOO-UZmAXU3rEJ_MTj8LN0&source=en&target=zh-TW&callback=translateText&q=' + sourceText;
+		newScript.src = source;
+
+		// When we add this script to the head, the request is sent off.
+		document.getElementsByTagName('head')[0].appendChild(newScript);
 		
 		if (evt.total <= savetotal2) 
 				QueueReadContent.scrollLeft = 0;
@@ -449,5 +461,10 @@ document.onkeydown = function(e) {
 	else if (e.keyCode == 37 ) {prev();} 
 };
 
-
+function translateText(response) {
+       // document.getElementById("translation").innerHTML += "<br>" + response.data.translations[0].translatedText;
+	   //alert(response.data.translations[0].translatedText);
+	   var QueueReadContent = document.getElementById('QueueReadContent');
+	   QueueReadContent.insertAdjacentHTML( 'beforeend', response.data.translations[0].translatedText );
+}
 
