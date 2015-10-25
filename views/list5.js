@@ -158,7 +158,7 @@ socket.on('events', function(evt) {
 			
 			spans[i].addEventListener('mouseover', function(e) {
 				if (e.target.nodeName != "A") {
-					document.body.style.backgroundImage = "";
+					//document.body.style.backgroundImage = "";
 					var id = e.target.getAttribute("data-id");
 					var tag = e.target;
 					if (!id) {
@@ -174,11 +174,19 @@ socket.on('events', function(evt) {
 						//newimg.style.display =  '';
 						document.body.style.backgroundImage = " url('" + img.src + "')";
 						document.body.style.backgroundRepeat = "no-repeat";
-						document.body.style.backgroundPosition = "top left";
+						document.body.style.backgroundPosition = "top center";
 						document.body.style.backgroundSize = "contain";
 					}
 					
-				}				
+					/*var spans = QueueReadContent.querySelectorAll('span'); 
+					for (var i = 1 ; i < spans.length ;  i++) {
+						if (parseInt(spans[i].getAttribute("data-id")) != parseInt(id)) {
+							spans[i].style.opacity = 0.5;
+						} else {
+							spans[i].style.opacity = 1;
+						}
+					}*/	
+				}
 			});
 		
 			var html = spans[i].innerHTML;			

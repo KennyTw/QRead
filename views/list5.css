@@ -76,7 +76,7 @@ body {
 }
 
 .BigTitle {
-  font-size: larger;
+ /* font-size: larger;*/
   color: rgb(255, 220, 20);
 }
 
@@ -91,7 +91,7 @@ img {
 	
 	#QueueReadContent {	
 		/*line-height: 18px;*/
-		font-size: 13px;
+		font-size: 15px;
 		/*-webkit-column-count: 7;
 		-webkit-column-gap: 0px;*/		
 	}	
@@ -104,7 +104,7 @@ img {
 		/*height: 128px;
 		overflow-y: scroll;*/
 		display: inline-block;
-		padding: 2px;
+		padding: 6px 0px 6px 0px;
 		width: 100%;
 		
 		/*min-height:50;*/
@@ -120,7 +120,12 @@ img {
 	   background-size: contain !important;
 	   background-repeat: no-repeat;
 	   background-position: center center;
-	}
+	   opacity : 1;	   
+	} 
+	
+	
+	
+	
 	
     img {
 		/*max-height: 80px;*/
