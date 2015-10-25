@@ -83,6 +83,36 @@ var http = require('http'),
 		res.render('list3', {  mode : mode , autolink : a , step : step , fontsize : z, book:book});									
 	});
 	
+	app.get('/list4', function(req, res) {
+		var qobj = req.query;
+		var mode = qobj.m;
+		var a = qobj.a;
+		var z = qobj.z;
+		var book = qobj.b;
+		
+		if (qobj.s)
+			step = parseInt(qobj.s)
+		else
+			step = 20;
+		
+		res.render('list4', {  mode : mode , autolink : a , step : step , fontsize : z, book:book});									
+	});
+	
+	
+	app.get('/list5', function(req, res) {
+		var qobj = req.query;
+		var mode = qobj.m;
+		var a = qobj.a;
+		var z = qobj.z;
+		var book = qobj.b;
+		
+		if (qobj.s)
+			step = parseInt(qobj.s)
+		else
+			step = 50;
+		
+		res.render('list5', {  mode : mode , autolink : a , step : step , fontsize : z, book:book});									
+	});
 	
 	app.get('/', function(req, res) {		
 		var qobj = req.query;

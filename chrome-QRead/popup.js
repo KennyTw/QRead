@@ -7,7 +7,7 @@ var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 socket.on('connect', function() {
 	//alert('connect');
 	if (!book)
-		book='kenny';
+		book='twitter';
 	
 	var data = {command:'sync',book:book};
 	send(data);	

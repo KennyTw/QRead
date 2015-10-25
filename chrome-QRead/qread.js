@@ -68,7 +68,7 @@ setBook = function(m_book) {
    book = m_book;
    
     if (!book)
-		book='kenny';
+		book='twitter';
 	
 	var data = {command:'sync',book:book};
 	send(data);
@@ -81,7 +81,7 @@ getBook = function() {
 socket.on('connect', function() {
 			//alert('connect');
 			if (!book)
-				book='kenny';
+				book='twitter';
 			
 			var data = {command:'sync',book:book};
 			send(data);
@@ -205,6 +205,8 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 				code += " var div1 = document.createElement('div');div1.innerHTML = 'Hello QueueRead'; div1.setAttribute('id', 'QueueReadContent'); div1.style.cssText = 'box-sizing: content-box; box-shadow: -2px -2px 20px rgba(50,50,50,.2),2px 0 20px rgba(50,50,50,.2);   zoom: reset; max-height: 10px;  overflow-x: hidden;overflow-y: auto; line-height: 25px; font-size: 16px; font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif; cursor:pointer; color:white ; opacity: 1; padding: 7px ; background:black;min-height: 20px; height:auto ; z-index:9999999999;text-align:left;width:30%;position: fixed ; bottom:0px ; right: 10px;    border-radius: 5px 5px 0px 0px;';document.body.insertBefore(div1,document.body.firstChild);"
 				//code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {return;} location.href='#QueueReadClick';});";
 				code += " QueueReadContent = document.getElementById('QueueReadContent'); QueueReadContent.addEventListener('click', function(e) {  if (e.target.nodeName == 'A') {if(e.target.id == 'QueueReadBack'){chrome.runtime.sendMessage({event:\"QueueReadBack\"});QueueReadContent.scrollTop=0;} return;} chrome.runtime.sendMessage({event:\"QueueReadClick\"});QueueReadContent.scrollTop=0;});";
+				
+				
 				code += " }";
 				chrome.tabs.executeScript(null, {code:code});
 				
@@ -230,7 +232,7 @@ chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
 					
 				//} else {
 					if (!book)
-					book='kenny';
+					book='twitter';
 					
 					var data = {command:'sync',book:book};
 					send(data);
@@ -289,7 +291,7 @@ chrome.tabs.onActivated.addListener(function(details) {
 	
 	if ( details.url.indexOf("http://104.155.234.188") < 0) {
 		if (!book)
-		book='kenny';
+		book='twitter';
 		
 		var data = {command:'sync',book:book};
 		send(data);

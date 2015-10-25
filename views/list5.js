@@ -11,6 +11,8 @@ var sendqueue = [];
 
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
+var TranslateDiv = document.getElementById('TranslateDiv');
+var LastDiv =  document.getElementById('LastDiv');
 
 function send(data,traceback) {	
 	var timestamp = Number(new Date());	
@@ -63,8 +65,7 @@ socket.on('events', function(evt) {
 	}
 
 	function go() {
-		if (evt.book == "kennyq") return;
-		
+		if (evt.book == "kennyq") return;	
 
 		page = evt.page;
 		//var totalchange = false
@@ -89,14 +90,14 @@ socket.on('events', function(evt) {
 		book = evt.book;
 		//var data = evt.dbdata[0].replace("<br><br>","");
 		var data = evt.dbdata[0];
-		data = data.replace(/\<br><br>/g,'<hr>');
-		data = "<span id='QreadCounter'>[<a href='javascript:' id=QueueReadNext>" + (parseInt(page) + 1) + "/" + total + "</a>] [<a href='javascript:' id=QueueReadBack>" +  (parseInt(total) -  (parseInt(page) + 1))  + "</a>] </span><br><hr>" + data;
+		data = data.replace(/\<br><br>/g,'');
+		data = "<span id='QreadCounter'>[<a href='javascript:' id=QueueReadNext>" + (parseInt(page) + 1) + "/" + total + "</a>] [<a href='javascript:' id=QueueReadBack>" +  (parseInt(total) -  (parseInt(page) + 1))  + "</a>] </span>" + data;
 		//var QueueReadContent = document.getElementById('QueueReadContent');
 		if (evt.total <= savetotal2) 
 			unfade(QueueReadContent);
 		QueueReadContent.innerHTML = data;
 		//QueueReadContent.insertAdjacentHTML( 'beforeend', data );
-		/*var allimg = document.querySelectorAll('img');
+		var allimg = document.querySelectorAll('img');
 		var loadcount = 0;
 		for (var i = 0; i < allimg.length; i++)        
 			allimg[i].addEventListener("load", function() { loadcount++; if (loadcount == allimg.length) {			
@@ -115,23 +116,7 @@ socket.on('events', function(evt) {
 				}				
 			} });
 		
-		if (allimg.length == 0) {
-			
-				stepdesc = 0;
-				for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
-				var obj = QueueReadContent.childNodes[i];
-				if (obj.tagName == "SPAN") {
-					 var rect = obj.getBoundingClientRect();
-					 //if (rect.left + (rect.width/3) >= window.screen.width * ratio) {
-					if (rect.left + (rect.width) >= window.innerWidth || 
-						rect.top + (rect.height) >= window.innerHeight) {
-						obj.style.opacity = 0.3; 
-						stepdesc ++;
-					 }
-				}
-				}
-			
-		}*/
+		
 		
 		var anchors = QueueReadContent.querySelectorAll('a');
 		for (var i = 0 ; i < anchors.length ;  i++) { 
@@ -142,11 +127,60 @@ socket.on('events', function(evt) {
 		var images = QueueReadContent.querySelectorAll('img'); 
 		for (var i = 0 ; i < images.length ;  i++) {
 			images[i].style.width='100%';
-			images[i].style.maxHeight = window.innerHeight * 0.6;
+			images[i].style.display =  'none';
+			//images[i].style.maxHeight = 100;
+			//images[i].parentNode.style.backgroundImage = " linear-gradient(rgba(0, 0, 0, 0.9),rgba(0, 0, 0, 0.1)),url('" + images[i].src  + "')";
+			//images[i].parentNode.style.textShadow = "2px 2px 5px #000000";
+			//images[i].parentNode.style.backgroundSize = "contain";
+			//images[i].parentNode.style.minHeight = "100px";
+			//images[i].parentNode.style.backgroundRepeat = "no-repeat";
+			//images[i].parentNode.style.backgroundPosition = "center center";
+			
+			//images[i].parentNode.removeChild( images[i] );
+			//images[i].style.position = 'absolute';
+			//images[i].style.left = 0;
+			
+			//images[i].style.maxHeight = window.innerHeight * 0.7;
 		}
 		
 		var spans = QueueReadContent.querySelectorAll('span'); 
 		for (var i = 1 ; i < spans.length ;  i++) {
+			spans[i].setAttribute("data-id", i);			
+			spans[i].addEventListener('click', function(e) {
+				if (e.target.nodeName != "A") {
+					var id = e.target.getAttribute("data-id");
+					if (!id)
+						id = e.target.parentNode.getAttribute("data-id");
+					stepdesc = step - parseInt(id);
+					next();
+				}				
+			});
+			
+			spans[i].addEventListener('mouseover', function(e) {
+				if (e.target.nodeName != "A") {
+					document.body.style.backgroundImage = "";
+					var id = e.target.getAttribute("data-id");
+					var tag = e.target;
+					if (!id) {
+						id = e.target.parentNode.getAttribute("data-id");
+						tag = e.target.parentNode;
+					}
+					
+					var img = tag.querySelector('img');
+					if (img) {
+						//var imgc = img.cloneNode(true);						
+						//LastDiv.appendChild(imgc);
+						//var newimg = LastDiv.querySelector('img');
+						//newimg.style.display =  '';
+						document.body.style.backgroundImage = " url('" + img.src + "')";
+						document.body.style.backgroundRepeat = "no-repeat";
+						document.body.style.backgroundPosition = "top left";
+						document.body.style.backgroundSize = "contain";
+					}
+					
+				}				
+			});
+		
 			var html = spans[i].innerHTML;			
 			//var pos1 = html.indexOf(" : ");
 			var pos1 = 0;
@@ -189,30 +223,22 @@ socket.on('events', function(evt) {
 				//if (pos2 - pos1 > 20) pos2 = pos1 + 20;
 				var content =  html.substring(pos2, html.length);
 				var contenttext = html.substring(pos2,pos3);
-				/*if (contenttext.length > 80) {
+				if (contenttext.length > 80) {
 					content = contenttext.substring(0, 80);
 					content = content + "..." + html.substring(pos3,html.length);
-				}*/
+				}
 				
 				spans[i].innerHTML = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
 			//}
 			
+			
+			
 		}
-		
-		var newScript = document.createElement('script');
-		newScript.type = 'text/javascript';
-		var sourceText = escape(document.getElementById("QueueReadContent").childNodes[3].innerText);
-		  // WARNING: be aware that YOUR-API-KEY inside html is viewable by all your users.
-		  // Restrict your key to designated domains or use a proxy to hide your key
-		  // to avoid misusage by other party.
-		var source = 'https://www.googleapis.com/language/translate/v2?key=AIzaSyB6SlunlYNvziOO-UZmAXU3rEJ_MTj8LN0&source=en&target=zh-TW&callback=translateText&q=' + sourceText;
-		newScript.src = source;
-
-		// When we add this script to the head, the request is sent off.
-		document.getElementsByTagName('head')[0].appendChild(newScript);
 		
 		if (evt.total <= savetotal2) 
 				QueueReadContent.scrollLeft = 0;
+			
+		
 		
 		
 			//window.scrollTo(0,0);		
@@ -234,6 +260,24 @@ socket.on('events', function(evt) {
 			
 			
 		},1500);*/
+		
+		if (allimg.length == 0) {
+			
+				stepdesc = 0;
+				for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
+				var obj = QueueReadContent.childNodes[i];
+				if (obj.tagName == "SPAN") {
+					 var rect = obj.getBoundingClientRect();
+					 //if (rect.left + (rect.width/3) >= window.screen.width * ratio) {
+					if (rect.left + (rect.width) >= window.innerWidth || 
+						rect.top + (rect.height) >= window.innerHeight) {
+						obj.style.opacity = 0.3; 
+						stepdesc ++;
+					 }
+				}
+				}
+			
+		}
 		
 		
 		savetotal2 = evt.total;
@@ -261,6 +305,7 @@ socket.on('events', function(evt) {
 });
 
 function next() {
+	TranslateDiv.innerHTML = "";
 	if (parseInt(page)+step < parseInt(total)) {			
 				laststep = step - stepdesc ;
 				if (laststep <= 0)
@@ -276,13 +321,13 @@ function next() {
 				
 				if (newstep <  step && stepdesc ==0) //for last page 
 					laststep --;
-					
 				var data = {command:'loaddata',page: parseInt(page) + laststep ,book:book};			
 				send(data,true);
 	}
 }	
 
 function prev() {
+	TranslateDiv.innerHTML = "";
 	if (QueueReadContent.scrollLeft == 0) {
 			//move to left end
 			//window.scrollTo(0,0);
@@ -461,12 +506,5 @@ document.onkeydown = function(e) {
 	else if (e.keyCode == 37 ) {prev();} 
 };
 
-function translateText(response) {
-       // document.getElementById("translation").innerHTML += "<br>" + response.data.translations[0].translatedText;
-	   //alert(response.data.translations[0].translatedText);
-	   var QueueReadContent = document.getElementById('QueueReadContent');
-	   QueueReadContent.insertAdjacentHTML( 'beforeend', response.data.translations[0].translatedText );
-	   var scriptcode = document.getElementsByTagName('head')[0];
-	   scriptcode.removeChild(scriptcode.lastChild);
-}
+
 
