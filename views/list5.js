@@ -440,7 +440,7 @@ document.addEventListener('mousewheel', function(e) {
 					evObj.initEvent( 'mouseover', true, false );
 					spans[i].dispatchEvent(evObj);
 					spans[i].style.backgroundColor  = "#5D5C5C";
-					spans[i].style.fontSize = "xx-large"
+					spans[i].style.fontSize = "x-large"
 				}
 				
 				lastid = parseInt(lastid) + 1
@@ -464,13 +464,13 @@ document.addEventListener('mousewheel', function(e) {
 				evObj.initEvent( 'mouseover', true, false );
 				spans[i].dispatchEvent(evObj);
 				spans[i].style.backgroundColor  = "#5D5C5C";
-				spans[i].style.fontSize = "xx-large"
+				spans[i].style.fontSize = "x-large"
 				//spans[i].style.backgroundColor  = "";
 				
 				for (var j=i ; j < spans.length ;  j++) {
 					if ( parseInt(spans[j].getAttribute("data-id")) == (parseInt(lastid) )) {
 						spans[j].style.backgroundColor  = "";
-						spans[i].style.fontSize = ""
+						spans[j].style.fontSize = ""
 						break;
 					}
 				}
