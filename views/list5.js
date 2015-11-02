@@ -327,7 +327,7 @@ socket.on('events', function(evt) {
 
 function next() {
 	TranslateDiv.innerHTML = "";
-	lastid = 0;
+	lastid = -1;
 	if (parseInt(page)+step < parseInt(total)) {			
 				laststep = step - stepdesc ;
 				if (laststep <= 0)
@@ -350,7 +350,7 @@ function next() {
 
 function prev() {
 	TranslateDiv.innerHTML = "";
-	lastid = 0;
+	lastid = -1;
 	if (QueueReadContent.scrollLeft == 0) {
 			//move to left end
 			//window.scrollTo(0,0);
@@ -440,14 +440,14 @@ document.addEventListener('mousewheel', function(e) {
 					evObj.initEvent( 'mouseover', true, false );
 					spans[i].dispatchEvent(evObj);
 					spans[i].style.backgroundColor  = "#5D5C5C";
-					spans[i].style.fontSize = "larger"
+					//spans[i].style.fontSize = "larger"
 				}
 				
 				lastid = parseInt(lastid) + 1
 				break;		
 			} else if (parseInt(spans[i].getAttribute("data-id")) == (parseInt(lastid) )) {
 				spans[i].style.backgroundColor  = "";
-				spans[i].style.fontSize = ""
+				//spans[i].style.fontSize = ""
 			}
 		}
 	
@@ -464,13 +464,13 @@ document.addEventListener('mousewheel', function(e) {
 				evObj.initEvent( 'mouseover', true, false );
 				spans[i].dispatchEvent(evObj);
 				spans[i].style.backgroundColor  = "#5D5C5C";
-				spans[i].style.fontSize = "larger"
+				//spans[i].style.fontSize = "larger"
 				//spans[i].style.backgroundColor  = "";
 				
 				for (var j=i ; j < spans.length ;  j++) {
 					if ( parseInt(spans[j].getAttribute("data-id")) == (parseInt(lastid) )) {
 						spans[j].style.backgroundColor  = "";
-						spans[j].style.fontSize = ""
+						//spans[j].style.fontSize = ""
 						break;
 					}
 				}
