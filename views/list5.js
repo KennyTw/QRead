@@ -440,7 +440,7 @@ document.addEventListener('mousewheel', function(e) {
 					evObj.initEvent( 'mouseover', true, false );
 					spans[i].dispatchEvent(evObj);
 					spans[i].style.backgroundColor  = "#5D5C5C";
-					spans[i].style.fontSize = "x-large"
+					spans[i].style.fontSize = "larger"
 				}
 				
 				lastid = parseInt(lastid) + 1
@@ -464,7 +464,7 @@ document.addEventListener('mousewheel', function(e) {
 				evObj.initEvent( 'mouseover', true, false );
 				spans[i].dispatchEvent(evObj);
 				spans[i].style.backgroundColor  = "#5D5C5C";
-				spans[i].style.fontSize = "x-large"
+				spans[i].style.fontSize = "larger"
 				//spans[i].style.backgroundColor  = "";
 				
 				for (var j=i ; j < spans.length ;  j++) {
