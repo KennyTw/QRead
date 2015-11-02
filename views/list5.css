@@ -63,7 +63,8 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
   /*-webkit-column-width: 300px;*/
   word-wrap: break-word;
   margin-left: 20%;
-  
+  /*max-height: 200px;
+  overflow-y: auto;*/
 }
 
 
@@ -116,7 +117,7 @@ img {
 	}
 	
 	#QueueReadContent >span:hover { 
-	   background: #353434  !important;
+	   background: #5D5C5C  !important;
 	   background-size: contain !important;
 	   background-repeat: no-repeat;
 	   background-position: center center;

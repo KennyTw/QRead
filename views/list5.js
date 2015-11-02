@@ -8,6 +8,7 @@ var step = parseInt(document.getElementById('step').value);
 var stepdesc = 0;
 var laststep = step;
 var sendqueue = [];
+var lastid = 0;
 
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
@@ -141,7 +142,14 @@ socket.on('events', function(evt) {
 			//images[i].style.left = 0;
 			
 			//images[i].style.maxHeight = window.innerHeight * 0.7;
+			if (i == images.length -1 && document.body.style.backgroundImage == "") {
+				document.body.style.backgroundImage = " url('" + images[i].src + "')";
+				document.body.style.backgroundRepeat = "no-repeat";
+				document.body.style.backgroundPosition = "top center";
+				document.body.style.backgroundSize = "contain";
+			}
 		}
+		
 		
 		var spans = QueueReadContent.querySelectorAll('span'); 
 		for (var i = 1 ; i < spans.length ;  i++) {
@@ -151,20 +159,25 @@ socket.on('events', function(evt) {
 					var id = e.target.getAttribute("data-id");
 					if (!id)
 						id = e.target.parentNode.getAttribute("data-id");
+					
+					//lastid = id;
 					stepdesc = step - parseInt(id);
 					next();
 				}				
 			});
 			
+			
 			spans[i].addEventListener('mouseover', function(e) {
 				if (e.target.nodeName != "A") {
-					//document.body.style.backgroundImage = "";
+					document.body.style.backgroundImage = "";
 					var id = e.target.getAttribute("data-id");
 					var tag = e.target;
 					if (!id) {
 						id = e.target.parentNode.getAttribute("data-id");
 						tag = e.target.parentNode;
 					}
+					
+					//lastid = id;
 					
 					var img = tag.querySelector('img');
 					if (img) {
@@ -314,6 +327,7 @@ socket.on('events', function(evt) {
 
 function next() {
 	TranslateDiv.innerHTML = "";
+	lastid = 0;
 	if (parseInt(page)+step < parseInt(total)) {			
 				laststep = step - stepdesc ;
 				if (laststep <= 0)
@@ -336,6 +350,7 @@ function next() {
 
 function prev() {
 	TranslateDiv.innerHTML = "";
+	lastid = 0;
 	if (QueueReadContent.scrollLeft == 0) {
 			//move to left end
 			//window.scrollTo(0,0);
@@ -403,6 +418,7 @@ function unfade(element) {
 	
 
 //window.onmousewheel = function(e) { 
+
 document.addEventListener('mousewheel', function(e) {  
 	if (e.wheelDelta < 0) {
 		//if (document.body.scrollWidth - document.body.clientWidth - document.body.scrollLeft < 1) {
@@ -411,25 +427,61 @@ document.addEventListener('mousewheel', function(e) {
 			//window.scrollTo(0,0);
 			
 		//} 
-		next();
+		//next();
+		
+		var spans = QueueReadContent.querySelectorAll('span');		
+		for (var i = 1 ; i < spans.length ;  i++) {
+			if (parseInt(spans[i].getAttribute("data-id")) == (parseInt(lastid) + 1)) {
+				
+				if (spans[i].style.opacity == 0.3) {
+					next();
+				} else {
+					var evObj = document.createEvent('MouseEvents');
+					evObj.initEvent( 'mouseover', true, false );
+					spans[i].dispatchEvent(evObj);
+					spans[i].style.backgroundColor  = "#5D5C5C";
+					spans[i].style.fontSize = "xx-large"
+				}
+				
+				lastid = parseInt(lastid) + 1
+				break;		
+			} else if (parseInt(spans[i].getAttribute("data-id")) == (parseInt(lastid) )) {
+				spans[i].style.backgroundColor  = "";
+				spans[i].style.fontSize = ""
+			}
+		}
+	
+		
 	} else if ( e.wheelDelta > 0) {
+		
 		//if (document.body.scrollLeft == 0) {
-		prev();
+		//prev();
+		
+		var spans = QueueReadContent.querySelectorAll('span');		
+		for (var i = 1 ; i < spans.length ;  i++) {
+			if (parseInt(spans[i].getAttribute("data-id")) == (parseInt(lastid) - 1)) {
+				var evObj = document.createEvent('MouseEvents');
+				evObj.initEvent( 'mouseover', true, false );
+				spans[i].dispatchEvent(evObj);
+				spans[i].style.backgroundColor  = "#5D5C5C";
+				spans[i].style.fontSize = "xx-large"
+				//spans[i].style.backgroundColor  = "";
+				
+				for (var j=i ; j < spans.length ;  j++) {
+					if ( parseInt(spans[j].getAttribute("data-id")) == (parseInt(lastid) )) {
+						spans[j].style.backgroundColor  = "";
+						spans[i].style.fontSize = ""
+						break;
+					}
+				}
+				
+				if (parseInt(lastid) >= 1)
+					lastid = parseInt(lastid) - 1
+				break;		
+			} 
+		}
 	}
 	
-	//window.scrollBy(e.wheelDelta * -3.2,0);
-	//var dir = 1;
-	//if (e.wheelDelta > 0)
-		//dir = -1;	
-	
-	/*if (document.body.scrollWidth - document.body.clientWidth - document.body.scrollLeft  >  document.body.clientWidth ) 	
-		window.scrollBy(dir * document.body.clientWidth ,0)
-	else
-		window.scrollBy(e.wheelDelta * -1 ,0);*/
-	
-	//window.scrollBy(dir * 15 ,0);
-	
-	//QueueReadContent.scrollLeft += e.wheelDelta * -3.2;
 	
 	e.preventDefault();
 	e.returnValue=false;
