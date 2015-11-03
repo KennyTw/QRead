@@ -67,6 +67,10 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
   overflow-y: auto;*/
 }
 
+#QreadCounter, #QueueReadNext, #QueueReadBack {
+	color: white; 
+	text-decoration: underline;
+}
 
 
 

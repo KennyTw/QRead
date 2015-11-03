@@ -85,6 +85,12 @@ socket.on('events', function(evt) {
 				oldtitle = oldtitle.substring(pos1 + 2,oldtitle.length);
 			} 					
 			window.parent.document.title = "(" + (evt.total - savetotal) + ") " + oldtitle;	
+			
+			if (evt.total - parseInt(page) > step) {
+				var qcounter = document.getElementById('QreadCounter');
+				qcounter.innerHTML = "[<a href='javascript:' id=QueueReadNext>" + (parseInt(page) + 1) + "/" + total + "</a>] [<a href='javascript:' id=QueueReadBack>" +  (parseInt(total) -  (parseInt(page) + 1))  + "</a>] "
+				return;				
+			}
 		} 
 		
 		total = evt.total;
@@ -97,6 +103,7 @@ socket.on('events', function(evt) {
 		if (evt.total <= savetotal2) 
 			unfade(QueueReadContent);
 		QueueReadContent.innerHTML = data;
+		
 		//QueueReadContent.insertAdjacentHTML( 'beforeend', data );
 		var allimg = document.querySelectorAll('img');
 		var loadcount = 0;
@@ -465,6 +472,7 @@ document.addEventListener('mousewheel', function(e) {
 				evObj.initEvent( 'mouseover', true, false );
 				spans[i].dispatchEvent(evObj);
 				spans[i].style.backgroundColor  = "#5D5C5C";
+				spans[i].style.opacity = "1";
 				//spans[i].style.fontSize = "larger"
 				//spans[i].style.backgroundColor  = "";
 				
