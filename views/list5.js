@@ -447,6 +447,7 @@ document.addEventListener('mousewheel', function(e) {
 				break;		
 			} else if (parseInt(spans[i].getAttribute("data-id")) == (parseInt(lastid) )) {
 				spans[i].style.backgroundColor  = "";
+				spans[i].style.opacity = "0.1";
 				//spans[i].style.fontSize = ""
 			}
 		}
