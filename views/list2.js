@@ -149,6 +149,7 @@ socket.on('events', function(evt) {
 		for (var i = 1 ; i < spans.length ;  i++) {
 			var html = spans[i].innerHTML;			
 			//var pos1 = html.indexOf(" : ");
+			if (book != "twitter") {
 			var pos1 = 0;
 			//var checkkey = html.substring(pos1 ,pos1 + 1);
 			
@@ -196,12 +197,25 @@ socket.on('events', function(evt) {
 				
 				spans[i].innerHTML = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
 			//}
+			} else {
+				var highlight = ['Docker','DevOps','XBox','Deep Learning','Google','VR','Kids','Kickstarter','microservice',
+								 'Twitter','MongoDB','search',' Uber','Facebook','Map',' app ','Apple','Microsoft',
+								 'Android','API','Samsung','.js'];
+				for (var z = 0 ; z < highlight.length ; z ++) {
+					var re = new RegExp(highlight[z],"ig");
+					html = html.replace(re , "<span class='BigTitle'>" + highlight[z] +  "</span>");
+				}
+				spans[i].innerHTML = html					
+			}
 			
 		}
 		
 		var newScript = document.createElement('script');
 		newScript.type = 'text/javascript';
-		var sourceText = escape(document.getElementById("QueueReadContent").childNodes[3].innerText);
+		var html = document.getElementById("QueueReadContent").childNodes[3].innerHTML;
+		var pos1 = html.indexOf(" <a");
+		html = html.substring(0,pos1-1);
+		var sourceText = escape(html);
 		  // WARNING: be aware that YOUR-API-KEY inside html is viewable by all your users.
 		  // Restrict your key to designated domains or use a proxy to hide your key
 		  // to avoid misusage by other party.

@@ -141,7 +141,9 @@ socket.on('events', function(evt) {
 		
 		var spans = QueueReadContent.querySelectorAll('span'); 
 		for (var i = 1 ; i < spans.length ;  i++) {
-			var html = spans[i].innerHTML;			
+			var html = spans[i].innerHTML;
+
+			if (book != "twitter") {
 			//var pos1 = html.indexOf(" : ");
 			var pos1 = 0;
 			//var checkkey = html.substring(pos1 ,pos1 + 1);
@@ -190,6 +192,17 @@ socket.on('events', function(evt) {
 				
 				spans[i].innerHTML = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
 			//}
+			} else {
+				
+				var highlight = ['Docker','DevOps','XBox','Deep Learning','Google','VR','Kids','Kickstarter','microservice',
+								 'Twitter','MongoDB','search',' Uber','Facebook','Map',' app ','Apple','Microsoft',
+								 'Android','API','Samsung','.js'];
+				for (var z = 0 ; z < highlight.length ; z ++) {
+					var re = new RegExp(highlight[z],"ig");
+					html = html.replace(re , "<span class='BigTitle'>" + highlight[z] +  "</span>");
+				}
+				spans[i].innerHTML = html	
+			}
 			
 		}
 		

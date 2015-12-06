@@ -6,6 +6,7 @@ var db = redis.createClient();
 var newcount = 0;
 var block = 0;
 var record ;
+var book = "udn"
 
 function fetch(feed,callback) {
   // Define our streams
@@ -52,24 +53,26 @@ function dbprocess(streamdata , callback)  {
 			  console.log('null return');
 			  return;
 		  }
-		  db.sadd('saveyahookey',record.guid, function(err,dbresult) {
+		  db.sadd('save' + book + 'key',record.guid, function(err,dbresult) {
 			if (err) { callback(err); return }
 			
 				if (dbresult > 0) {	
 					
-					var yahootext = record.title;
+					var booktext = record.title;
 					var desc = record.description;
 					desc = desc.replace("<p>","");
 					desc = desc.replace("</p>","");
-					desc = desc.replace('align="left"','');
+					desc = desc.replace("<P>","");
+					desc = desc.replace("</P>","");
+					//desc = desc.replace('align="left"','');
 					//desc = desc.replace(record.link,'javascript:none'); 
 					
-					yahootext = yahootext + " : " + desc;
-					yahootext = yahootext + " <a href='" +  record.link  + "' target='new'>Link</a>";
-					yahootext = "<span>" + yahootext + "</span>"
+					booktext = booktext + " : " + desc;
+					booktext = booktext + " <a href='" +  record.link  + "' target='new'>Link</a>";
+					booktext = "<span>" + booktext + "</span>"
 					
 					console.log(record.title);
-					db.rpush("datayahoo"  ,yahootext ,function(err,dbdata){});
+					db.rpush("data" + book  ,booktext ,function(err,dbdata){});
 					newcount++;
 					
 				} else {
@@ -94,24 +97,20 @@ function done(err) {
   process.exit();
 }
 
-db.exists("saveyahoo" ,function(err,dbdata) {					
+db.exists("save" + book ,function(err,dbdata) {					
 					if (dbdata == 0) {
-						db.hset("saveyahoo"  ,"page",0);
-						db.hset("saveyahoo"  ,"pos",0);
+						db.hset("save" + book  ,"page",0);
+						db.hset("save" + book  ,"pos",0);
 					}	
 					
 					
-			fetch('https://tw.news.yahoo.com/rss/',function() {		
-				fetch('https://tw.news.yahoo.com/rss/information-3c',function() {
-					fetch('https://tw.news.yahoo.com/rss/technology',function () {					
+			fetch('http://udn.com/rssfeed/news/1',function() {					
 							console.log('done : ' + newcount);						
 							if (newcount > 0) {
-								var rtn = {command:'newdata',book:'yahoo'};
+								var rtn = {command:'newdata',book:book};
 								db.publish("events",JSON.stringify(rtn));					
 							}
 							process.exit();					
-					});
-				});	
 			});	
 });
 

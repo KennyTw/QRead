@@ -9,6 +9,7 @@ var stepdesc = 0;
 var laststep = step;
 var sendqueue = [];
 var lastid = 0;
+var savepage = 0;
 
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
@@ -86,13 +87,14 @@ socket.on('events', function(evt) {
 			} 					
 			window.parent.document.title = "(" + (evt.total - savetotal) + ") " + oldtitle;	
 			
-			if (evt.total - parseInt(page) > step) {
+			if (evt.total - parseInt(page) > step  &&  savepage == page) {
 				var qcounter = document.getElementById('QreadCounter');
 				qcounter.innerHTML = "[<a href='javascript:' id=QueueReadNext>" + (parseInt(page) + 1) + "/" + total + "</a>] [<a href='javascript:' id=QueueReadBack>" +  (parseInt(total) -  (parseInt(page) + 1))  + "</a>] "
 				return;				
 			}
 		} 
 		
+		savepage = page;
 		total = evt.total;
 		book = evt.book;
 		//var data = evt.dbdata[0].replace("<br><br>","");
@@ -107,8 +109,10 @@ socket.on('events', function(evt) {
 		//QueueReadContent.insertAdjacentHTML( 'beforeend', data );
 		var allimg = document.querySelectorAll('img');
 		var loadcount = 0;
-		for (var i = 0; i < allimg.length; i++)        
-			allimg[i].addEventListener("load", function() { loadcount++; if (loadcount == allimg.length) {			
+		for (var i = 0; i < allimg.length; i++) { 
+			allimg[i].addEventListener("error", function() { loadcount++;}); 
+			allimg[i].addEventListener("load", function() { loadcount++; 
+			if (loadcount == allimg.length) {			
 				stepdesc = 0;
 				for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
 					var obj = QueueReadContent.childNodes[i];
@@ -123,8 +127,7 @@ socket.on('events', function(evt) {
 					}
 				}				
 			} });
-		
-		
+		}	
 		
 		var anchors = QueueReadContent.querySelectorAll('a');
 		for (var i = 0 ; i < anchors.length ;  i++) { 
@@ -149,7 +152,8 @@ socket.on('events', function(evt) {
 			//images[i].style.left = 0;
 			
 			//images[i].style.maxHeight = window.innerHeight * 0.7;
-			if (i == images.length -1 && document.body.style.backgroundImage == "") {
+			//if (i == images.length -1 && document.body.style.backgroundImage == "") {
+			if (i == 0 && document.body.style.backgroundImage == "") {
 				document.body.style.backgroundImage = " url('" + images[i].src + "')";
 				document.body.style.backgroundRepeat = "no-repeat";
 				document.body.style.backgroundPosition = "top center";
@@ -174,7 +178,7 @@ socket.on('events', function(evt) {
 			});
 			
 			
-			spans[i].addEventListener('mouseover', function(e) {
+			/*spans[i].addEventListener('mouseover', function(e) {
 				if (e.target.nodeName != "A") {
 					document.body.style.backgroundImage = "";
 					var id = e.target.getAttribute("data-id");
@@ -198,19 +202,13 @@ socket.on('events', function(evt) {
 						document.body.style.backgroundSize = "contain";
 					}
 					
-					/*var spans = QueueReadContent.querySelectorAll('span'); 
-					for (var i = 1 ; i < spans.length ;  i++) {
-						if (parseInt(spans[i].getAttribute("data-id")) != parseInt(id)) {
-							spans[i].style.opacity = 0.5;
-						} else {
-							spans[i].style.opacity = 1;
-						}
-					}*/	
 				}
-			});
+			});*/
 		
 			var html = spans[i].innerHTML;			
 			//var pos1 = html.indexOf(" : ");
+			
+			if (book != "twitter") {
 			var pos1 = 0;
 			//var checkkey = html.substring(pos1 ,pos1 + 1);
 			
@@ -259,7 +257,16 @@ socket.on('events', function(evt) {
 				spans[i].innerHTML = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
 			//}
 			
-			
+			} else  {
+				var highlight = ['Docker','DevOps','XBox','Deep Learning','Google','VR','Kids','Kickstarter','microservice',
+								 'Twitter','MongoDB','search',' Uber','Facebook','Map',' app ','Apple','Microsoft',
+								 'Android','API','Samsung','.js'];
+				for (var z = 0 ; z < highlight.length ; z ++) {
+					var re = new RegExp(highlight[z],"ig");
+					html = html.replace(re , "<span class='BigTitle'>" + highlight[z] +  "</span>");
+				}
+				spans[i].innerHTML = html				
+			}
 			
 		}
 		
@@ -334,7 +341,7 @@ socket.on('events', function(evt) {
 
 function next() {
 	TranslateDiv.innerHTML = "";
-	lastid = -1;
+	lastid = 0;
 	if (parseInt(page)+step < parseInt(total)) {			
 				laststep = step - stepdesc ;
 				if (laststep <= 0)
@@ -357,7 +364,7 @@ function next() {
 
 function prev() {
 	TranslateDiv.innerHTML = "";
-	lastid = -1;
+	lastid = 0;
 	if (QueueReadContent.scrollLeft == 0) {
 			//move to left end
 			//window.scrollTo(0,0);
@@ -436,16 +443,65 @@ document.addEventListener('mousewheel', function(e) {
 		//} 
 		//next();
 		
-		var spans = QueueReadContent.querySelectorAll('span');		
-		for (var i = 1 ; i < spans.length ;  i++) {
-			if (parseInt(spans[i].getAttribute("data-id")) == (parseInt(lastid) + 1)) {
+		
+		var spans = QueueReadContent.querySelectorAll('span');
+		var found = false;
+		for (var i = 1 ; i < spans.length ;  i++) {			
+			var id = spans[i].getAttribute("data-id");
+			if (parseInt(id) == (parseInt(lastid) + 1)) {
+			found = true;					
+					window['translate'+id] = function(response) {
+					var scriptcode = document.getElementsByTagName('head')[0];
+					scriptcode.removeChild(scriptcode.lastChild);		
+							
+					var s = QueueReadContent.querySelectorAll('span');
+					for (var j = 0 ; j < s.length ; j++) {
+						if (s[j].getAttribute("data-id") == id) {
+							//s[j].innerHTML = response.data.translations[0].translatedText;
+							var rect = s[j].getBoundingClientRect();
+							TranslateDiv.innerHTML = response.data.translations[0].translatedText;
+							TranslateDiv.style.top = rect.top;
+							break;
+						}
+					}		
 				
-				if (spans[i].style.opacity == 0.3) {
+					setTimeout(function() {
+						// remove the temporary function
+						window['translate'+id] = null;
+					}, 1000);
+				};
+	
+				var newScript = document.createElement('script');
+				newScript.type = 'text/javascript';
+				var html = spans[i].innerHTML;
+				var pos1 = html.indexOf(" <a");
+				html = html.substring(0,pos1-1);
+				var sourceText = escape(html);
+				  // WARNING: be aware that YOUR-API-KEY inside html is viewable by all your users.
+				  // Restrict your key to designated domains or use a proxy to hide your key
+				  // to avoid misusage by other party.
+				var source = 'https://www.googleapis.com/language/translate/v2?key=AIzaSyB6SlunlYNvziOO-UZmAXU3rEJ_MTj8LN0&source=en&target=zh-TW&callback=translate'+id+'&q=' + sourceText;
+				newScript.src = source;
+
+				// When we add this script to the head, the request is sent off.
+				document.getElementsByTagName('head')[0].appendChild(newScript);
+			
+				if (spans[i].style.opacity == 0.3 ) {
 					next();
 				} else {
-					var evObj = document.createEvent('MouseEvents');
-					evObj.initEvent( 'mouseover', true, false );
-					spans[i].dispatchEvent(evObj);
+					//var evObj = document.createEvent('MouseEvents');
+					//evObj.initEvent( 'mouseover', true, false );
+					//spans[i].dispatchEvent(evObj);
+					var img = spans[i].querySelector('img');
+					document.body.style.backgroundImage = "";
+					if (img) {						
+						document.body.style.backgroundImage = " url('" + img.src + "')";
+						document.body.style.backgroundRepeat = "no-repeat";
+						document.body.style.backgroundPosition = "top center";
+						document.body.style.backgroundSize = "contain";
+					}
+					
+					
 					spans[i].style.backgroundColor  = "#5D5C5C";
 					//spans[i].style.fontSize = "larger"
 				}
@@ -458,6 +514,9 @@ document.addEventListener('mousewheel', function(e) {
 				//spans[i].style.fontSize = ""
 			}
 		}
+		
+		if (!found) //not found
+			next();
 	
 		
 	} else if ( e.wheelDelta > 0) {
@@ -465,21 +524,72 @@ document.addEventListener('mousewheel', function(e) {
 		//if (document.body.scrollLeft == 0) {
 		//prev();
 		
+		if (parseInt(lastid) <= 1) {
+			prev(); 
+			return;
+		}
+		
 		var spans = QueueReadContent.querySelectorAll('span');		
 		for (var i = 1 ; i < spans.length ;  i++) {
 			if (parseInt(spans[i].getAttribute("data-id")) == (parseInt(lastid) - 1)) {
-				var evObj = document.createEvent('MouseEvents');
-				evObj.initEvent( 'mouseover', true, false );
-				spans[i].dispatchEvent(evObj);
+				/*var evObj = document.createEvent('MouseEvents');
+				evObj.initEvent( 'mouseover', true, false );			
+				spans[i].dispatchEvent(evObj);*/
+				
+				var img = spans[i].querySelector('img');
+				document.body.style.backgroundImage = "";
+				if (img) {						
+						document.body.style.backgroundImage = " url('" + img.src + "')";
+						document.body.style.backgroundRepeat = "no-repeat";
+						document.body.style.backgroundPosition = "top center";
+						document.body.style.backgroundSize = "contain";
+				}
+				
 				spans[i].style.backgroundColor  = "#5D5C5C";
 				spans[i].style.opacity = "1";
 				//spans[i].style.fontSize = "larger"
 				//spans[i].style.backgroundColor  = "";
 				
+				var id = spans[i].getAttribute("data-id");
+				window['translate'+id] = function(response) {
+					var scriptcode = document.getElementsByTagName('head')[0];
+					scriptcode.removeChild(scriptcode.lastChild);		
+							
+					var s = QueueReadContent.querySelectorAll('span');
+					for (var j = 0 ; j < s.length ; j++) {
+						if (s[j].getAttribute("data-id") == id) {
+							//s[j].innerHTML = response.data.translations[0].translatedText;
+							var rect = s[j].getBoundingClientRect();
+							TranslateDiv.innerHTML = response.data.translations[0].translatedText;
+							TranslateDiv.style.top = rect.top;
+							break;
+						}
+					}		
+				
+					setTimeout(function() {
+						// remove the temporary function
+						window['translate'+id] = null;
+					}, 1000);
+				};
+		
+				var newScript = document.createElement('script');
+				newScript.type = 'text/javascript';
+				var html = spans[i].innerHTML;
+				var pos1 = html.indexOf(" <a");
+				html = html.substring(0,pos1-1);
+				var sourceText = escape(html);
+				  // WARNING: be aware that YOUR-API-KEY inside html is viewable by all your users.
+				  // Restrict your key to designated domains or use a proxy to hide your key
+				  // to avoid misusage by other party.
+				var source = 'https://www.googleapis.com/language/translate/v2?key=AIzaSyB6SlunlYNvziOO-UZmAXU3rEJ_MTj8LN0&source=en&target=zh-TW&callback=translate'+id+'&q=' + sourceText;
+				newScript.src = source;
+
+				// When we add this script to the head, the request is sent off.
+				document.getElementsByTagName('head')[0].appendChild(newScript);
+				
 				for (var j=i ; j < spans.length ;  j++) {
 					if ( parseInt(spans[j].getAttribute("data-id")) == (parseInt(lastid) )) {
 						spans[j].style.backgroundColor  = "";
-						//spans[j].style.fontSize = ""
 						break;
 					}
 				}

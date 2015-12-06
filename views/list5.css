@@ -14,11 +14,17 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
 
 #TranslateDiv {
 	color: white;
-	top: 0;
+    top: 0;
     position: fixed;
-	font-size: 17px;
-	font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif;
-	width: 30%;
+    font-size: 15px;
+    font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif;
+    width: 20%;
+    background: #000000;
+    /* opacity: 0.95; */
+   /* padding: 2px;*/
+    left: 0px;
+	text-align: -webkit-right;
+}
 }
 
 

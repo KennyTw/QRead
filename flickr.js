@@ -61,6 +61,8 @@ function dbprocess(streamdata , callback)  {
 						} else 
 							text = desc;
 						
+						text = "<span>" + text + "</span>"
+						
 						console.log(record.title);
 						db.rpush("data" + keyprefix  ,text ,function(err,dbdata){});	
 						db.rpush("datakenny"  ,text ,function(err,dbdata){});
