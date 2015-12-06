@@ -13,18 +13,21 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
 ::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	}
 
 #TranslateDiv {
-	color: white;
+    color: white;
     top: 0;
-    position: fixed;
+    position: absolute;
     font-size: 15px;
     font-family: Helvetica Neue, Helvetica, Arial, Microsoft Jhenghei, sans-serif;
     width: 20%;
     background: #000000;
     /* opacity: 0.95; */
-   /* padding: 2px;*/
+    /* padding: 2px; */
     left: 0px;
-	text-align: -webkit-right;
-}
+    text-align: -webkit-center;
+    /* bottom: 10px; */
+    width: 100%;
+    margin-top: -20px;
+
 }
 
 

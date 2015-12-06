@@ -475,7 +475,7 @@ document.addEventListener('mousewheel', function(e) {
 				newScript.type = 'text/javascript';
 				var html = spans[i].innerHTML;
 				var pos1 = html.indexOf(" <a");
-				html = html.substring(0,pos1-1);
+				html = html.substring(0,pos1-2);
 				var sourceText = escape(html);
 				  // WARNING: be aware that YOUR-API-KEY inside html is viewable by all your users.
 				  // Restrict your key to designated domains or use a proxy to hide your key
@@ -576,7 +576,7 @@ document.addEventListener('mousewheel', function(e) {
 				newScript.type = 'text/javascript';
 				var html = spans[i].innerHTML;
 				var pos1 = html.indexOf(" <a");
-				html = html.substring(0,pos1-1);
+				html = html.substring(0,pos1-2);
 				var sourceText = escape(html);
 				  // WARNING: be aware that YOUR-API-KEY inside html is viewable by all your users.
 				  // Restrict your key to designated domains or use a proxy to hide your key
