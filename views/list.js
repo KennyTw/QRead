@@ -98,7 +98,8 @@ socket.on('events', function(evt) {
 		//QueueReadContent.insertAdjacentHTML( 'beforeend', data );
 		var allimg = document.querySelectorAll('img');
 		var loadcount = 0;
-		for (var i = 0; i < allimg.length; i++)        
+		for (var i = 0; i < allimg.length; i++)    {
+			allimg[i].addEventListener("error", function() { loadcount++;}); 
 			allimg[i].addEventListener("load", function() { loadcount++; if (loadcount == allimg.length) {			
 				stepdesc = 0;
 				for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
@@ -114,6 +115,7 @@ socket.on('events', function(evt) {
 					}
 				}				
 			} });
+		}
 		
 		if (allimg.length == 0) {
 			
@@ -191,7 +193,16 @@ socket.on('events', function(evt) {
 					content = content + "..." + html.substring(pos3,html.length);
 				}
 				
-				spans[i].innerHTML = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
+				html = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
+				
+				var highlight = ['Docker','DevOps','XBox','Deep Learning','Google','VR','Kids','Kickstarter','microservice',
+								 'Twitter','MongoDB','search',' Uber','Facebook','Map',' app ','Apple','Microsoft',
+								 'Android','API','Samsung','.js'];
+				for (var z = 0 ; z < highlight.length ; z ++) {
+					var re = new RegExp(highlight[z],"ig");
+					html = html.replace(re , "<span class='BigTitle'>" + highlight[z] +  "</span>");
+				}
+				spans[i].innerHTML = html	
 			//}
 			
 		}
@@ -335,7 +346,7 @@ function unfade(element) {
 	
 
 //window.onmousewheel = function(e) { 
-QueueReadContent.addEventListener('mousewheel', function(e) {  
+document.addEventListener('mousewheel', function(e) {  
 	if (e.wheelDelta < 0) {
 		//if (document.body.scrollWidth - document.body.clientWidth - document.body.scrollLeft < 1) {
 		//if (QueueReadContent.scrollWidth - QueueReadContent.clientWidth - QueueReadContent.scrollLeft < 2) {
@@ -446,8 +457,8 @@ QueueReadContent.addEventListener('touchend', function(e){
 }, false)
 
 document.onkeydown = function(e) {
-	if (e.keyCode == 39) {next();} 
-	else if (e.keyCode == 37 ) {prev();} 
+	if (e.keyCode == 39 || e.keyCode == 34) {next();} 
+	else if (e.keyCode == 37 || e.keyCode == 33) {prev();} 
 };
 
 

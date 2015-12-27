@@ -98,7 +98,8 @@ socket.on('events', function(evt) {
 		//QueueReadContent.insertAdjacentHTML( 'beforeend', data );
 		var allimg = document.querySelectorAll('img');
 		var loadcount = 0;
-		for (var i = 0; i < allimg.length; i++)        
+		for (var i = 0; i < allimg.length; i++) {
+			allimg[i].addEventListener("error", function() { loadcount++;}); 
 			allimg[i].addEventListener("load", function() { loadcount++; if (loadcount == allimg.length) {			
 				stepdesc = 0;
 				for (var i = 0 ; i < QueueReadContent.childNodes.length ; i ++) {
@@ -115,7 +116,7 @@ socket.on('events', function(evt) {
 				}				
 			} });
 		
-		
+		}
 		
 		var anchors = QueueReadContent.querySelectorAll('a');
 		for (var i = 0 ; i < anchors.length ;  i++) { 
@@ -143,7 +144,7 @@ socket.on('events', function(evt) {
 		for (var i = 1 ; i < spans.length ;  i++) {
 			var html = spans[i].innerHTML;
 
-			if (book != "twitter") {
+			//if (book != "twitter") {
 			//var pos1 = html.indexOf(" : ");
 			var pos1 = 0;
 			//var checkkey = html.substring(pos1 ,pos1 + 1);
@@ -190,9 +191,9 @@ socket.on('events', function(evt) {
 					content = content + "..." + html.substring(pos3,html.length);
 				}
 				
-				spans[i].innerHTML = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
+				html = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
 			//}
-			} else {
+			//} else {
 				
 				var highlight = ['Docker','DevOps','XBox','Deep Learning','Google','VR','Kids','Kickstarter','microservice',
 								 'Twitter','MongoDB','search',' Uber','Facebook','Map',' app ','Apple','Microsoft',
@@ -202,7 +203,7 @@ socket.on('events', function(evt) {
 					html = html.replace(re , "<span class='BigTitle'>" + highlight[z] +  "</span>");
 				}
 				spans[i].innerHTML = html	
-			}
+			//}
 			
 		}
 		

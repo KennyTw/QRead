@@ -36,7 +36,7 @@ hr {   display: block !important; border: 0;  height: 1px;  background-color: #7
   bottom: 0px;
   /* right: 10px; */
   border-radius: 5px 5px 0px 0px;
-  min-height: 99%;
+  max-height: 95%;
   -webkit-column-count: 4;
   /*-webkit-column-gap: 40px;*/
   /*-webkit-column-width: 300px;*/
@@ -69,13 +69,13 @@ img {
 	#QueueReadContent {	
 		line-height: 18px;
 		font-size: 15px;
-		-webkit-column-count: 7;
+		-webkit-column-count: 5;
 		-webkit-column-gap: 0px;
 		
 	}	
 	
 	#QueueReadContent >span {
-		height: 128px;
+		/*height: 128px;*/
 		overflow-y: scroll;
 		display: inline-block;
 		padding: 2px 4px 0px 4px;
