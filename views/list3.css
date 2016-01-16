@@ -8,6 +8,8 @@ body {
 
 hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D; }   
 
+a {  color: white; text-decoration: underline;}
+
 ::-webkit-scrollbar { width: 6px; height: 6px; } 
 
 ::-webkit-scrollbar-thumb {background: #959595;  border-radius: 10px;	}

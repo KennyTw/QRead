@@ -1,11 +1,13 @@
 body {
-	background:black;
+	background:#3B3D79;
 }
 
 /* hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D;   margin: 16px 0px 8px 0px;} */  
 
 
-hr {   display: block !important; border: 0;  height: 1px;  background-color: #732D2D; }   
+hr {   display: none !important; border: 0;  height: 1px;  background-color: #732D2D; }  
+
+a {  color: white; text-decoration: underline;}
 
 ::-webkit-scrollbar { width: 6px; height: 6px; } 
 
@@ -67,7 +69,7 @@ img {
 @media only screen and (min-width:1366px) and (max-width: 3200px) {
 	
 	#QueueReadContent {	
-		line-height: 18px;
+		line-height: 23px;
 		font-size: 15px;
 		-webkit-column-count: 5;
 		-webkit-column-gap: 0px;
@@ -78,7 +80,12 @@ img {
 		/*height: 128px;*/
 		overflow-y: scroll;
 		display: inline-block;
-		padding: 2px 4px 0px 4px;
+		padding: 2px 4px 0px 4px;		
+		background: #000000;
+		border-radius: 2px;		
+		padding: 0.5rem;
+		margin: 0.4rem;		
+		box-shadow: 0 3px 6px rgb(0, 0, 0), 0 3px 6px rgb(0, 0, 0);
 	}
 	
 	#QueueReadContent >span:hover { 
@@ -96,10 +103,22 @@ img {
   #QueueReadContent {	
 	-webkit-column-count: 2;
 	font-size: 13px;	
-	line-height: 14px;
-	-webkit-column-gap: 8px;
+	line-height: 15px;
+	-webkit-column-gap: 2px;
 	
   }	
+  
+ #QueueReadContent >span {
+		/*height: 128px;*/
+		overflow-y: scroll;
+		display: inline-block;
+		padding: 2px 4px 0px 4px;
+		background: #000000;
+		border-radius: 2px;		
+		padding: 0.3rem;
+		margin: 0.3rem;		
+		box-shadow: 0 3px 6px rgb(0, 0, 0), 0 3px 6px rgb(0, 0, 0);
+	}
   
   .BigTitle {
 	font-size: larger;
@@ -125,9 +144,9 @@ img {
 @media only screen and (min-width:760px) and (max-width: 1024px) {
   #QueueReadContent {	
 	-webkit-column-count: 3;
-	font-size: 13px;	
-	line-height: 18.5px;
-	-webkit-column-gap: 8px;
+	font-size: 14px;	
+	line-height: 19px;
+	-webkit-column-gap: 4px;
 	
   }	
   
@@ -149,4 +168,16 @@ img {
 	max-height: 150px;   
 	object-fit: cover;
   }
+  
+  #QueueReadContent >span {
+		/*height: 128px;*/
+		overflow-y: scroll;
+		display: inline-block;
+		padding: 2px 4px 0px 4px;		
+		background: #000000;
+		border-radius: 2px;		
+		padding: 0.3rem;
+		margin: 0.3rem;		
+		box-shadow: 0 3px 6px rgb(0, 0, 0), 0 3px 6px rgb(0, 0, 0);
+	}
 }

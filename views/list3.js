@@ -8,6 +8,7 @@ var step = parseInt(document.getElementById('step').value);
 var stepdesc = 0;
 var laststep = step;
 var sendqueue = [];
+var savepage = 0;
 
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
@@ -83,8 +84,15 @@ socket.on('events', function(evt) {
 				oldtitle = oldtitle.substring(pos1 + 2,oldtitle.length);
 			} 					
 			window.parent.document.title = "(" + (evt.total - savetotal) + ") " + oldtitle;	
+			
+			if (evt.total - parseInt(page) > step  &&  savepage == page) {
+				var qcounter = document.getElementById('QreadCounter');
+				qcounter.innerHTML = "[<a href='javascript:' id=QueueReadNext>" + (parseInt(page) + 1) + "/" + total + "</a>] [<a href='javascript:' id=QueueReadBack>" +  (parseInt(total) -  (parseInt(page) + 1))  + "</a>] "
+				return;				
+			}
 		} 
 		
+		savepage = page;
 		total = evt.total;
 		book = evt.book;
 		//var data = evt.dbdata[0].replace("<br><br>","");
@@ -198,11 +206,19 @@ socket.on('events', function(evt) {
 				var highlight = ['Docker','DevOps','XBox','Deep Learning','Google','VR','Kids','Kickstarter','microservice',
 								 'Twitter','MongoDB','search',' Uber','Facebook','Map',' app ','Apple','Microsoft',
 								 'Android','API','Samsung','.js'];
+				
+				var pos4 = html.indexOf("<a");
+				var pos5 = html.indexOf("<img");
+				
+				if (pos4 > pos5 && pos5 > 0) pos4 = pos5;
+				var contentleft = html.substring(0, pos4);
+				var contentright = html.substring(pos4, html.length);
+				
 				for (var z = 0 ; z < highlight.length ; z ++) {
 					var re = new RegExp(highlight[z],"ig");
-					html = html.replace(re , "<span class='BigTitle'>" + highlight[z] +  "</span>");
+					contentleft = contentleft.replace(re , "<span class='BigTitle'>" + highlight[z] +  "</span>");
 				}
-				spans[i].innerHTML = html	
+				spans[i].innerHTML = contentleft + contentright;	
 			//}
 			
 		}

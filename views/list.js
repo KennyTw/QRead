@@ -8,6 +8,7 @@ var step = parseInt(document.getElementById('step').value);
 var stepdesc = 0;
 var laststep = step;
 var sendqueue = [];
+var savepage = 0;
 
 var socket = io.connect("http://104.155.234.188",{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
@@ -65,7 +66,7 @@ socket.on('events', function(evt) {
 	function go() {
 		if (evt.book == "kennyq") return;
 		
-
+		QueueReadContent.style.opacity = 1;
 		page = evt.page;
 		//var totalchange = false
 		//if (evt.total != total && total-page <=  step)	
@@ -83,8 +84,15 @@ socket.on('events', function(evt) {
 				oldtitle = oldtitle.substring(pos1 + 2,oldtitle.length);
 			} 					
 			window.parent.document.title = "(" + (evt.total - savetotal) + ") " + oldtitle;	
+			
+			if (evt.total - parseInt(page) > step  &&  savepage == page) {
+				var qcounter = document.getElementById('QreadCounter');
+				qcounter.innerHTML = "[<a href='javascript:' id=QueueReadNext>" + (parseInt(page) + 1) + "/" + total + "</a>] [<a href='javascript:' id=QueueReadBack>" +  (parseInt(total) -  (parseInt(page) + 1))  + "</a>] "
+				return;				
+			}
 		} 
 		
+		savepage = page;
 		total = evt.total;
 		book = evt.book;
 		//var data = evt.dbdata[0].replace("<br><br>","");
@@ -109,7 +117,7 @@ socket.on('events', function(evt) {
 						 //if (rect.left + (rect.width/3) >= window.screen.width * ratio) {
 						if (rect.left + (rect.width) >= window.innerWidth || 
 							rect.top + (rect.height) >= window.innerHeight) {
-							obj.style.opacity = 0.3; 
+							obj.style.opacity = 0; 
 							stepdesc ++;
 						 }
 					}
@@ -127,7 +135,7 @@ socket.on('events', function(evt) {
 					 //if (rect.left + (rect.width/3) >= window.screen.width * ratio) {
 					if (rect.left + (rect.width) >= window.innerWidth || 
 						rect.top + (rect.height) >= window.innerHeight) {
-						obj.style.opacity = 0.3; 
+						obj.style.opacity = 0; 
 						stepdesc ++;
 					 }
 				}
@@ -187,22 +195,32 @@ socket.on('events', function(evt) {
 				
 				//if (pos2 - pos1 > 20) pos2 = pos1 + 20;
 				var content =  html.substring(pos2, html.length);
-				var contenttext = html.substring(pos2,pos3);
+				var contenttext = html.substring(pos2,pos3); 
+				
 				if (contenttext.length > 80) {
 					content = contenttext.substring(0, 80);
 					content = content + "..." + html.substring(pos3,html.length);
 				}
 				
-				html = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;
+				html = html.substring(0,pos1) + "<span class='BigTitle'>"  + html.substring(pos1 , pos2) + "</span>" + content;				
 				
 				var highlight = ['Docker','DevOps','XBox','Deep Learning','Google','VR','Kids','Kickstarter','microservice',
 								 'Twitter','MongoDB','search',' Uber','Facebook','Map',' app ','Apple','Microsoft',
 								 'Android','API','Samsung','.js'];
+				
+				var pos4 = html.indexOf("<a");
+				var pos5 = html.indexOf("<img");
+				
+				if (pos4 > pos5 && pos5 > 0) pos4 = pos5;
+				var contentleft = html.substring(0, pos4);
+				var contentright = html.substring(pos4, html.length);
+				
 				for (var z = 0 ; z < highlight.length ; z ++) {
 					var re = new RegExp(highlight[z],"ig");
-					html = html.replace(re , "<span class='BigTitle'>" + highlight[z] +  "</span>");
+					contentleft = contentleft.replace(re , "<span class='BigTitle'>" + highlight[z] +  "</span>");
 				}
-				spans[i].innerHTML = html	
+				
+				spans[i].innerHTML = contentleft + contentright;	
 			//}
 			
 		}
@@ -233,6 +251,7 @@ socket.on('events', function(evt) {
 		
 		
 		savetotal2 = evt.total;
+		
 	}
 	
 	if (evt.command == 'sync') {		
@@ -262,8 +281,9 @@ function next() {
 				if (laststep <= 0)
 					laststep = 1;
 				var data = {command:'loaddata',page: parseInt(page) + laststep,book:book};			
-				
+				QueueReadContent.style.opacity = 0.5;
 				send(data,true);
+				
 	} else if (parseInt(page)+1 < parseInt(total)){
 				var newstep = parseInt(total) - parseInt(page) ;
 				laststep = newstep - stepdesc ;
@@ -274,6 +294,7 @@ function next() {
 					laststep --;
 					
 				var data = {command:'loaddata',page: parseInt(page) + laststep ,book:book};			
+				QueueReadContent.style.opacity = 0.5;
 				send(data,true);
 	}
 }	
@@ -284,6 +305,7 @@ function prev() {
 			//window.scrollTo(0,0);
 			if (parseInt(page) - laststep >= 0) {			
 				var data = {command:'loaddata',page: parseInt(page) - laststep,book:book};			
+				QueueReadContent.style.opacity = 0.5;
 				send(data,true);
 			}			
 	}	
@@ -395,6 +417,8 @@ startTime;
 QueueReadContent.addEventListener('touchstart', function(e){ 
 		if (e.target.nodeName == "A") return;
         var touchobj = e.changedTouches[0]
+		
+		//alert(touchobj.pageX  + ',' + document.body.scrollWidth);
 		
 		if (touchobj.pageX < (10 * 2)) {
 			prev();
