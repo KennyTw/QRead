@@ -78,7 +78,7 @@ img {
 	
 	#QueueReadContent >span {
 		/*height: 128px;*/
-		overflow-y: scroll;
+		/*overflow-y: scroll;*/
 		display: inline-block;
 		padding: 2px 4px 0px 4px;		
 		background: #000000;
@@ -110,7 +110,7 @@ img {
   
  #QueueReadContent >span {
 		/*height: 128px;*/
-		overflow-y: scroll;
+		/*overflow-y: scroll;*/
 		display: inline-block;
 		padding: 2px 4px 0px 4px;
 		background: #000000;
@@ -171,7 +171,7 @@ img {
   
   #QueueReadContent >span {
 		/*height: 128px;*/
-		overflow-y: scroll;
+		/*overflow-y: scroll;*/
 		display: inline-block;
 		padding: 2px 4px 0px 4px;		
 		background: #000000;

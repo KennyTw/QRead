@@ -187,7 +187,10 @@ socket.on('events', function(evt) {
 				var pos26 = html.indexOf("。",pos1);
 				if (pos26 < 0) pos26 = html.length;
 				
-				pos2 = Math.min(pos25,pos21,pos22,pos23,pos24,pos26);
+				var pos27 = html.indexOf("\n",pos1);
+				if (pos27 < 0) pos27 = html.length;
+				
+				pos2 = Math.min(pos25,pos21,pos22,pos23,pos24,pos26,pos27);
 				
 				var pos3 = html.indexOf("<",pos1); //html tag
 				if (pos2 > pos3) pos2 = pos3 ;
@@ -311,7 +314,7 @@ function prev() {
 	}	
 }
 
-QueueReadContent.addEventListener('click', function(e) {  
+document.addEventListener('click', function(e) {  
 
 			if (e.target.nodeName == 'A') {
 				if(e.target.id == 'QueueReadBack'){
@@ -414,7 +417,7 @@ allowedTime = 300, // maximum time allowed to travel that distance
 elapsedTime,
 startTime;
 		
-QueueReadContent.addEventListener('touchstart', function(e){ 
+document.addEventListener('touchstart', function(e){ 
 		if (e.target.nodeName == "A") return;
         var touchobj = e.changedTouches[0]
 		
@@ -442,12 +445,12 @@ QueueReadContent.addEventListener('touchstart', function(e){
         e.preventDefault()
 }, false)
 
-QueueReadContent.addEventListener('touchmove', function(e){
+document.addEventListener('touchmove', function(e){
 	if (e.target.nodeName == "A") return;
     e.preventDefault() // prevent scrolling when inside DIV
 }, false)
 
-QueueReadContent.addEventListener('touchend', function(e){
+document.addEventListener('touchend', function(e){
 	if (e.target.nodeName == "A") return;
 	if (startX == null) return;
     var touchobj = e.changedTouches[0]
