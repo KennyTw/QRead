@@ -9,7 +9,7 @@ var stepdesc = 0;
 var laststep = step;
 var sendqueue = [];
 
-var socket = io.connect("http://104.155.234.188",{'forceNew':true });
+var socket = io.connect(window.location.origin,{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
 var TranslateDiv = document.getElementById('TranslateDiv');
 

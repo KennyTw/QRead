@@ -498,4 +498,4 @@ var http = require('http'),
 	evt.subscribe('events');
 	
 		
-server.listen(80); //the port you want to use
+server.listen(3000); //the port you want to use

@@ -11,7 +11,7 @@ var sendqueue = [];
 var lastid = 0;
 var savepage = 0;
 
-var socket = io.connect("http://104.155.234.188",{'forceNew':true });
+var socket = io.connect(window.location.origin,{'forceNew':true });
 var QueueReadContent = document.getElementById('QueueReadContent');
 var TranslateDiv = document.getElementById('TranslateDiv');
 var LastDiv =  document.getElementById('LastDiv');
